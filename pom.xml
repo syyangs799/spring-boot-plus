@@ -19,7 +19,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.geekidea.springbootplus</groupId>
+    <groupId>com.syyang.springbootplus</groupId>
     <artifactId>parent</artifactId>
     <version>2.0</version>
     <packaging>pom</packaging>
@@ -38,8 +38,7 @@
     <developers>
         <developer>
             <id>spring-boot-plus</id>
-            <name>geekidea</name>
-            <email>geekidea@qq.com</email>
+            <name>syyang</name>
         </developer>
     </developers>
 
@@ -298,38 +297,43 @@
 
             <!-- 项目模块start -->
             <dependency>
-                <groupId>io.geekidea.springbootplus</groupId>
+                <groupId>com.syyang.springbootplus</groupId>
                 <artifactId>admin</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.geekidea.springbootplus</groupId>
+                <groupId>com.syyang.springbootplus</groupId>
                 <artifactId>bootstrap</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.geekidea.springbootplus</groupId>
+                <groupId>com.syyang.springbootplus</groupId>
                 <artifactId>config</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.geekidea.springbootplus</groupId>
+                <groupId>com.syyang.springbootplus</groupId>
                 <artifactId>example</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.geekidea.springbootplus</groupId>
+                <groupId>com.syyang.springbootplus</groupId>
                 <artifactId>framework</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.geekidea.springbootplus</groupId>
+                <groupId>com.syyang.springbootplus</groupId>
                 <artifactId>system</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.geekidea.springbootplus</groupId>
+                <groupId>com.syyang.springbootplus</groupId>
                 <artifactId>scheduled</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.syyang.springbootplus</groupId>
+                <artifactId>inventory</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <!-- 项目模块end -->

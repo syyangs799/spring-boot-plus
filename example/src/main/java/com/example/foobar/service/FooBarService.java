@@ -18,8 +18,8 @@ package com.example.foobar.service;
 
 import com.example.foobar.entity.FooBar;
 import com.example.foobar.param.FooBarPageParam;
-import io.geekidea.springbootplus.framework.common.service.BaseService;
-import io.geekidea.springbootplus.framework.core.pagination.Paging;
+import com.syyang.springbootplus.framework.common.service.BaseService;
+import com.syyang.springbootplus.framework.core.pagination.Paging;
 
 /**
  * FooBar 服务类

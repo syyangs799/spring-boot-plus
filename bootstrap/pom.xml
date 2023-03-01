@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.geekidea.springbootplus</groupId>
+        <groupId>com.syyang.springbootplus</groupId>
         <artifactId>parent</artifactId>
         <version>2.0</version>
     </parent>
@@ -36,23 +36,23 @@
             <version>${spring-boot-admin.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.geekidea.springbootplus</groupId>
+            <groupId>com.syyang.springbootplus</groupId>
             <artifactId>framework</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.geekidea.springbootplus</groupId>
+            <groupId>com.syyang.springbootplus</groupId>
             <artifactId>example</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.geekidea.springbootplus</groupId>
+            <groupId>com.syyang.springbootplus</groupId>
             <artifactId>system</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.geekidea.springbootplus</groupId>
+            <groupId>com.syyang.springbootplus</groupId>
             <artifactId>scheduled</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.geekidea.springbootplus</groupId>
+            <groupId>com.syyang.springbootplus</groupId>
             <artifactId>inventory</artifactId>
         </dependency>
     </dependencies>

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package io.geekidea.springbootplus.generator.test;
+package com.syyang.springbootplus.generator.test;
 
-import io.geekidea.springbootplus.generator.CodeGenerator;
-import io.geekidea.springbootplus.generator.properties.GeneratorProperties;
+import com.syyang.springbootplus.generator.CodeGenerator;
+import com.syyang.springbootplus.generator.properties.GeneratorProperties;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

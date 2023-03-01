@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package io.geekidea.springbootplus.test;
+package com.syyang.springbootplus.test;
 
-import io.geekidea.springbootplus.SpringBootPlusApplication;
+import com.syyang.springbootplus.SpringBootPlusApplication;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;

@@ -2,8 +2,8 @@ package com.syyang.inventory.service;
 
 import com.syyang.inventory.entity.FooBar;
 import com.syyang.inventory.param.FooBarPageParam;
-import io.geekidea.springbootplus.framework.common.service.BaseService;
-import io.geekidea.springbootplus.framework.core.pagination.Paging;
+import com.syyang.springbootplus.framework.common.service.BaseService;
+import com.syyang.springbootplus.framework.core.pagination.Paging;
 
 /**
  * FooBar 服务类

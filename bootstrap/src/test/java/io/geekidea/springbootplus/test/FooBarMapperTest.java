@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.geekidea.springbootplus.test;
+package com.syyang.springbootplus.test;
 
 import com.example.foobar.entity.FooBar;
 import com.example.foobar.mapper.FooBarMapper;

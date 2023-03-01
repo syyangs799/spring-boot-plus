@@ -1,6 +1,6 @@
 package com.syyang.inventory.entity;
 
-import io.geekidea.springbootplus.framework.common.entity.BaseEntity;
+import com.syyang.springbootplus.framework.common.entity.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotation.Version;
@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import io.geekidea.springbootplus.framework.core.validator.groups.Update;
+import com.syyang.springbootplus.framework.core.validator.groups.Update;
 
 /**
  * FooBar

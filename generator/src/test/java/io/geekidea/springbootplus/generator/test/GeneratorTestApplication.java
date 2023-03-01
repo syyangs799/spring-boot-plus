@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.geekidea.springbootplus.generator.test;
+package com.syyang.springbootplus.generator.test;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -22,6 +22,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author geekidea
  * @date 2020/3/12
  **/
-@SpringBootApplication(scanBasePackages = "io.geekidea.springbootplus.generator")
+@SpringBootApplication(scanBasePackages = "com.syyang.springbootplus.generator")
 public class GeneratorTestApplication {
 }
