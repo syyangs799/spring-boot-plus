@@ -97,6 +97,7 @@
         <module>generator</module>
         <module>scheduled</module>
         <module>system</module>
+        <module>inventory</module>
     </modules>
 
     <dependencyManagement>
