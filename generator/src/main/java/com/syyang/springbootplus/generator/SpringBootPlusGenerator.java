@@ -52,7 +52,12 @@ public class SpringBootPlusGenerator {
                 .setFileOverride(true);
 
         // 设置表信息
-        generatorProperties.addTable("foo_bar","id");
+        generatorProperties.addTable("inventory_daily_business","id");
+        generatorProperties.addTable("inventory_product_info","id");
+        generatorProperties.addTable("inventory_project_business","id");
+        generatorProperties.addTable("inventory_project_info","id");
+        generatorProperties.addTable("inventory_stock_business","id");
+        generatorProperties.addTable("inventory_stock_info","id");
         // 设置表前缀
 //         generatorProperties.setTablePrefix(Arrays.asList("foo_"));
 
@@ -62,7 +67,7 @@ public class SpringBootPlusGenerator {
                 .setUsername("root")
                 .setPassword("123456")
                 .setDriverName("com.mysql.jdbc.Driver")
-                .setUrl("jdbc:mysql://192.168.139.120:3306/spring_boot_plus?useUnicode=true&characterEncoding=UTF-8&useSSL=false");
+                .setUrl("jdbc:mysql://192.168.139.120:3306/inventory_pro?useUnicode=true&characterEncoding=UTF-8&useSSL=false");
 
         // 生成配置
         generatorProperties.getGeneratorConfig()

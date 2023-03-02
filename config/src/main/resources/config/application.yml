@@ -64,7 +64,7 @@ spring-boot-plus:
   login-init-password: admin
   login-init-head: http://${spring-boot-plus.server-ip}:8888/api/resource/logo.png
   # 实现BaseEnum接口的枚举包
-  enum-packages: com.example.foorbar.enums
+  enum-packages: com.syyang.inventory.enums
   # Swagger路径
   swagger-paths: /swagger-ui.html,/docs,/doc.html,/swagger-resources/**,/webjars/**,/v2/api-docs,/csrf,/v2/api-docs-ext,/null/swagger-resources/**
   # Filter配置
@@ -302,9 +302,9 @@ spring-boot-plus:
     enable: true
     base:
       # 扫描的包，多个包使用逗号隔开
-      package: io.geekidea.springbootplus,com.example
+      package: com.syyang.springbootplus,com.syyang
     contact:
-      email: geekidea@qq.com
+      email: syyang@qq.com
       name: springboot.plus
       url: https://springboot.plus
     description:

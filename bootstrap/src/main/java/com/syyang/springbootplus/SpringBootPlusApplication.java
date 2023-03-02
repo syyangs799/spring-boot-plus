@@ -38,8 +38,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @EnableConfigurationProperties
 @ServletComponentScan
-@MapperScan({"com.syyang.springbootplus.**.mapper", "com.example.**.mapper"})
-@SpringBootApplication(scanBasePackages = {"com.syyang.springbootplus", "com.example"})
+@MapperScan({"com.syyang.springbootplus.**.mapper", "com.syyang.**.mapper"})
+@SpringBootApplication(scanBasePackages = {"com.syyang.springbootplus", "com.syyang"})
 public class SpringBootPlusApplication {
 
     public static void main(String[] args) {
@@ -48,7 +48,7 @@ public class SpringBootPlusApplication {
         // 打印项目信息
         PrintApplicationInfo.print(context);
         // 打印项目提示
-        PrintApplicationInfo.printTip(context);
+//        PrintApplicationInfo.printTip(context);
     }
 
 }

@@ -1,9 +1,9 @@
 spring-boot-plus:
   generator:
     # Maven模块名称
-    maven-module-name: example
+    maven-module-name: inventory
     # 生成的父包全路径名称
-    parent-package: com.example
+    parent-package: com.syyang
     # 业务模块名称
     module-name: foorbar
     # 表前缀

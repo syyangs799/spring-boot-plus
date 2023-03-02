@@ -18,7 +18,7 @@ import com.syyang.springbootplus.framework.core.validator.groups.Update;
  * 库存交易流水表
  *
  * @author syyang
- * @since 2023-03-01
+ * @since 2023-03-02
  */
 @Data
 @Accessors(chain = true)
@@ -55,10 +55,16 @@ public class InventoryStockBusiness extends BaseEntity {
     @ApiModelProperty("创建人")
     private String createUser;
 
+    @ApiModelProperty("当前字段为出库时必填，入库的产品id")
+    private Integer bachId;
+
     @ApiModelProperty("创建时间")
     private Date createTime;
 
     @ApiModelProperty("更新时间")
     private Date updateTime;
+
+    @ApiModelProperty("部门id，用作区分不同的项目id")
+    private Integer departmentId;
 
 }

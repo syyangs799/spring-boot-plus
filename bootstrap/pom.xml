@@ -41,10 +41,6 @@
         </dependency>
         <dependency>
             <groupId>com.syyang.springbootplus</groupId>
-            <artifactId>example</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.syyang.springbootplus</groupId>
             <artifactId>system</artifactId>
         </dependency>
         <dependency>

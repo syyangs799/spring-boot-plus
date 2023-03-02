@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
  * 产品信息表 控制器
  *
  * @author syyang
- * @since 2023-03-01
+ * @since 2023-03-02
  */
 @Slf4j
 @RestController

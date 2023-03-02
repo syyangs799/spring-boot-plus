@@ -18,7 +18,7 @@ import com.syyang.springbootplus.framework.core.validator.groups.Update;
  * 项目收入与支出交易流水表
  *
  * @author syyang
- * @since 2023-03-01
+ * @since 2023-03-02
  */
 @Data
 @Accessors(chain = true)
@@ -76,5 +76,8 @@ public class InventoryProjectBusiness extends BaseEntity {
 
     @ApiModelProperty("附件路径")
     private String uploadFilePath;
+
+    @ApiModelProperty("部门id，用作区分不同的部门权限")
+    private Integer departmentId;
 
 }

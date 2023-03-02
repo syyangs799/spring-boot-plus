@@ -18,7 +18,7 @@ import com.syyang.springbootplus.framework.core.validator.groups.Update;
  * 库存信息表
  *
  * @author syyang
- * @since 2023-03-01
+ * @since 2023-03-02
  */
 @Data
 @Accessors(chain = true)
@@ -49,5 +49,8 @@ public class InventoryStockInfo extends BaseEntity {
 
     @ApiModelProperty("创建人")
     private String createUser;
+
+    @ApiModelProperty("部门id，用作区分不同的部门权限")
+    private Integer departmentId;
 
 }

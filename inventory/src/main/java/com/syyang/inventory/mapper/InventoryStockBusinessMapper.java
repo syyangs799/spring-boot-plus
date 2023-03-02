@@ -15,7 +15,7 @@ import java.io.Serializable;
  * 库存交易流水表 Mapper 接口
  *
  * @author syyang
- * @since 2023-03-01
+ * @since 2023-03-02
  */
 @Repository
 public interface InventoryStockBusinessMapper extends BaseMapper<InventoryStockBusiness> {

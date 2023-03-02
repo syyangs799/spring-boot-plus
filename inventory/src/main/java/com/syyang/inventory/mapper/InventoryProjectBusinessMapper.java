@@ -15,7 +15,7 @@ import java.io.Serializable;
  * 项目收入与支出交易流水表 Mapper 接口
  *
  * @author syyang
- * @since 2023-03-01
+ * @since 2023-03-02
  */
 @Repository
 public interface InventoryProjectBusinessMapper extends BaseMapper<InventoryProjectBusiness> {

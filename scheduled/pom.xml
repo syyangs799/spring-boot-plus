@@ -33,7 +33,7 @@
     <dependencies>
         <dependency>
             <groupId>com.syyang.springbootplus</groupId>
-            <artifactId>example</artifactId>
+            <artifactId>inventory</artifactId>
         </dependency>
     </dependencies>
 

@@ -18,7 +18,7 @@ import com.syyang.springbootplus.framework.core.validator.groups.Update;
  * 项目信息表
  *
  * @author syyang
- * @since 2023-03-01
+ * @since 2023-03-02
  */
 @Data
 @Accessors(chain = true)
@@ -115,5 +115,8 @@ public class InventoryProjectInfo extends BaseEntity {
 
     @ApiModelProperty("项目更新时间")
     private Date updateTime;
+
+    @ApiModelProperty("部门id，用作区分不同的项目权限")
+    private Integer departmentId;
 
 }

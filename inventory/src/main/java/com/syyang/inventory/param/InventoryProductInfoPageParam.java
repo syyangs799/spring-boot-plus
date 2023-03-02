@@ -12,7 +12,7 @@ import com.syyang.springbootplus.framework.core.pagination.BasePageOrderParam;
  * </pre>
  *
  * @author syyang
- * @date 2023-03-01
+ * @date 2023-03-02
  */
 @Data
 @Accessors(chain = true)

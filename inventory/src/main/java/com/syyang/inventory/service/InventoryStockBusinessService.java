@@ -9,7 +9,7 @@ import com.syyang.springbootplus.framework.core.pagination.Paging;
  * 库存交易流水表 服务类
  *
  * @author syyang
- * @since 2023-03-01
+ * @since 2023-03-02
  */
 public interface InventoryStockBusinessService extends BaseService<InventoryStockBusiness> {
 

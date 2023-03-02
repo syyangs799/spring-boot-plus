@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * 产品信息表 服务实现类
  *
  * @author syyang
- * @since 2023-03-01
+ * @since 2023-03-02
  */
 @Slf4j
 @Service
