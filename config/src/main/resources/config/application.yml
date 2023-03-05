@@ -4,7 +4,7 @@
 server:
   port: 8888
   servlet:
-    context-path: /api
+    context-path: /inventory
   tomcat:
     max-threads: 1000
     min-spare-threads: 30
@@ -236,7 +236,7 @@ mybatis-plus:
   # 启动时是否检查MyBatis XML文件是否存在
   check-config-location: true
   # 支持统配符 * 或者 ; 分割
-  typeEnumsPackage: io.geekidea.springbootplus.*.enums
+  typeEnumsPackage: com.syyang.springbootplus.*.enums
   # MyBatis原生配置
   configuration:
     # 字段名称下划线转驼峰命名
@@ -375,7 +375,7 @@ info:
   project-groupId: '@project.parent.groupId@'
   project-name: ${spring.application.name}
   project-finalName: '@boot.artifact.name@'
-  project-author: geekidea
+  project-author: syyang
   project-description: ${spring.application.name} project
   project-sourceEncoding: '@project.build.sourceEncoding@'
   project-spring-boot-version: '@spring-boot.version@'
