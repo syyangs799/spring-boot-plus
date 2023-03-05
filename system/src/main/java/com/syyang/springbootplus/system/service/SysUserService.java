@@ -20,6 +20,7 @@ import com.syyang.springbootplus.framework.common.service.BaseService;
 import com.syyang.springbootplus.framework.core.pagination.Paging;
 import com.syyang.springbootplus.system.entity.SysUser;
 import com.syyang.springbootplus.system.param.sysuser.ResetPasswordParam;
+import com.syyang.springbootplus.system.param.sysuser.RetrievePasswordParam;
 import com.syyang.springbootplus.system.param.sysuser.SysUserPageParam;
 import com.syyang.springbootplus.system.param.sysuser.UpdatePasswordParam;
 import com.syyang.springbootplus.system.vo.SysUserQueryVo;
@@ -135,4 +136,6 @@ public interface SysUserService extends BaseService<SysUser> {
      * @throws Exception
      */
     boolean resetPassword(ResetPasswordParam resetPasswordParam) throws Exception;
+
+    boolean retrievePassword(RetrievePasswordParam retrievePasswordParam) throws Exception;
 }

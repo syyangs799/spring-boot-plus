@@ -19,8 +19,11 @@ package com.syyang.springbootplus.system.controller;
 import com.alibaba.fastjson.JSON;
 import com.syyang.springbootplus.framework.common.api.ApiResult;
 import com.syyang.springbootplus.framework.log.annotation.Module;
+import com.syyang.springbootplus.framework.log.annotation.OperationLog;
 import com.syyang.springbootplus.framework.log.annotation.OperationLogIgnore;
+import com.syyang.springbootplus.framework.log.enums.OperationLogType;
 import com.syyang.springbootplus.framework.shiro.util.JwtTokenUtil;
+import com.syyang.springbootplus.system.param.sysuser.RetrievePasswordParam;
 import com.syyang.springbootplus.system.service.LoginService;
 import com.syyang.springbootplus.system.service.SysUserService;
 import com.syyang.springbootplus.system.vo.LoginSysUserTokenVo;
@@ -28,6 +31,7 @@ import com.syyang.springbootplus.system.vo.SysUserQueryVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
@@ -101,6 +105,18 @@ public class LoginController {
     public ApiResult<String> logout(HttpServletRequest request) throws Exception {
         loginService.logout(request);
         return ApiResult.ok("退出成功");
+    }
+
+
+    /**
+     * 用户找回密码
+     */
+    @PostMapping("/retrievePassword")
+    @OperationLog(name = "用户找回密码", type = OperationLogType.UPDATE)
+    @ApiOperation(value = "用户找回密码", response = ApiResult.class)
+    public ApiResult<Boolean> retrievePassword(@Validated @RequestBody RetrievePasswordParam retrievePasswordParam) throws Exception {
+        boolean flag = sysUserService.retrievePassword(retrievePasswordParam);
+        return ApiResult.result(flag);
     }
 
 }

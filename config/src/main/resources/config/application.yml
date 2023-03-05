@@ -182,8 +182,8 @@ spring-boot-plus:
     enable: true
     # 权限配置
     anon:
-      # 排除登录登出
-      - /login,/logout
+      # 排除登录登出 和重置密码
+      - /login,/logout,/retrievePassword
       # 排除静态资源
       - /static/**,/templates/**
       # 排除Swagger
@@ -258,7 +258,7 @@ mybatis-plus:
 ---
 spring:
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.zaxxer.hikari.HikariDataSource
     cachePrepStmts: true
     prepStmtCacheSize: 300

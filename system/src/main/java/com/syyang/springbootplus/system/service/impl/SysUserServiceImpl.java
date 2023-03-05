@@ -32,6 +32,7 @@ import com.syyang.springbootplus.system.entity.SysUser;
 import com.syyang.springbootplus.system.enums.StateEnum;
 import com.syyang.springbootplus.system.mapper.SysUserMapper;
 import com.syyang.springbootplus.system.param.sysuser.ResetPasswordParam;
+import com.syyang.springbootplus.system.param.sysuser.RetrievePasswordParam;
 import com.syyang.springbootplus.system.param.sysuser.SysUserPageParam;
 import com.syyang.springbootplus.system.param.sysuser.UpdatePasswordParam;
 import com.syyang.springbootplus.system.service.SysDepartmentService;
@@ -243,6 +244,39 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserMapper, SysUser> 
         SysUser sysUser = getById(resetPasswordParam.getUserId());
         if (sysUser == null) {
             throw new BusinessException("用户不存在");
+        }
+        if (StateEnum.DISABLE.getCode().equals(sysUser.getState())) {
+            throw new BusinessException("用户已禁用");
+        }
+        // 密码加密处理
+        String salt = sysUser.getSalt();
+        // 新密码加密
+        String encryptNewPassword = PasswordUtil.encrypt(newPassword, salt);
+
+        // 修改密码
+        SysUser updateSysUser = new SysUser()
+                .setId(sysUser.getId())
+                .setPassword(encryptNewPassword)
+                .setUpdateTime(new Date());
+        return updateById(updateSysUser);
+    }
+
+    @Override
+    public boolean retrievePassword(RetrievePasswordParam retrievePasswordParam) throws Exception {
+        String newPassword = retrievePasswordParam.getNewPassword();
+        String confirmPassword = retrievePasswordParam.getConfirmPassword();
+        if (!newPassword.equals(confirmPassword)) {
+            throw new BusinessException("两次输入的密码不一致");
+        }
+        // 判断用户是否可修改
+        SysUser sysUserEntity = new SysUser()
+                .setUsername(retrievePasswordParam.getUsername());
+//                .setPhone(retrievePasswordParam.getPhone());
+        SysUser sysUser = sysUserMapper.selectOne(new QueryWrapper<SysUser>(sysUserEntity));
+        if (sysUser == null) {
+            throw new BusinessException("用户不存在");
+        }else if(!sysUser.getPhone().equals(retrievePasswordParam.getPhone())){
+            throw new BusinessException("用户输入的电话号码和当前用户号码不一致，请检查输入!");
         }
         if (StateEnum.DISABLE.getCode().equals(sysUser.getState())) {
             throw new BusinessException("用户已禁用");
