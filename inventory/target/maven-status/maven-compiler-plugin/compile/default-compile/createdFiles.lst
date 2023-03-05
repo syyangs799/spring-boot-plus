@@ -1,6 +1,0 @@
-com\syyang\inventory\service\impl\FooBarServiceImpl.class
-com\syyang\inventory\entity\FooBar.class
-com\syyang\inventory\service\FooBarService.class
-com\syyang\inventory\mapper\FooBarMapper.class
-com\syyang\inventory\controller\FooBarController.class
-com\syyang\inventory\param\FooBarPageParam.class
