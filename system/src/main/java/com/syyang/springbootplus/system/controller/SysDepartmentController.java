@@ -24,9 +24,12 @@ import com.syyang.springbootplus.framework.log.annotation.OperationLog;
 import com.syyang.springbootplus.framework.log.enums.OperationLogType;
 import com.syyang.springbootplus.system.entity.SysDepartment;
 import com.syyang.springbootplus.system.param.SysDepartmentPageParam;
+import com.syyang.springbootplus.system.param.sysuser.SysUserPageParam;
 import com.syyang.springbootplus.system.service.SysDepartmentService;
+import com.syyang.springbootplus.system.service.SysUserService;
 import com.syyang.springbootplus.system.vo.SysDepartmentQueryVo;
 import com.syyang.springbootplus.system.vo.SysDepartmentTreeVo;
+import com.syyang.springbootplus.system.vo.SysUserQueryVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +54,9 @@ import java.util.List;
 @Module("system")
 @Api(value = "系统部门API", tags = {"系统部门"})
 public class SysDepartmentController extends BaseController {
+
+    @Autowired
+    private SysUserService sysUserService;
 
     @Autowired
     private SysDepartmentService sysDepartmentService;
@@ -86,9 +92,21 @@ public class SysDepartmentController extends BaseController {
     @RequiresPermissions("sys:department:delete")
     @OperationLog(name = "删除部门", type = OperationLogType.DELETE)
     @ApiOperation(value = "删除部门", response = ApiResult.class)
-    public ApiResult<Boolean> deleteSysDepartment(@PathVariable("id") Long id) throws Exception {
-        boolean flag = sysDepartmentService.deleteSysDepartment(id);
-        return ApiResult.result(flag);
+    public ApiResult<String> deleteSysDepartment(@PathVariable("id") Long id) throws Exception {
+        //判断该部门是否有人
+        SysUserPageParam sysUserPageParam  = new SysUserPageParam();
+        sysUserPageParam.setDepartmentId(id);
+        Paging<SysUserQueryVo> sysUserPageList = sysUserService.getSysUserPageList(sysUserPageParam);
+        if(sysUserPageList.getTotal()>0) {
+            boolean flag = sysDepartmentService.deleteSysDepartment(id);
+            if(flag) {
+                return ApiResult.ok("删除成功");
+            }else{
+                return ApiResult.fail("删除失败!");
+            }
+        }else{
+            return ApiResult.fail(500,"当前部门存在关联用户，删除失败！");
+        }
     }
 
     /**
