@@ -97,7 +97,7 @@ public class SysDepartmentController extends BaseController {
         SysUserPageParam sysUserPageParam  = new SysUserPageParam();
         sysUserPageParam.setDepartmentId(id);
         Paging<SysUserQueryVo> sysUserPageList = sysUserService.getSysUserPageList(sysUserPageParam);
-        if(sysUserPageList.getTotal()>0) {
+        if(sysUserPageList.getTotal()<=0) {
             boolean flag = sysDepartmentService.deleteSysDepartment(id);
             if(flag) {
                 return ApiResult.ok("删除成功");
