@@ -85,6 +85,7 @@ spring-boot-plus:
     permission:
       enable: false
       include-paths: /**
+      package-path: com.syyang
     resource:
       enable: false
       include-paths: ${spring-boot-plus.resource-access-patterns}

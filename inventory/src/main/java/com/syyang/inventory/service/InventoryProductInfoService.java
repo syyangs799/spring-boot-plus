@@ -44,7 +44,7 @@ public interface InventoryProductInfoService extends BaseService<InventoryProduc
     /**
      * 获取分页对象
      *
-     * @param inventoryProductInfoQueryParam
+     * @param inventoryProductInfoPageParam
      * @return
      * @throws Exception
      */

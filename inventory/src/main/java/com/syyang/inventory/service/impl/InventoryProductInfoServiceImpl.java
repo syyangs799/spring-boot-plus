@@ -5,6 +5,7 @@ import com.syyang.inventory.mapper.InventoryProductInfoMapper;
 import com.syyang.inventory.service.InventoryProductInfoService;
 import com.syyang.inventory.param.InventoryProductInfoPageParam;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.syyang.springbootplus.framework.common.annotationun.ProjectDataPermission;
 import com.syyang.springbootplus.framework.common.service.impl.BaseServiceImpl;
 import com.syyang.springbootplus.framework.core.pagination.Paging;
 import com.syyang.springbootplus.framework.core.pagination.PageInfo;

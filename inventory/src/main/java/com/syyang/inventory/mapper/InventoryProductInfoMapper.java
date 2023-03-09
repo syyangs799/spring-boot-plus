@@ -1,9 +1,11 @@
 package com.syyang.inventory.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.syyang.inventory.entity.InventoryProductInfo;
 import com.syyang.inventory.param.InventoryProductInfoPageParam;
 
+import com.syyang.springbootplus.framework.common.annotationun.ProjectDataPermission;
 import org.springframework.stereotype.Repository;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -18,7 +20,10 @@ import java.io.Serializable;
  * @since 2023-03-02
  */
 @Repository
+@ProjectDataPermission
 public interface InventoryProductInfoMapper extends BaseMapper<InventoryProductInfo> {
 
 
+    @ProjectDataPermission(isCreateUserPermi = false,isDepartmentPermi = true)
+    <E extends IPage<InventoryProductInfo>> E selectPage(E page, @Param("ew") Wrapper<InventoryProductInfo> queryWrapper);
 }
