@@ -17,10 +17,12 @@
 package com.syyang.springbootplus.config;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.syyang.springbootplus.config.properties.SpringBootPlusFilterProperties;
 import com.syyang.springbootplus.config.properties.SpringBootPlusInterceptorProperties;
 import com.syyang.springbootplus.config.properties.SpringBootPlusProperties;
 import com.syyang.springbootplus.framework.core.filter.RequestDetailFilter;
+import com.syyang.springbootplus.framework.core.handle.CreateAndUpdateMetaObjectHandler;
 import com.syyang.springbootplus.framework.core.interceptor.PermissionInterceptor;
 import com.syyang.springbootplus.framework.core.xss.XssFilter;
 import com.syyang.springbootplus.framework.util.IniUtil;
@@ -141,6 +143,14 @@ public class SpringBootPlusWebMvcConfig implements WebMvcConfigurer {
         return new DownloadInterceptor();
     }
 
+
+    /**
+     * 元对象字段填充控制器
+     */
+    @Bean
+    public MetaObjectHandler metaObjectHandler() {
+        return new CreateAndUpdateMetaObjectHandler();
+    }
 
     @PostConstruct
     public void init() {

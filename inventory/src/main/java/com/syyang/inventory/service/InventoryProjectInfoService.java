@@ -5,6 +5,8 @@ import com.syyang.inventory.param.InventoryProjectInfoPageParam;
 import com.syyang.springbootplus.framework.common.service.BaseService;
 import com.syyang.springbootplus.framework.core.pagination.Paging;
 
+import java.util.List;
+
 /**
  * 项目信息表 服务类
  *
@@ -50,4 +52,5 @@ public interface InventoryProjectInfoService extends BaseService<InventoryProjec
      */
     Paging<InventoryProjectInfo> getInventoryProjectInfoPageList(InventoryProjectInfoPageParam inventoryProjectInfoPageParam) throws Exception;
 
+    List<InventoryProjectInfo> getInventoryProjectInfoList(InventoryProjectInfoPageParam inventoryProjectInfoPageParam);
 }

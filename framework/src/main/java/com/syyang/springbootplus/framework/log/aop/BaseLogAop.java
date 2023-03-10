@@ -16,6 +16,7 @@
 
 package com.syyang.springbootplus.framework.log.aop;
 
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
@@ -789,7 +790,8 @@ public abstract class BaseLogAop {
                         .setToken(requestInfo.getTokenMd5());
 
                 // 设置参数字符串
-                sysOperationLog.setParam(Jackson.toJsonStringNonNull(requestInfo.getParam()));
+//                sysOperationLog.setParam(Jackson.toJsonStringNonNull(requestInfo.getParam()));
+                sysOperationLog.setParam(JSONUtil.toJsonStr(requestInfo.getParam()));
                 // User-Agent
                 ClientInfo clientInfo = ClientInfoUtil.get(requestInfo.getUserAgent());
                 if (clientInfo != null) {

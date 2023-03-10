@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 产品信息表 Mapper 接口
@@ -26,4 +27,8 @@ public interface InventoryProductInfoMapper extends BaseMapper<InventoryProductI
 
     @ProjectDataPermission(isCreateUserPermi = false,isDepartmentPermi = true)
     <E extends IPage<InventoryProductInfo>> E selectPage(E page, @Param("ew") Wrapper<InventoryProductInfo> queryWrapper);
+
+    @ProjectDataPermission(isCreateUserPermi = false,isDepartmentPermi = true)
+    List<InventoryProductInfo> selectList(@Param("ew") Wrapper<InventoryProductInfo> queryWrapper);
+
 }

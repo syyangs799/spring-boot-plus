@@ -1,10 +1,16 @@
 package com.syyang.inventory.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.syyang.springbootplus.framework.common.entity.BaseEntity;
+
+import java.time.LocalDateTime;
 import java.util.Date;
-import com.baomidou.mybatisplus.annotation.Version;
-import com.baomidou.mybatisplus.annotation.TableId;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -48,12 +54,13 @@ public class InventoryDailyBusiness extends BaseEntity {
     private String amountTaxes;
 
     @ApiModelProperty("交易时间")
-    private Date businessTime;
+    private LocalDateTime businessTime;
 
     @ApiModelProperty("备注信息")
     private String remark;
 
     @ApiModelProperty("创建人")
+    @TableField(fill = FieldFill.INSERT)
     private String createUser;
 
     @ApiModelProperty("交易状态 0表示创建 1表示提交审批 2表示通过 -1表示未通过")
@@ -66,13 +73,21 @@ public class InventoryDailyBusiness extends BaseEntity {
     private String approver;
 
     @ApiModelProperty("审核时间")
-    private Date approveTime;
+    private LocalDateTime approveTime;
 
     @ApiModelProperty("创建日期")
-    private Date createTime;
+    @TableField(fill = FieldFill.INSERT)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private LocalDateTime createTime;
 
     @ApiModelProperty("更新时间")
-    private Date updateTime;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private LocalDateTime updateTime;
 
     @ApiModelProperty("附件名称")
     private String uploadFileName;
@@ -81,6 +96,7 @@ public class InventoryDailyBusiness extends BaseEntity {
     private String uploadFilePath;
 
     @ApiModelProperty("部门id，用作项目权限区分")
+    @TableField(fill = FieldFill.INSERT)
     private Integer departmentId;
 
 }

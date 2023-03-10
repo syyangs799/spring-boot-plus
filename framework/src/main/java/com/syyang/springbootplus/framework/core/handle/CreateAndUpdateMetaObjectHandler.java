@@ -1,9 +1,6 @@
 package com.syyang.springbootplus.framework.core.handle;
 
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.http.HttpStatus;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
-import com.syyang.springbootplus.framework.common.entity.BaseEntity;
 import com.syyang.springbootplus.framework.shiro.cache.LoginRedisService;
 import com.syyang.springbootplus.framework.shiro.util.JwtTokenUtil;
 import com.syyang.springbootplus.framework.shiro.util.JwtUtil;
@@ -35,11 +32,11 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
             if (metaObject.hasSetter("updateTime") && Objects.isNull(metaObject.getValue("updateTime"))) {
                 metaObject.setValue("updateTime", LocalDateTime.now());
             }
-            if (metaObject.hasSetter("create_user") && Objects.isNull(metaObject.getValue("create_user"))) {
-                metaObject.setValue("create_user", JwtUtil.getUsername(JwtTokenUtil.getToken()));
+            if (metaObject.hasSetter("createUser") && Objects.isNull(metaObject.getValue("createUser"))) {
+                metaObject.setValue("createUser", JwtUtil.getUsername(JwtTokenUtil.getToken()));
             }
-            if (metaObject.hasSetter("department_id") && Objects.isNull(metaObject.getValue("department_id"))) {
-                metaObject.setValue("department_id", loginRedisService.getLoginSysUserRedisVo(JwtUtil.getUsername(JwtTokenUtil.getToken())).getDepartmentId());
+            if (metaObject.hasSetter("departmentId") && Objects.isNull(metaObject.getValue("departmentId"))) {
+                metaObject.setValue("departmentId", loginRedisService.getLoginSysUserRedisVo(JwtUtil.getUsername(JwtTokenUtil.getToken())).getDepartmentId().intValue());
             }
         } catch (Exception e) {
             throw new RuntimeException("自动填充属性异常 => " + e.getLocalizedMessage());

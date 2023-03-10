@@ -5,6 +5,8 @@ import com.syyang.inventory.param.InventoryStockBusinessPageParam;
 import com.syyang.springbootplus.framework.common.service.BaseService;
 import com.syyang.springbootplus.framework.core.pagination.Paging;
 
+import java.util.List;
+
 /**
  * 库存交易流水表 服务类
  *
@@ -50,4 +52,9 @@ public interface InventoryStockBusinessService extends BaseService<InventoryStoc
      */
     Paging<InventoryStockBusiness> getInventoryStockBusinessPageList(InventoryStockBusinessPageParam inventoryStockBusinessPageParam) throws Exception;
 
+    boolean addOutStockBusiness(List<InventoryStockBusiness> inventoryStockBusiness) throws Exception ;
+
+    List<InventoryStockBusiness> getInventoryStockBusinessList(InventoryStockBusinessPageParam inventoryStockBusinessPageParam);
+
+    List<InventoryStockBusiness> getInventoryStockBusinessDeliveredList(InventoryStockBusinessPageParam inventoryStockBusinessPageParam);
 }

@@ -1,9 +1,12 @@
 package com.syyang.inventory.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.syyang.inventory.entity.InventoryDailyBusiness;
+import com.syyang.inventory.entity.InventoryProductInfo;
 import com.syyang.inventory.param.InventoryDailyBusinessPageParam;
 
+import com.syyang.springbootplus.framework.common.annotationun.ProjectDataPermission;
 import org.springframework.stereotype.Repository;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -21,4 +24,6 @@ import java.io.Serializable;
 public interface InventoryDailyBusinessMapper extends BaseMapper<InventoryDailyBusiness> {
 
 
+    @ProjectDataPermission(isCreateUserPermi = false,isDepartmentPermi = true)
+    <E extends IPage<InventoryDailyBusiness>> E selectPage(E page, @Param("ew") Wrapper<InventoryDailyBusiness> queryWrapper);
 }

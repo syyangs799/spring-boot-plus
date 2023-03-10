@@ -1,10 +1,16 @@
 package com.syyang.inventory.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.syyang.springbootplus.framework.common.entity.BaseEntity;
+
+import java.time.LocalDateTime;
 import java.util.Date;
-import com.baomidou.mybatisplus.annotation.Version;
-import com.baomidou.mybatisplus.annotation.TableId;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -27,7 +33,6 @@ import com.syyang.springbootplus.framework.core.validator.groups.Update;
 public class InventoryStockBusiness extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "不能为空")
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
@@ -53,18 +58,28 @@ public class InventoryStockBusiness extends BaseEntity {
     private String productTax;
 
     @ApiModelProperty("创建人")
+    @TableField(fill = FieldFill.INSERT)
     private String createUser;
 
     @ApiModelProperty("当前字段为出库时必填，入库的产品id")
     private Integer bachId;
 
     @ApiModelProperty("创建时间")
-    private Date createTime;
+    @TableField(fill = FieldFill.INSERT)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private LocalDateTime createTime;
 
     @ApiModelProperty("更新时间")
-    private Date updateTime;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private LocalDateTime updateTime;
 
     @ApiModelProperty("部门id，用作区分不同的项目id")
+    @TableField(fill = FieldFill.INSERT)
     private Integer departmentId;
 
 }

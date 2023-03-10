@@ -19,6 +19,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 产品信息表 控制器
  *
@@ -90,5 +92,15 @@ public class InventoryProductInfoController extends BaseController {
         return ApiResult.ok(paging);
     }
 
+    /**
+     * 产品信息表列表
+     */
+    @PostMapping("/getList")
+    @OperationLog(name = "产品信息表列表", type = OperationLogType.LIST)
+    @ApiOperation(value = "产品信息表列表", response = InventoryProductInfo.class)
+    public ApiResult<List<InventoryProductInfo>> getInventoryProductInfoList(@Validated @RequestBody InventoryProductInfoPageParam inventoryProductInfoPageParam) throws Exception {
+        List<InventoryProductInfo> inventoryProductInfos = inventoryProductInfoService.getInventoryProductInfoList(inventoryProductInfoPageParam);
+        return ApiResult.ok(inventoryProductInfos);
+    }
 }
 

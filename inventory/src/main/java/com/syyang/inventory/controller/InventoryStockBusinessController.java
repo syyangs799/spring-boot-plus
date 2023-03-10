@@ -19,6 +19,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 库存交易流水表 控制器
  *
@@ -89,6 +91,40 @@ public class InventoryStockBusinessController extends BaseController {
         Paging<InventoryStockBusiness> paging = inventoryStockBusinessService.getInventoryStockBusinessPageList(inventoryStockBusinessPageParam);
         return ApiResult.ok(paging);
     }
+
+    /**
+     * 添加库存交易流水表
+     */
+    @PostMapping("/addOutStockBusiness")
+    @OperationLog(name = "库存交易-出库", type = OperationLogType.ADD)
+    @ApiOperation(value = "库存交易-出库", response = ApiResult.class)
+    public ApiResult<Boolean> addOutStockBusiness(@Validated(Add.class) @RequestBody List<InventoryStockBusiness> inventoryStockBusiness) throws Exception {
+        boolean flag = inventoryStockBusinessService.addOutStockBusiness(inventoryStockBusiness);
+        return ApiResult.result(flag);
+    }
+
+    /**
+     * 库存交易流水表列表
+     */
+    @PostMapping("/getList")
+    @OperationLog(name = "库存交易流水表列表---》明细", type = OperationLogType.LIST)
+    @ApiOperation(value = "库存交易流水表列表---》明细", response = InventoryStockBusiness.class)
+    public ApiResult<List<InventoryStockBusiness>> getInventoryStockBusinessList(@Validated @RequestBody InventoryStockBusinessPageParam inventoryStockBusinessPageParam) throws Exception {
+        List<InventoryStockBusiness> inventoryStockBusinesses = inventoryStockBusinessService.getInventoryStockBusinessList(inventoryStockBusinessPageParam);
+        return ApiResult.ok(inventoryStockBusinesses);
+    }
+
+    /**
+     * 库存交易流水表列表--->出库列表
+     */
+    @PostMapping("/getDeliveredList")
+    @OperationLog(name = "库存交易流水表列表--->出库列表", type = OperationLogType.LIST)
+    @ApiOperation(value = "库存交易流水表列表--->出库列表", response = InventoryStockBusiness.class)
+    public ApiResult<List<InventoryStockBusiness>> getInventoryStockBusinessDeliveredList(@Validated @RequestBody InventoryStockBusinessPageParam inventoryStockBusinessPageParam) throws Exception {
+        List<InventoryStockBusiness> inventoryStockBusinesses = inventoryStockBusinessService.getInventoryStockBusinessDeliveredList(inventoryStockBusinessPageParam);
+        return ApiResult.ok(inventoryStockBusinesses);
+    }
+
 
 }
 

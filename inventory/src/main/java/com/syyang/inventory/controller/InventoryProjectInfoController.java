@@ -19,6 +19,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 项目信息表 控制器
  *
@@ -88,6 +90,17 @@ public class InventoryProjectInfoController extends BaseController {
     public ApiResult<Paging<InventoryProjectInfo>> getInventoryProjectInfoPageList(@Validated @RequestBody InventoryProjectInfoPageParam inventoryProjectInfoPageParam) throws Exception {
         Paging<InventoryProjectInfo> paging = inventoryProjectInfoService.getInventoryProjectInfoPageList(inventoryProjectInfoPageParam);
         return ApiResult.ok(paging);
+    }
+
+    /**
+     * 项目信息表分页列表
+     */
+    @PostMapping("/getList")
+    @OperationLog(name = "项目信息表列表", type = OperationLogType.LIST)
+    @ApiOperation(value = "项目信息表列表", response = InventoryProjectInfo.class)
+    public ApiResult<List<InventoryProjectInfo>> getInventoryProjectInfoList(@Validated @RequestBody InventoryProjectInfoPageParam inventoryProjectInfoPageParam) throws Exception {
+        List<InventoryProjectInfo> inventoryProjectInfos = inventoryProjectInfoService.getInventoryProjectInfoList(inventoryProjectInfoPageParam);
+        return ApiResult.ok(inventoryProjectInfos);
     }
 
 }

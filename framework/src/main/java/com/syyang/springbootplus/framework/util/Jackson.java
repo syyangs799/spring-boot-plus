@@ -20,7 +20,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
 
 /**
@@ -97,6 +101,10 @@ public class Jackson {
         }
         ObjectMapper objectMapper = new ObjectMapper();
         try {
+            JavaTimeModule javaTimeModule = new JavaTimeModule();
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(dateTimeFormatter));
+            objectMapper.registerModule(javaTimeModule);
             // 格式化输出
             objectMapper.configure(SerializationFeature.INDENT_OUTPUT, prettyFormat);
             // 键按自然顺序输出

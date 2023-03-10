@@ -5,6 +5,8 @@ import com.syyang.inventory.param.InventoryProductInfoPageParam;
 import com.syyang.springbootplus.framework.common.service.BaseService;
 import com.syyang.springbootplus.framework.core.pagination.Paging;
 
+import java.util.List;
+
 /**
  * 产品信息表 服务类
  *
@@ -50,4 +52,5 @@ public interface InventoryProductInfoService extends BaseService<InventoryProduc
      */
     Paging<InventoryProductInfo> getInventoryProductInfoPageList(InventoryProductInfoPageParam inventoryProductInfoPageParam) throws Exception;
 
+    List<InventoryProductInfo> getInventoryProductInfoList(InventoryProductInfoPageParam inventoryProductInfoPageParam);
 }

@@ -17,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 /**
  * 产品信息表 服务实现类
  *
@@ -54,6 +56,12 @@ public class InventoryProductInfoServiceImpl extends BaseServiceImpl<InventoryPr
         LambdaQueryWrapper<InventoryProductInfo> wrapper = new LambdaQueryWrapper<>();
         IPage<InventoryProductInfo> iPage = inventoryProductInfoMapper.selectPage(page, wrapper);
         return new Paging<InventoryProductInfo>(iPage);
+    }
+
+    @Override
+    public List<InventoryProductInfo> getInventoryProductInfoList(InventoryProductInfoPageParam inventoryProductInfoPageParam) {
+        LambdaQueryWrapper<InventoryProductInfo> wrapper = new LambdaQueryWrapper<>();
+        return inventoryProductInfoMapper.selectList(wrapper);
     }
 
 }
