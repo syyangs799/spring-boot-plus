@@ -37,6 +37,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 /**
  * $!{table.comment} 控制器
  *
@@ -154,6 +155,22 @@ public class ${table.controllerName} {
     public ApiResult<Paging<${entity}${cfg.queryVo}>> get${entity}PageList(#if(${cfg.paramValidation})@Validated #end@RequestBody ${entity}${cfg.pageParam} ${cfg.entityObjectName}${cfg.pageParam}) throws Exception {
         Paging<${entity}${cfg.queryVo}> paging = ${cfg.entityObjectName}Service.get${entity}PageList(${cfg.entityObjectName}${cfg.pageParam});
         return ApiResult.ok(paging);
+    }
+
+/**
+ * $!{table.comment}列表
+ */
+    @PostMapping("/getList")
+        #if(${cfg.requiresPermissions})
+        @RequiresPermissions("$!{cfg.colonTableName}:list")
+        #end
+        #if(${cfg.operationLog})
+        @OperationLog(name = "$!{table.comment}列表", type = OperationLogType.LIST)
+        #end
+    @ApiOperation(value = "$!{table.comment}列表", response = ${entity}${cfg.queryVo}.class)
+    public ApiResult<List<${entity}${cfg.queryVo}>> get${entity}List(#if(${cfg.paramValidation})@Validated #end@RequestBody ${entity}${cfg.pageParam} ${cfg.entityObjectName}${cfg.pageParam}) throws Exception {
+        List<${entity}${cfg.queryVo}> dataList = ${cfg.entityObjectName}Service.get${entity}List(${cfg.entityObjectName}${cfg.pageParam});
+        return ApiResult.ok(dataList);
     }
 #end
 

@@ -12,6 +12,7 @@ import ${cfg.queryVoClass};
 import ${cfg.pagingClass};
 #end
 
+import java.util.List;
 /**
  * $!{table.comment} 服务类
  *
@@ -67,6 +68,16 @@ public interface ${table.serviceName} extends ${superServiceClass}<${entity}> {
      * @throws Exception
      */
     Paging<${entity}${cfg.queryVo}> get${entity}PageList(${entity}${cfg.pageParam} ${cfg.entityObjectName}${cfg.pageParam}) throws Exception;
+
+
+    /**
+     * 获取列表对象
+     *
+     * @param ${cfg.entityObjectName}QueryParam
+     * @return
+     * @throws Exception
+     */
+    List<${entity}${cfg.queryVo}> get${entity}List(${entity}${cfg.pageParam} ${cfg.entityObjectName}${cfg.pageParam}) throws Exception;
 #end
 
 }

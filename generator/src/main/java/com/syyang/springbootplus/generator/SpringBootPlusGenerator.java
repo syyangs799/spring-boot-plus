@@ -52,12 +52,13 @@ public class SpringBootPlusGenerator {
                 .setFileOverride(true);
 
         // 设置表信息
-        generatorProperties.addTable("inventory_daily_business","id");
-        generatorProperties.addTable("inventory_product_info","id");
-        generatorProperties.addTable("inventory_project_business","id");
-        generatorProperties.addTable("inventory_project_info","id");
-        generatorProperties.addTable("inventory_stock_business","id");
-        generatorProperties.addTable("inventory_stock_info","id");
+//        generatorProperties.addTable("inventory_daily_business","id");
+//        generatorProperties.addTable("inventory_product_info","id");
+//        generatorProperties.addTable("inventory_project_business","id");
+//        generatorProperties.addTable("inventory_project_info","id");
+//        generatorProperties.addTable("inventory_stock_business","id");
+//        generatorProperties.addTable("inventory_stock_info","id");
+        generatorProperties.addTable("sy_dict_data","id");
         // 设置表前缀
 //         generatorProperties.setTablePrefix(Arrays.asList("foo_"));
 

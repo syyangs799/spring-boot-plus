@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
 /**
  * $!{table.comment} 服务实现类
  *
@@ -75,6 +76,18 @@ public class ${table.serviceImplName} extends BaseServiceImpl<${table.mapperName
     #end
         return new Paging<${entity}${cfg.queryVo}>(iPage);
     }
+    @Override
+    public List<${entity}${cfg.queryVo}> get${entity}List(${entity}${cfg.pageParam} ${cfg.entityObjectName}${cfg.pageParam}) throws Exception {
+    #if(${cfg.generatorStrategy} != 'SINGLE')
+        List<${entity}${cfg.queryVo}> dataLists = ${cfg.mapperObjectName}.get${entity}List(${cfg.entityObjectName}${cfg.pageParam});
+    #else
+        LambdaQueryWrapper<${entity}> wrapper = new LambdaQueryWrapper<>();
+        List<${entity}${cfg.queryVo}> dataLists = ${cfg.mapperObjectName}.selectList(wrapper);
+    #end
+        return dataLists;
+    }
+
+
 #end
 
 }
