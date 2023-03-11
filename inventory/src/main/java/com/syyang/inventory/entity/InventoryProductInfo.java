@@ -57,9 +57,6 @@ public class InventoryProductInfo extends BaseEntity {
 
     @ApiModelProperty("创建人")
     @TableField(fill = FieldFill.INSERT)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private String createUser;
 
     @ApiModelProperty("创建时间")

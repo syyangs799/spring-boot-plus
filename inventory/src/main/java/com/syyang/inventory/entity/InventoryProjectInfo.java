@@ -39,7 +39,7 @@ public class InventoryProjectInfo extends BaseEntity {
     private Integer id;
 
     @ApiModelProperty("项目名称")
-    private String name;
+    private String projectName;
 
     @ApiModelProperty("商务负责人id")
     private String businesserId;
@@ -48,7 +48,7 @@ public class InventoryProjectInfo extends BaseEntity {
     private String businesserName;
 
     @ApiModelProperty("项目描述")
-    private String desc;
+    private String projectDesc;
 
     @ApiModelProperty("技术负责人id")
     private Integer technicalerId;

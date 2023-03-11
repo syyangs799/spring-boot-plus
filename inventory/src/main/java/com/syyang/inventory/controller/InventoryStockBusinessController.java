@@ -41,8 +41,8 @@ public class InventoryStockBusinessController extends BaseController {
      * 添加库存交易流水表
      */
     @PostMapping("/add")
-    @OperationLog(name = "添加库存交易流水表", type = OperationLogType.ADD)
-    @ApiOperation(value = "添加库存交易流水表", response = ApiResult.class)
+    @OperationLog(name = "添加库存交易流水表==入库", type = OperationLogType.ADD)
+    @ApiOperation(value = "添加库存交易流水表==入库", response = ApiResult.class)
     public ApiResult<Boolean> addInventoryStockBusiness(@Validated(Add.class) @RequestBody InventoryStockBusiness inventoryStockBusiness) throws Exception {
         boolean flag = inventoryStockBusinessService.saveInventoryStockBusiness(inventoryStockBusiness);
         return ApiResult.result(flag);

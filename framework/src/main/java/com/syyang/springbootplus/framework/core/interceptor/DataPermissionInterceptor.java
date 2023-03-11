@@ -70,6 +70,10 @@ public class DataPermissionInterceptor implements Interceptor {
     public Object intercept(Invocation invocation) throws Throwable {
         try {
             String username = JwtUtil.getUsername(JwtTokenUtil.getToken());
+            if (StrUtil.isEmpty(username )){
+                logger.info("获取到当前用户的username为空，不进行数据权限隔离");
+                return invocation.proceed();
+            }
             // 获取登录用户角色权限信息
             LoginSysUserRedisVo loginSysUserRedisVo = loginRedisService.getLoginSysUserRedisVo(username);
             if (loginSysUserRedisVo == null){
