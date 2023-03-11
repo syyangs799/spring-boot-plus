@@ -64,6 +64,9 @@ public class InventoryStockBusiness extends BaseEntity {
     @ApiModelProperty("当前字段为出库时必填，入库的产品id")
     private Integer bachId;
 
+    @ApiModelProperty("项目id，当前字段为出库时必填字段")
+    private Integer projectId;
+
     @ApiModelProperty("创建时间")
     @TableField(fill = FieldFill.INSERT)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
