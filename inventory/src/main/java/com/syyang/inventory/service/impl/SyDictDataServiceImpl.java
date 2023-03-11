@@ -1,5 +1,6 @@
 package com.syyang.inventory.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.syyang.inventory.entity.SyDictData;
 import com.syyang.inventory.mapper.SyDictDataMapper;
 import com.syyang.inventory.service.SyDictDataService;
@@ -52,12 +53,14 @@ public class SyDictDataServiceImpl extends BaseServiceImpl<SyDictDataMapper, SyD
     public Paging<SyDictData> getSyDictDataPageList(SyDictDataPageParam syDictDataPageParam) throws Exception {
         Page<SyDictData> page = new PageInfo<>(syDictDataPageParam, OrderItem.desc(getLambdaColumn(SyDictData::getCreateTime)));
         LambdaQueryWrapper<SyDictData> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StrUtil.isNotBlank(syDictDataPageParam.getDictType()),SyDictData::getDictType,syDictDataPageParam.getDictType());
         IPage<SyDictData> iPage = syDictDataMapper.selectPage(page, wrapper);
         return new Paging<SyDictData>(iPage);
     }
     @Override
     public List<SyDictData> getSyDictDataList(SyDictDataPageParam syDictDataPageParam) throws Exception {
         LambdaQueryWrapper<SyDictData> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StrUtil.isNotBlank(syDictDataPageParam.getDictType()),SyDictData::getDictType,syDictDataPageParam.getDictType());
         List<SyDictData> dataLists = syDictDataMapper.selectList(wrapper);
         return dataLists;
     }

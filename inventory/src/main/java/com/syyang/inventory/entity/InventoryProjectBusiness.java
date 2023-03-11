@@ -63,7 +63,7 @@ public class InventoryProjectBusiness extends BaseEntity {
     @TableField(fill = FieldFill.INSERT)
     private String createUser;
 
-    @ApiModelProperty("交易状态 0表示创建 1表示提交审批 2表示通过 -1表示未通过")
+    @ApiModelProperty("交易状态 0表示创建 1表示提交审批 2表示通过 -1表示未通过 3表示已入账 4表示未入账")
     private String status;
 
     @ApiModelProperty("审核人")
@@ -95,5 +95,28 @@ public class InventoryProjectBusiness extends BaseEntity {
     @ApiModelProperty("部门id，用作区分不同的部门权限")
     @TableField(fill = FieldFill.INSERT)
     private Integer departmentId;
+
+
+
+    @ApiModelProperty("出纳人")
+    private String cashier;
+
+    @ApiModelProperty("出纳时间")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private LocalDateTime cashierTime;
+
+
+    @ApiModelProperty("出纳人")
+    private String cashierAmount;
+
+    @ApiModelProperty("出纳附件名称")
+    private String cashierFileName;
+
+
+    @ApiModelProperty("出纳附件路径")
+    private String cashierFilePath;
+
 
 }

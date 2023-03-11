@@ -1,7 +1,6 @@
 package com.syyang.inventory.param;
 
 import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -9,7 +8,7 @@ import com.syyang.springbootplus.framework.core.pagination.BasePageOrderParam;
 
 /**
  * <pre>
- * 字典数据表 分页参数对象
+ * 项目修改记录表 分页参数对象
  * </pre>
  *
  * @author syyang
@@ -18,13 +17,7 @@ import com.syyang.springbootplus.framework.core.pagination.BasePageOrderParam;
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
-@ApiModel(value = "字典数据表分页参数")
-public class SyDictDataPageParam extends BasePageOrderParam {
+@ApiModel(value = "项目修改记录表分页参数")
+public class InventoryProjectOperationRecordPageParam extends BasePageOrderParam {
     private static final long serialVersionUID = 1L;
-
-
-    @ApiModelProperty("字典类型")
-    private String dictType;
-
-
 }
