@@ -1,5 +1,7 @@
 package com.syyang.inventory.service.impl;
 
+import cn.hutool.core.util.StrUtil;
+import com.syyang.inventory.entity.InventoryDailyBusiness;
 import com.syyang.inventory.entity.InventoryProjectBusiness;
 import com.syyang.inventory.mapper.InventoryProjectBusinessMapper;
 import com.syyang.inventory.service.InventoryProjectBusinessService;
@@ -51,6 +53,7 @@ public class InventoryProjectBusinessServiceImpl extends BaseServiceImpl<Invento
     public Paging<InventoryProjectBusiness> getInventoryProjectBusinessPageList(InventoryProjectBusinessPageParam inventoryProjectBusinessPageParam) throws Exception {
         Page<InventoryProjectBusiness> page = new PageInfo<>(inventoryProjectBusinessPageParam, OrderItem.desc(getLambdaColumn(InventoryProjectBusiness::getCreateTime)));
         LambdaQueryWrapper<InventoryProjectBusiness> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StrUtil.isNotBlank(inventoryProjectBusinessPageParam.getStatus()), InventoryProjectBusiness::getStatus,inventoryProjectBusinessPageParam.getStatus());
         IPage<InventoryProjectBusiness> iPage = inventoryProjectBusinessMapper.selectPage(page, wrapper);
         return new Paging<InventoryProjectBusiness>(iPage);
     }

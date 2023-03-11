@@ -1,7 +1,9 @@
 package com.syyang.inventory.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
 import com.syyang.inventory.entity.InventoryProductInfo;
+import com.syyang.inventory.entity.InventoryProjectBusiness;
 import com.syyang.inventory.entity.InventoryStockBusiness;
 import com.syyang.inventory.entity.InventoryStockInfo;
 import com.syyang.inventory.enums.StockBusinessTypeEnum;
@@ -151,7 +153,8 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
     public Paging<InventoryStockBusiness> getInventoryStockBusinessPageList(InventoryStockBusinessPageParam inventoryStockBusinessPageParam) throws Exception {
         Page<InventoryStockBusiness> page = new PageInfo<>(inventoryStockBusinessPageParam, OrderItem.desc(getLambdaColumn(InventoryStockBusiness::getCreateTime)));
         LambdaQueryWrapper<InventoryStockBusiness> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(InventoryStockBusiness::getProductId,inventoryStockBusinessPageParam.getProductId());
+        wrapper.eq(StrUtil.isNotBlank(inventoryStockBusinessPageParam.getProductId()),InventoryStockBusiness::getProductId,inventoryStockBusinessPageParam.getProductId());
+        wrapper.eq(StrUtil.isNotBlank(inventoryStockBusinessPageParam.getStatus()), InventoryStockBusiness::getStatus,inventoryStockBusinessPageParam.getStatus());
         IPage<InventoryStockBusiness> iPage = inventoryStockBusinessMapper.selectPage(page, wrapper);
         return new Paging<InventoryStockBusiness>(iPage);
     }

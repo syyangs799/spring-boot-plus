@@ -50,14 +50,16 @@ public class InventoryProjectOperationRecordServiceImpl extends BaseServiceImpl<
 
     @Override
     public Paging<InventoryProjectOperationRecord> getInventoryProjectOperationRecordPageList(InventoryProjectOperationRecordPageParam inventoryProjectOperationRecordPageParam) throws Exception {
-        Page<InventoryProjectOperationRecord> page = new PageInfo<>(inventoryProjectOperationRecordPageParam, OrderItem.desc(getLambdaColumn(InventoryProjectOperationRecord::getCreateTime)));
+        Page<InventoryProjectOperationRecord> page = new PageInfo<>(inventoryProjectOperationRecordPageParam, OrderItem.desc(getLambdaColumn(InventoryProjectOperationRecord::getUpdateTime)));
         LambdaQueryWrapper<InventoryProjectOperationRecord> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(null!= inventoryProjectOperationRecordPageParam.getProjectId(),InventoryProjectOperationRecord::getProjectId,inventoryProjectOperationRecordPageParam.getProjectId());
         IPage<InventoryProjectOperationRecord> iPage = inventoryProjectOperationRecordMapper.selectPage(page, wrapper);
         return new Paging<InventoryProjectOperationRecord>(iPage);
     }
     @Override
     public List<InventoryProjectOperationRecord> getInventoryProjectOperationRecordList(InventoryProjectOperationRecordPageParam inventoryProjectOperationRecordPageParam) throws Exception {
         LambdaQueryWrapper<InventoryProjectOperationRecord> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(null!= inventoryProjectOperationRecordPageParam.getProjectId(),InventoryProjectOperationRecord::getProjectId,inventoryProjectOperationRecordPageParam.getProjectId());
         List<InventoryProjectOperationRecord> dataLists = inventoryProjectOperationRecordMapper.selectList(wrapper);
         return dataLists;
     }
