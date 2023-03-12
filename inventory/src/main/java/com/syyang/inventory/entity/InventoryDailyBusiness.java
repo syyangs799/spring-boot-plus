@@ -73,7 +73,7 @@ public class InventoryDailyBusiness extends BaseEntity {
     private String approver;
 
     @ApiModelProperty("审核时间")
-    private LocalDateTime approveTime;
+    private LocalDateTime approverTime;
 
     @ApiModelProperty("创建日期")
     @TableField(fill = FieldFill.INSERT)

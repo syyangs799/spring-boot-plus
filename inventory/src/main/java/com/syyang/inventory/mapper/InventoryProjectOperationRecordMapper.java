@@ -15,7 +15,7 @@ import java.io.Serializable;
  * 项目修改记录表 Mapper 接口
  *
  * @author syyang
- * @since 2023-03-11
+ * @since 2023-03-12
  */
 @Repository
 public interface InventoryProjectOperationRecordMapper extends BaseMapper<InventoryProjectOperationRecord> {
