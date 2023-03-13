@@ -1,7 +1,14 @@
 package com.syyang.inventory.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.syyang.springbootplus.framework.common.entity.BaseEntity;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -47,7 +54,10 @@ public class InventoryProjectOperationRecord extends BaseEntity {
     private String updateUser;
 
     @ApiModelProperty("修改时间")
-    private Date updateTime;
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private LocalDateTime updateTime;
 
     @ApiModelProperty("更新内容")
     private String updateContent;

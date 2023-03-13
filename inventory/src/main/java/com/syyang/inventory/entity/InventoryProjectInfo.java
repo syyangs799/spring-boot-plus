@@ -42,7 +42,7 @@ public class InventoryProjectInfo extends BaseEntity {
     private String projectName;
 
     @ApiModelProperty("商务负责人id")
-    private String businesserId;
+    private Integer businesserId;
 
     @ApiModelProperty("商务负责人名称")
     private String businesserName;
@@ -63,6 +63,9 @@ public class InventoryProjectInfo extends BaseEntity {
     private String amountWarranty;
 
     @ApiModelProperty("质保金截止日期")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime amountWarrantyEnding;
 
     @ApiModelProperty("利润")
@@ -111,6 +114,9 @@ public class InventoryProjectInfo extends BaseEntity {
     private String proApprover;
 
     @ApiModelProperty("项目审批时间")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime proApproveTime;
 
     @ApiModelProperty("项目创建人")

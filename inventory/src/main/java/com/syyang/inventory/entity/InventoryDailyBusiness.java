@@ -54,6 +54,9 @@ public class InventoryDailyBusiness extends BaseEntity {
     private String amountTaxes;
 
     @ApiModelProperty("交易时间")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime businessTime;
 
     @ApiModelProperty("备注信息")
@@ -73,6 +76,9 @@ public class InventoryDailyBusiness extends BaseEntity {
     private String approver;
 
     @ApiModelProperty("审核时间")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime approverTime;
 
     @ApiModelProperty("创建日期")
