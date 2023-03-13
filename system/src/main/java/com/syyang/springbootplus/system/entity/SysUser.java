@@ -93,21 +93,21 @@ public class SysUser extends BaseEntity {
     private Long roleId;
 
     @ApiModelProperty("逻辑删除，0：未删除，1：已删除")
-    @Null(message = "逻辑删除不用传")
+//    @Null(message = "逻辑删除不用传")
     @TableLogic
     private Integer deleted;
 
     @ApiModelProperty("版本")
-    @Null(message = "版本不用传")
+//    @Null(message = "版本不用传")
     @Version
     private Integer version;
 
     @ApiModelProperty("创建时间")
-    @Null(message = "创建时间不用传")
+//    @Null(message = "创建时间不用传")
     private Date createTime;
 
     @ApiModelProperty("修改时间")
-    @Null(message = "修改时间不用传")
+//    @Null(message = "修改时间不用传")
     private Date updateTime;
 
 }

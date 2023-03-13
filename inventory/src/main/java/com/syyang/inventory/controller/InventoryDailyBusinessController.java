@@ -19,6 +19,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 日常收入与支出交易流水表 控制器
  *
@@ -90,5 +92,16 @@ public class InventoryDailyBusinessController extends BaseController {
         return ApiResult.ok(paging);
     }
 
+
+    /**
+     * 日常收入与支出交易流水表分页列表
+     */
+    @PostMapping("/getList")
+    @OperationLog(name = "日常收入与支出交易流水表列表", type = OperationLogType.LIST)
+    @ApiOperation(value = "日常收入与支出交易流水表列表", response = InventoryDailyBusiness.class)
+    public ApiResult<List<InventoryDailyBusiness>> getInventoryDailyBusinessList(@Validated @RequestBody InventoryDailyBusinessPageParam inventoryDailyBusinessPageParam) throws Exception {
+        List<InventoryDailyBusiness> paging = inventoryDailyBusinessService.getInventoryDailyBusinessList(inventoryDailyBusinessPageParam);
+        return ApiResult.ok(paging);
+    }
 }
 

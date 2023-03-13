@@ -19,6 +19,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 库存信息表 控制器
  *
@@ -89,6 +91,15 @@ public class InventoryStockInfoController extends BaseController {
         Paging<InventoryStockInfo> paging = inventoryStockInfoService.getInventoryStockInfoPageList(inventoryStockInfoPageParam);
         return ApiResult.ok(paging);
     }
-
+    /**
+     * 库存信息表分页列表
+     */
+    @PostMapping("/getList")
+    @OperationLog(name = "库存信息表列表", type = OperationLogType.LIST)
+    @ApiOperation(value = "库存信息表列表", response = InventoryStockInfo.class)
+    public ApiResult<List<InventoryStockInfo>> getInventoryStockInfoList(@Validated @RequestBody InventoryStockInfoPageParam inventoryStockInfoPageParam) throws Exception {
+        List<InventoryStockInfo> paging = inventoryStockInfoService.getInventoryStockInfoList(inventoryStockInfoPageParam);
+        return ApiResult.ok(paging);
+    }
 }
 

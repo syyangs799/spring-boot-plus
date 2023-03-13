@@ -67,16 +67,16 @@ public class SysDepartment extends BaseEntity {
     private String remark;
 
     @ApiModelProperty("版本")
-    @Null(message = "版本不用传")
+//    @Null(message = "版本不用传")
     @Version
     private Integer version;
 
     @ApiModelProperty("创建时间")
-    @Null(message = "创建时间不用传")
+//    @Null(message = "创建时间不用传")
     private Date createTime;
 
     @ApiModelProperty("修改时间")
-    @Null(message = "修改时间不用传")
+//    @Null(message = "修改时间不用传")
     private Date updateTime;
 
 }

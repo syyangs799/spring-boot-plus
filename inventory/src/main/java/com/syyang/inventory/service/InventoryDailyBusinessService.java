@@ -5,6 +5,8 @@ import com.syyang.inventory.param.InventoryDailyBusinessPageParam;
 import com.syyang.springbootplus.framework.common.service.BaseService;
 import com.syyang.springbootplus.framework.core.pagination.Paging;
 
+import java.util.List;
+
 /**
  * 日常收入与支出交易流水表 服务类
  *
@@ -50,4 +52,5 @@ public interface InventoryDailyBusinessService extends BaseService<InventoryDail
      */
     Paging<InventoryDailyBusiness> getInventoryDailyBusinessPageList(InventoryDailyBusinessPageParam inventoryDailyBusinessPageParam) throws Exception;
 
+    List<InventoryDailyBusiness> getInventoryDailyBusinessList(InventoryDailyBusinessPageParam inventoryDailyBusinessPageParam);
 }

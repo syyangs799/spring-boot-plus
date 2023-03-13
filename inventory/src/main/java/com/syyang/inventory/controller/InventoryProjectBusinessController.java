@@ -19,6 +19,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 项目收入与支出交易流水表 控制器
  *
@@ -87,6 +89,17 @@ public class InventoryProjectBusinessController extends BaseController {
     @ApiOperation(value = "项目收入与支出交易流水表分页列表", response = InventoryProjectBusiness.class)
     public ApiResult<Paging<InventoryProjectBusiness>> getInventoryProjectBusinessPageList(@Validated @RequestBody InventoryProjectBusinessPageParam inventoryProjectBusinessPageParam) throws Exception {
         Paging<InventoryProjectBusiness> paging = inventoryProjectBusinessService.getInventoryProjectBusinessPageList(inventoryProjectBusinessPageParam);
+        return ApiResult.ok(paging);
+    }
+
+    /**
+     * 项目收入与支出交易流水表分页列表
+     */
+    @PostMapping("/getList")
+    @OperationLog(name = "项目收入与支出交易流水表列表", type = OperationLogType.LIST)
+    @ApiOperation(value = "项目收入与支出交易流水表列表", response = InventoryProjectBusiness.class)
+    public ApiResult<List<InventoryProjectBusiness>> getInventoryProjectBusinessList(@Validated @RequestBody InventoryProjectBusinessPageParam inventoryProjectBusinessPageParam) throws Exception {
+        List<InventoryProjectBusiness> paging = inventoryProjectBusinessService.getInventoryProjectBusinessList(inventoryProjectBusinessPageParam);
         return ApiResult.ok(paging);
     }
 

@@ -17,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 /**
  * 日常收入与支出交易流水表 服务实现类
  *
@@ -55,6 +57,13 @@ public class InventoryDailyBusinessServiceImpl extends BaseServiceImpl<Inventory
         wrapper.eq(StrUtil.isNotBlank(inventoryDailyBusinessPageParam.getStatus()),InventoryDailyBusiness::getStatus,inventoryDailyBusinessPageParam.getStatus());
         IPage<InventoryDailyBusiness> iPage = inventoryDailyBusinessMapper.selectPage(page, wrapper);
         return new Paging<InventoryDailyBusiness>(iPage);
+    }
+
+    @Override
+    public List<InventoryDailyBusiness> getInventoryDailyBusinessList(InventoryDailyBusinessPageParam inventoryDailyBusinessPageParam) {
+        LambdaQueryWrapper<InventoryDailyBusiness> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StrUtil.isNotBlank(inventoryDailyBusinessPageParam.getStatus()),InventoryDailyBusiness::getStatus,inventoryDailyBusinessPageParam.getStatus());
+        return inventoryDailyBusinessMapper.selectList(wrapper);
     }
 
 }

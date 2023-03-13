@@ -5,6 +5,8 @@ import com.syyang.inventory.param.InventoryProjectBusinessPageParam;
 import com.syyang.springbootplus.framework.common.service.BaseService;
 import com.syyang.springbootplus.framework.core.pagination.Paging;
 
+import java.util.List;
+
 /**
  * 项目收入与支出交易流水表 服务类
  *
@@ -50,4 +52,5 @@ public interface InventoryProjectBusinessService extends BaseService<InventoryPr
      */
     Paging<InventoryProjectBusiness> getInventoryProjectBusinessPageList(InventoryProjectBusinessPageParam inventoryProjectBusinessPageParam) throws Exception;
 
+    List<InventoryProjectBusiness> getInventoryProjectBusinessList(InventoryProjectBusinessPageParam inventoryProjectBusinessPageParam);
 }
