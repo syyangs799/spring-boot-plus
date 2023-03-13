@@ -41,8 +41,8 @@ public class InventoryProjectBusiness extends BaseEntity {
     @ApiModelProperty("项目id")
     private Integer proId;
 
-    @ApiModelProperty("交易类型 收入和支出")
-    private String type;
+    @ApiModelProperty("交易类型 0收入和1支出")
+    private Integer type;
 
     @ApiModelProperty("子类型")
     private String subType;

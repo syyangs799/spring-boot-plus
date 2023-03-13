@@ -40,7 +40,7 @@ public class InventoryStockBusiness extends BaseEntity {
     private String productId;
 
     @ApiModelProperty("交易类型，1入库 2出库")
-    private String type;
+    private Integer type;
 
     @ApiModelProperty("产品数量")
     private Integer productNum;
