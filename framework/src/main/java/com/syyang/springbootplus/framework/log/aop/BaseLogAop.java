@@ -530,9 +530,9 @@ public abstract class BaseLogAop {
      */
     protected void printRequestResponseString(int code, String requestInfoString, String responseResultString) {
         if (code == ApiCode.SUCCESS.getCode()) {
-            log.info(requestInfoString + "\n" + responseResultString);
+            log.info(requestInfoString.trim() + "\n" + responseResultString.trim());
         } else {
-            log.error(requestInfoString + "\n" + responseResultString);
+            log.error(requestInfoString.trim() + "\n" + responseResultString.trim());
         }
     }
 
@@ -563,7 +563,7 @@ public abstract class BaseLogAop {
      * @param requestInfoString
      */
     protected void printRequestInfoString(String requestInfoString) {
-        log.info(requestInfoString);
+        log.info(requestInfoString.trim());
     }
 
     /**
