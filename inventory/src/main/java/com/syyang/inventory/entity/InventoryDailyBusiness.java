@@ -66,6 +66,10 @@ public class InventoryDailyBusiness extends BaseEntity {
     @TableField(fill = FieldFill.INSERT)
     private String createUser;
 
+    @ApiModelProperty("创建人名称")
+    @TableField(fill = FieldFill.INSERT)
+    private String createUserName;
+
     @ApiModelProperty("交易状态 0表示创建 1表示提交审批 2表示通过 -1表示未通过 3表示已入账 4表示未入账")
     private String status;
 
@@ -74,6 +78,9 @@ public class InventoryDailyBusiness extends BaseEntity {
 
     @ApiModelProperty("审核人")
     private String approver;
+
+    @ApiModelProperty("审核人名称")
+    private String approverName;
 
     @ApiModelProperty("审核时间")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -105,10 +112,12 @@ public class InventoryDailyBusiness extends BaseEntity {
     @TableField(fill = FieldFill.INSERT)
     private Integer departmentId;
 
-
-
     @ApiModelProperty("出纳人")
     private String cashier;
+
+    @ApiModelProperty("出纳人名称")
+    private String cashierName;
+
 
     @ApiModelProperty("出纳时间")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -117,7 +126,7 @@ public class InventoryDailyBusiness extends BaseEntity {
     private LocalDateTime cashierTime;
 
 
-    @ApiModelProperty("出纳人")
+    @ApiModelProperty("出纳金额")
     private String cashierAmount;
 
     @ApiModelProperty("出纳附件名称")

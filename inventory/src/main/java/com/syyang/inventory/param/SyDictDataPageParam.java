@@ -23,7 +23,7 @@ public class SyDictDataPageParam extends BasePageOrderParam {
     private static final long serialVersionUID = 1L;
 
 
-    @ApiModelProperty("字典类型")
+    @ApiModelProperty("字典类型 目前有project_step[项目进度] business_status[库存交易状态] daily_sub_type[日常流水子类型] project_sub_type[项目开支子类型]")
     private String dictType;
 
 

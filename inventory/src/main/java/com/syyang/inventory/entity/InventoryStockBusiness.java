@@ -39,7 +39,7 @@ public class InventoryStockBusiness extends BaseEntity {
     @ApiModelProperty("产品id")
     private String productId;
 
-    @ApiModelProperty("交易类型，1入库 2出库")
+    @ApiModelProperty("交易类型，0入库 1出库")
     private Integer type;
 
     @ApiModelProperty("产品数量")
@@ -61,7 +61,11 @@ public class InventoryStockBusiness extends BaseEntity {
     @TableField(fill = FieldFill.INSERT)
     private String createUser;
 
-    @ApiModelProperty("当前字段为出库时必填，入库的产品id")
+    @ApiModelProperty("创建人名称")
+    @TableField(fill = FieldFill.INSERT)
+    private String createUserName;
+
+    @ApiModelProperty("当前字段为出库时必填，当前选择的入库记录id")
     private Integer bachId;
 
     @ApiModelProperty("项目id，当前字段为出库时必填字段")
@@ -91,6 +95,9 @@ public class InventoryStockBusiness extends BaseEntity {
     @ApiModelProperty("审核人")
     private String approver;
 
+    @ApiModelProperty("审核人名称")
+    private String approverName;
+
     @ApiModelProperty("审核时间")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -101,6 +108,10 @@ public class InventoryStockBusiness extends BaseEntity {
     @ApiModelProperty("出纳人")
     private String cashier;
 
+
+    @ApiModelProperty("出纳人名称")
+    private String cashierName;
+
     @ApiModelProperty("出纳时间")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -108,7 +119,7 @@ public class InventoryStockBusiness extends BaseEntity {
     private LocalDateTime cashierTime;
 
 
-    @ApiModelProperty("出纳人")
+    @ApiModelProperty("出纳金额")
     private String cashierAmount;
 
     @ApiModelProperty("出纳附件名称")

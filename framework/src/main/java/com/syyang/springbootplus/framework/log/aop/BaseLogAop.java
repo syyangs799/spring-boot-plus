@@ -600,9 +600,9 @@ public abstract class BaseLogAop {
      */
     protected void printResponseResult(int code, String responseResultString) {
         if (code == ApiCode.SUCCESS.getCode()) {
-            log.info(responseResultString);
+            log.info(responseResultString.trim());
         } else {
-            log.error(responseResultString);
+            log.error(responseResultString.trim());
         }
     }
 

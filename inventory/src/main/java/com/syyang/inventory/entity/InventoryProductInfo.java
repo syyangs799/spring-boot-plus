@@ -59,6 +59,10 @@ public class InventoryProductInfo extends BaseEntity {
     @TableField(fill = FieldFill.INSERT)
     private String createUser;
 
+    @ApiModelProperty("创建人名称")
+    @TableField(fill = FieldFill.INSERT)
+    private String createUserName;
+
     @ApiModelProperty("创建时间")
     @TableField(fill = FieldFill.INSERT)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)

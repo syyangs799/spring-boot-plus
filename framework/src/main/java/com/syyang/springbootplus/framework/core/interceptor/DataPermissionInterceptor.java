@@ -70,7 +70,7 @@ public class DataPermissionInterceptor implements Interceptor {
     public Object intercept(Invocation invocation) throws Throwable {
         try {
             String username = JwtUtil.getUsername(JwtTokenUtil.getToken());
-            if (StrUtil.isEmpty(username )){
+            if (StrUtil.isEmpty(username)){
                 logger.info("获取到当前用户的username为空，不进行数据权限隔离");
                 return invocation.proceed();
             }
@@ -136,7 +136,7 @@ public class DataPermissionInterceptor implements Interceptor {
                 // 解析并返回新的SQL语句，只处理查询sql
                 if (mappedStatement.getSqlCommandType().toString().equals("SELECT")) {
                     //                    String newSql = getNewSql(sql,deptIds,user.getUserId());
-                    sql = getSql(sql,deptId,loginSysUserRedisVo.getId(),isDepartmentPermi,isCreateUserPermi);
+                    sql = getSql(sql,deptId,loginSysUserRedisVo.getId().toString(),isDepartmentPermi,isCreateUserPermi);
                 }
                 // 修改sql
                 metaObject.setValue("delegate.boundSql.sql", sql);
@@ -157,7 +157,7 @@ public class DataPermissionInterceptor implements Interceptor {
      * @param sql 原SQL
      * @return 新SQL
      */
-    private String getSql(String sql,Long deptId,long username,boolean isDepartmentPermi,boolean isCreateUserPermi) {
+    private String getSql(String sql,Long deptId,String userId,boolean isDepartmentPermi,boolean isCreateUserPermi) {
 
         try {
             String condition = "";
@@ -166,7 +166,7 @@ public class DataPermissionInterceptor implements Interceptor {
                 condition += "," + DEPARTMENT_ID +" = " + deptId;
             }
             if(isCreateUserPermi) {
-                condition += "," + CREATE_USER +" = " + username;
+                condition += "," + CREATE_USER +" = " + userId;
             }
 
             if (StrUtil.isBlank(condition)){

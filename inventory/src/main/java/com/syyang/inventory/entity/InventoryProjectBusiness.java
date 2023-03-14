@@ -44,8 +44,10 @@ public class InventoryProjectBusiness extends BaseEntity {
     @ApiModelProperty("交易类型 0收入和1支出")
     private Integer type;
 
-    @ApiModelProperty("子类型")
+    @ApiModelProperty("子类型-码表")
     private String subType;
+    @ApiModelProperty("子类型名称")
+    private String subTypeName;
 
     @ApiModelProperty("金额")
     private String amountMoney;
@@ -66,17 +68,24 @@ public class InventoryProjectBusiness extends BaseEntity {
     @TableField(fill = FieldFill.INSERT)
     private String createUser;
 
+    @ApiModelProperty("创建人名称")
+    @TableField(fill = FieldFill.INSERT)
+    private String createUserName;
+
     @ApiModelProperty("交易状态 0表示创建 1表示提交审批 2表示通过 -1表示未通过 3表示已入账 4表示未入账")
     private String status;
 
     @ApiModelProperty("审核人")
     private String approver;
 
+    @ApiModelProperty("审核人名称")
+    private String approverName;
+
     @ApiModelProperty("审核时间")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private LocalDateTime approveTime;
+    private LocalDateTime approverTime;
 
     @ApiModelProperty("创建日期")
     @TableField(fill = FieldFill.INSERT)
@@ -106,6 +115,9 @@ public class InventoryProjectBusiness extends BaseEntity {
 
     @ApiModelProperty("出纳人")
     private String cashier;
+
+    @ApiModelProperty("出纳人名称")
+    private String cashierName;
 
     @ApiModelProperty("出纳时间")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)

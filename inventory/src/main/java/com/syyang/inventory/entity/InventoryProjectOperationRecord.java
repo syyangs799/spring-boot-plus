@@ -49,9 +49,13 @@ public class InventoryProjectOperationRecord extends BaseEntity {
 
     @ApiModelProperty("创建人")
     private String createUser;
+    @ApiModelProperty("创建人名称")
+    private String createUserName;
 
     @ApiModelProperty("修改人")
     private String updateUser;
+    @ApiModelProperty("修改人名称")
+    private String updateUserName;
 
     @ApiModelProperty("修改时间")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)

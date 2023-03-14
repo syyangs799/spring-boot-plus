@@ -226,13 +226,13 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
         LambdaQueryWrapper<InventoryStockBusiness> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(InventoryStockBusiness::getProductId,inventoryStockBusinessPageParam.getProductId());
         List<InventoryStockBusiness> inventoryStockBusinesses = inventoryStockBusinessMapper.selectList(wrapper);
-        Map<String, List<InventoryStockBusiness>> proInventoryStockBusiness = new LinkedHashMap<String, List<InventoryStockBusiness>>();
+        Map<Integer, List<InventoryStockBusiness>> proInventoryStockBusiness = new LinkedHashMap<Integer, List<InventoryStockBusiness>>();
         CommonListUtils.listGroup2Map(inventoryStockBusinesses, proInventoryStockBusiness, InventoryStockBusiness.class, "getType");// 输入方法名
 
         //入库
-        List<InventoryStockBusiness> in = proInventoryStockBusiness.get("1");
+        List<InventoryStockBusiness> in = proInventoryStockBusiness.getOrDefault(1,Lists.newArrayList());
         //出库
-        List<InventoryStockBusiness> out = proInventoryStockBusiness.get("2");
+        List<InventoryStockBusiness> out = proInventoryStockBusiness.getOrDefault(2,Lists.newArrayList());
         Map<Integer, List<InventoryStockBusiness>> outMap = new LinkedHashMap<Integer, List<InventoryStockBusiness>>();
         CommonListUtils.listGroup2Map(out, outMap, InventoryStockBusiness.class, "getBachId");// 输入方法名
 

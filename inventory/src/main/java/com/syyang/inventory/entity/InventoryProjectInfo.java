@@ -107,21 +107,31 @@ public class InventoryProjectInfo extends BaseEntity {
     @ApiModelProperty("管理提成已付 0表示未付 1表示已付")
     private String amountCommissionManagementPaid;
 
-    @ApiModelProperty("项目状态，新建 1  实施 2 完结 3")
-    private String proStatus;
+    @ApiModelProperty("项目进度，新建 1  实施 2 完结 3")
+    private String step;
+
+    @ApiModelProperty("项目状态，0表示创建 1表示提交审批 2表示通过 -1表示未通过")
+    private String status;
 
     @ApiModelProperty("项目审批人")
-    private String proApprover;
+    private String approver;
+
+    @ApiModelProperty("项目审批人名称")
+    private String approverName;
 
     @ApiModelProperty("项目审批时间")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private LocalDateTime proApproveTime;
+    private LocalDateTime approverTime;
 
     @ApiModelProperty("项目创建人")
     @TableField(fill = FieldFill.INSERT)
     private String createUser;
+
+    @ApiModelProperty("项目创建人名称")
+    @TableField(fill = FieldFill.INSERT)
+    private String createUserName;
 
     @ApiModelProperty("项目创建时间")
     @TableField(fill = FieldFill.INSERT)

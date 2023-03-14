@@ -1,6 +1,6 @@
 package com.syyang.inventory.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -11,9 +11,7 @@ import com.syyang.springbootplus.framework.common.entity.BaseEntity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
-import com.baomidou.mybatisplus.annotation.Version;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -68,18 +66,21 @@ public class SyDictData extends BaseEntity {
     @ApiModelProperty("备注")
     private String remark;
 
-    @ApiModelProperty("创建者")
-    private String creator;
+    @ApiModelProperty("创建人")
+    @TableField(fill = FieldFill.INSERT)
+    private String createUser;
+
+    @ApiModelProperty("创建人名称")
+    @TableField(fill = FieldFill.INSERT)
+    private String createUserName;
+    
 
     @ApiModelProperty("创建时间")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime createTime;
-
-    @ApiModelProperty("更新者")
-    private String updater;
-
+    
     @ApiModelProperty("更新时间")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)

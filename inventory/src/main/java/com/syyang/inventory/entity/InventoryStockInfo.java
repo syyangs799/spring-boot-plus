@@ -61,6 +61,10 @@ public class InventoryStockInfo extends BaseEntity {
     @TableField(fill = FieldFill.INSERT)
     private String createUser;
 
+    @ApiModelProperty("创建人名称")
+    @TableField(fill = FieldFill.INSERT)
+    private String createUserName;
+
     @ApiModelProperty("部门id，用作区分不同的部门权限")
     @TableField(fill = FieldFill.INSERT)
     private Integer departmentId;
