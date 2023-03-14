@@ -53,4 +53,13 @@ public interface InventoryProjectInfoService extends BaseService<InventoryProjec
     Paging<InventoryProjectInfo> getInventoryProjectInfoPageList(InventoryProjectInfoPageParam inventoryProjectInfoPageParam) throws Exception;
 
     List<InventoryProjectInfo> getInventoryProjectInfoList(InventoryProjectInfoPageParam inventoryProjectInfoPageParam);
+
+
+
+    /**
+     * 重新计算项目信息--新建后--修改后 自动进行计算
+     * @param proId 项目id
+     * @return
+     */
+    boolean calculateProjectInformation(Integer proId);
 }

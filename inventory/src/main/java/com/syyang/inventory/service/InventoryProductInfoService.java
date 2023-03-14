@@ -53,4 +53,10 @@ public interface InventoryProductInfoService extends BaseService<InventoryProduc
     Paging<InventoryProductInfo> getInventoryProductInfoPageList(InventoryProductInfoPageParam inventoryProductInfoPageParam) throws Exception;
 
     List<InventoryProductInfo> getInventoryProductInfoList(InventoryProductInfoPageParam inventoryProductInfoPageParam);
+
+
+
+
+
+
 }

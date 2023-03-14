@@ -151,4 +151,19 @@ public class InventoryProjectInfo extends BaseEntity {
     @TableField(fill = FieldFill.INSERT)
     private Integer departmentId;
 
+
+
+    @ApiModelProperty("项目统计-应收款")
+    private String totalReceivables;
+    @ApiModelProperty("项目统计-已收款")
+    private String totalReceived;
+    @ApiModelProperty("项目统计-待收款")
+    private String totalUnreceived;
+    @ApiModelProperty("项目统计-应支付")
+    private String totalPayable;
+    @ApiModelProperty("项目统计-已支付")
+    private String totalPaid;
+    @ApiModelProperty("项目统计-未支付")
+    private String totalUnpaid;
+
 }
