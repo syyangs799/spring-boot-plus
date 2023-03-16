@@ -71,7 +71,7 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
                     inventoryStockInfo.setProductNum(inventoryStockBusiness.getProductNum());
                 } else {
                     //出库
-                    inventoryStockInfo.setProductAmount(BigDecimal.valueOf(0L).divide(BigDecimal.valueOf(Double.valueOf(inventoryStockBusiness.getProductAmount()))).toString());
+                    inventoryStockInfo.setProductAmount(BigDecimal.valueOf(0L).subtract(BigDecimal.valueOf(Double.valueOf(inventoryStockBusiness.getProductAmount()))).toString());
                     inventoryStockInfo.setProductNum(0 - inventoryStockBusiness.getProductNum());
                 }
                 //添加产品名称
@@ -89,7 +89,7 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
                     inventoryStockInfo.setProductAmount(BigDecimal.valueOf(Double.valueOf(inventoryStockInfo.getProductAmount())).add(BigDecimal.valueOf(Double.valueOf(inventoryStockBusiness.getProductAmount()))).toString());
                     inventoryStockInfo.setProductNum(inventoryStockInfo.getProductNum() + inventoryStockBusiness.getProductNum());
                 } else {
-                    inventoryStockInfo.setProductAmount(BigDecimal.valueOf(Double.valueOf(inventoryStockInfo.getProductAmount())).divide(BigDecimal.valueOf(Double.valueOf(inventoryStockBusiness.getProductAmount()))).toString());
+                    inventoryStockInfo.setProductAmount(BigDecimal.valueOf(Double.valueOf(inventoryStockInfo.getProductAmount())).subtract(BigDecimal.valueOf(Double.valueOf(inventoryStockBusiness.getProductAmount()))).toString());
                     inventoryStockInfo.setProductNum(inventoryStockInfo.getProductNum() - inventoryStockBusiness.getProductNum());
                 }
                 result = inventoryStockInfoMapper.updateById(inventoryStockInfo) > 0;
@@ -113,7 +113,7 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
                         amount = amount.add(BigDecimal.valueOf(Double.valueOf(inventory.getProductAmount())));
                         productNum = productNum + inventory.getProductNum();
                     } else {
-                        amount = amount.divide(BigDecimal.valueOf(Double.valueOf(inventory.getProductAmount())));
+                        amount = amount.subtract(BigDecimal.valueOf(Double.valueOf(inventory.getProductAmount())));
                         productNum = productNum - inventory.getProductNum();
                     }
                 }
@@ -140,7 +140,8 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean updateInventoryStockBusiness(InventoryStockBusiness inventoryStockBusiness) throws Exception {
-        return super.updateById(inventoryStockBusiness);
+        boolean b = super.updateById(inventoryStockBusiness);
+        return b;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -190,7 +191,7 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
                     amount = amount.add(BigDecimal.valueOf(Double.valueOf(inventory.getProductAmount())));
                     productNum = productNum + inventory.getProductNum();
                 } else {
-                    amount = amount.divide(BigDecimal.valueOf(Double.valueOf(inventory.getProductAmount())));
+                    amount = amount.subtract(BigDecimal.valueOf(Double.valueOf(inventory.getProductAmount())));
                     productNum = productNum - inventory.getProductNum();
                 }
             }
@@ -243,7 +244,7 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
                 BigDecimal amount = BigDecimal.valueOf(Double.valueOf(now.getProductAmount()));
                 int productNum = now.getProductNum();
                 for (InventoryStockBusiness entryOut : outMap.get(now.getId())) {
-                    amount = amount.divide(BigDecimal.valueOf(Double.valueOf(entryOut.getProductAmount())));
+                    amount = amount.subtract(BigDecimal.valueOf(Double.valueOf(entryOut.getProductAmount())));
                     productNum = productNum - entryOut.getProductNum();
                 }
                 now.setProductAmount(amount.toString());

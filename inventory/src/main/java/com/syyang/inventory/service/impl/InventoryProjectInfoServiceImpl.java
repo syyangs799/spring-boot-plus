@@ -47,13 +47,17 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean saveInventoryProjectInfo(InventoryProjectInfo inventoryProjectInfo) throws Exception {
-        return super.save(inventoryProjectInfo);
+        boolean save = super.save(inventoryProjectInfo);
+        calculateProjectInformation(inventoryProjectInfo.getId());
+        return save;
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean updateInventoryProjectInfo(InventoryProjectInfo inventoryProjectInfo) throws Exception {
-        return super.updateById(inventoryProjectInfo);
+        boolean b = super.updateById(inventoryProjectInfo);
+        calculateProjectInformation(inventoryProjectInfo.getId());
+        return b;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -63,7 +67,7 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
     }
 
     @Override
-    public Paging<InventoryProjectInfo> getInventoryProjectInfoPageList(InventoryProjectInfoPageParam inventoryProjectInfoPageParam) throws Exception {
+    public Paging<InventoryProjectInfo> getInventoryProjectInfoPageList(InventoryProjectInfoPageParam inventoryProjectInfoPageParam) {
         Page<InventoryProjectInfo> page = new PageInfo<>(inventoryProjectInfoPageParam, OrderItem.desc(getLambdaColumn(InventoryProjectInfo::getCreateTime)));
         LambdaQueryWrapper<InventoryProjectInfo> wrapper = new LambdaQueryWrapper<>();
         IPage<InventoryProjectInfo> iPage = inventoryProjectInfoMapper.selectPage(page, wrapper);
@@ -79,25 +83,8 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
 
     @Override
     public boolean calculateProjectInformation(Integer proId) {
+        log.info("开始计算项目的相关金额，proId:{}",proId);
         InventoryProjectInfo inventoryProjectInfo = inventoryProjectInfoMapper.selectById(proId);
-        //统计项目基本信息
-        calculateProjectForBaseInfo(inventoryProjectInfo);
-        //计算项目的 统计信息
-        calculateProjectForTotalMoney(inventoryProjectInfo);
-        return inventoryProjectInfoMapper.updateById(inventoryProjectInfo) > 0;
-    }
-
-    private void calculateProjectForBaseInfo(InventoryProjectInfo inventoryProjectInfo) {
-        //商务费用 手动输入
-//        inventoryProjectInfo.setAmountBusiness();
-
-    }
-
-    /**
-     * 重新统计项目的金额
-     * @param inventoryProjectInfo
-     */
-    private void calculateProjectForTotalMoney(InventoryProjectInfo inventoryProjectInfo) {
         //查询项目的收支数据
         LambdaQueryWrapper<InventoryProjectBusiness> inventoryProjectBusinessLambdaQueryWrapper= new LambdaQueryWrapper<>();
         inventoryProjectBusinessLambdaQueryWrapper.eq(InventoryProjectBusiness::getProId,inventoryProjectInfo.getId());
@@ -105,7 +92,78 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
 
         Map<Integer, List<InventoryProjectBusiness>> map = new LinkedHashMap<Integer, List<InventoryProjectBusiness>>();
         CommonListUtils.listGroup2Map(inventoryProjectBusinesses, map, InventoryProjectBusiness.class, "getType");// 输入方法名
+        //统计项目基本信息
+        log.info("开始计算项目的基本金额，proId:{}",proId);
+        calculateProjectForBaseInfo(inventoryProjectInfo,map);
+        //计算项目的 统计信息
+        log.info("开始计算项目的统计金额，proId:{}",proId);
+        calculateProjectForTotalMoney(inventoryProjectInfo,map);
+        log.info("计算项目的相关金额完毕，更新项目信息，proId:{}",proId);
+        return inventoryProjectInfoMapper.updateById(inventoryProjectInfo) > 0;
+    }
 
+    /**
+     * 计算基础信息的金额
+     * @param inventoryProjectInfo
+     */
+    private void calculateProjectForBaseInfo(InventoryProjectInfo inventoryProjectInfo,Map<Integer, List<InventoryProjectBusiness>> map) {
+        //判断项目金额和质保金 如果无 置为0
+        //合同金额
+        if(null == inventoryProjectInfo.getAmountContract()){
+            inventoryProjectInfo.setAmountContract("0");
+        }
+        //商务费用
+        if(null == inventoryProjectInfo.getAmountBusiness()){
+            inventoryProjectInfo.setAmountBusiness("0");
+        }
+        //质保金
+        if(null == inventoryProjectInfo.getAmountWarranty()){
+            inventoryProjectInfo.setAmountWarranty("0");
+        }
+        //商务费用 手动输入
+//        inventoryProjectInfo.setAmountBusiness();
+        BigDecimal costIncludingTax = new BigDecimal(0);
+        BigDecimal costExcludingTax = new BigDecimal(0);
+        //支出记录
+        for(InventoryProjectBusiness inventoryProjectBusiness:map.getOrDefault(1, Lists.newArrayList())){
+            costIncludingTax = costIncludingTax.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
+            //先加价格 再减去税
+            costExcludingTax = costExcludingTax.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())))
+                    .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountTaxes())));
+        }
+        //计算含税成本
+        inventoryProjectInfo.setAmountCostTax(costIncludingTax.toString());
+        //计算不含税成本
+        inventoryProjectInfo.setAmountCostNoTax(costExcludingTax.toString());
+        //计算税务成本 (合同金额一含税成本)*15%
+        inventoryProjectInfo.setAmountTax((BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountContract()))
+                .subtract(costIncludingTax)).multiply(BigDecimal.valueOf(0.15)).toString());
+        //计算利润 合同金额一 质保金一含税成本 不含税成本 税务成本
+        inventoryProjectInfo.setAmountProfit(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountContract()))
+                .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountWarranty())))
+                .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountCostTax())))
+                .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountCostNoTax())))
+                .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountTax()))).toString());
+        //计算业务提成 ( 利润一商务费用]*10%
+        inventoryProjectInfo.setAmountCommissionBusiness(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountProfit()))
+                .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountBusiness())))
+                .multiply(BigDecimal.valueOf(0.15)).toString());
+        //计算技术提成 ( 利润一商务费用]*10%
+        inventoryProjectInfo.setAmountCommissionTechnical(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountProfit()))
+                .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountBusiness())))
+                .multiply(BigDecimal.valueOf(0.15)).toString());
+        //计算管理提成 ( 利润一商务费用]*10%
+        inventoryProjectInfo.setAmountCommissionManagement(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountProfit()))
+                .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountBusiness())))
+                .multiply(BigDecimal.valueOf(0.15)).toString());
+
+    }
+
+    /**
+     * 重新统计项目的金额
+     * @param inventoryProjectInfo
+     */
+    private void calculateProjectForTotalMoney(InventoryProjectInfo inventoryProjectInfo,Map<Integer, List<InventoryProjectBusiness>> map) {
 
         //说明 项目应收款 = 合同金额
         //已收款 出纳确认过的项目收入的金额
@@ -132,9 +190,9 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         BigDecimal totalUnpaid = new BigDecimal(0);
         for(InventoryProjectBusiness inventoryProjectBusiness:map.getOrDefault(1, Lists.newArrayList())){
             if(StatusTypeEnum.CASHI_SUCCESS.getCode().equals(Integer.valueOf(inventoryProjectBusiness.getStatus()))){
-                totalPaid = totalReceived.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getCashierAmount())));
+                totalPaid = totalPaid.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getCashierAmount())));
             }else if(StatusTypeEnum.CHECK_SUCCESS.getCode().equals(Integer.valueOf(inventoryProjectBusiness.getStatus()))){
-                totalUnpaid = totalUnreceived.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
+                totalUnpaid = totalUnpaid.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
             }
         }
         //应支付 审批通过的项目支出金额
@@ -142,7 +200,7 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         // 未支付 应支付-已支付
         inventoryProjectInfo.setTotalPayable(totalUnpaid.toString());
         inventoryProjectInfo.setTotalPaid(totalPaid.toString());
-        inventoryProjectInfo.setTotalUnpaid(totalUnpaid.divide(totalPaid).toString());
+        inventoryProjectInfo.setTotalUnpaid(totalUnpaid.subtract(totalPaid).toString());
     }
 
 

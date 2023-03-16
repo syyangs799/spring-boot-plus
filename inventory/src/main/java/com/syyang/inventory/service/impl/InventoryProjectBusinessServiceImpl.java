@@ -3,10 +3,12 @@ package com.syyang.inventory.service.impl;
 import cn.hutool.core.util.StrUtil;
 import com.syyang.inventory.entity.InventoryDailyBusiness;
 import com.syyang.inventory.entity.InventoryProjectBusiness;
+import com.syyang.inventory.enums.StatusTypeEnum;
 import com.syyang.inventory.mapper.InventoryProjectBusinessMapper;
 import com.syyang.inventory.service.InventoryProjectBusinessService;
 import com.syyang.inventory.param.InventoryProjectBusinessPageParam;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.syyang.inventory.service.InventoryProjectInfoService;
 import com.syyang.springbootplus.framework.common.service.impl.BaseServiceImpl;
 import com.syyang.springbootplus.framework.core.pagination.Paging;
 import com.syyang.springbootplus.framework.core.pagination.PageInfo;
@@ -33,6 +35,9 @@ public class InventoryProjectBusinessServiceImpl extends BaseServiceImpl<Invento
     @Autowired
     private InventoryProjectBusinessMapper inventoryProjectBusinessMapper;
 
+    @Autowired
+    private InventoryProjectInfoService inventoryProjectInfoService;
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean saveInventoryProjectBusiness(InventoryProjectBusiness inventoryProjectBusiness) throws Exception {
@@ -42,7 +47,12 @@ public class InventoryProjectBusinessServiceImpl extends BaseServiceImpl<Invento
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean updateInventoryProjectBusiness(InventoryProjectBusiness inventoryProjectBusiness) throws Exception {
-        return super.updateById(inventoryProjectBusiness);
+        boolean b = super.updateById(inventoryProjectBusiness);
+        //判断一下如果是出纳 需要更新项目信息
+        if(inventoryProjectBusiness.getStatus().equals(String.valueOf(StatusTypeEnum.CASHI_SUCCESS.getCode()))) {
+            inventoryProjectInfoService.calculateProjectInformation(inventoryProjectBusiness.getProId());
+        }
+        return b;
     }
 
     @Transactional(rollbackFor = Exception.class)
