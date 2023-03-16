@@ -47,6 +47,8 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean saveInventoryProjectInfo(InventoryProjectInfo inventoryProjectInfo) throws Exception {
+        //项目状态强制置为新建
+        inventoryProjectInfo.setStatus(StatusTypeEnum.CHECKING.getCode().toString());
         boolean save = super.save(inventoryProjectInfo);
         calculateProjectInformation(inventoryProjectInfo.getId());
         return save;
@@ -85,6 +87,19 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
     public boolean calculateProjectInformation(Integer proId) {
         log.info("开始计算项目的相关金额，proId:{}",proId);
         InventoryProjectInfo inventoryProjectInfo = inventoryProjectInfoMapper.selectById(proId);
+        //判断项目金额和质保金 如果无 置为0
+        //合同金额
+        if(null == inventoryProjectInfo.getAmountContract()){
+            inventoryProjectInfo.setAmountContract("0");
+        }
+        //商务费用
+        if(null == inventoryProjectInfo.getAmountBusiness()){
+            inventoryProjectInfo.setAmountBusiness("0");
+        }
+        //质保金
+        if(null == inventoryProjectInfo.getAmountWarranty()){
+            inventoryProjectInfo.setAmountWarranty("0");
+        }
         //查询项目的收支数据
         LambdaQueryWrapper<InventoryProjectBusiness> inventoryProjectBusinessLambdaQueryWrapper= new LambdaQueryWrapper<>();
         inventoryProjectBusinessLambdaQueryWrapper.eq(InventoryProjectBusiness::getProId,inventoryProjectInfo.getId());
@@ -107,19 +122,6 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
      * @param inventoryProjectInfo
      */
     private void calculateProjectForBaseInfo(InventoryProjectInfo inventoryProjectInfo,Map<Integer, List<InventoryProjectBusiness>> map) {
-        //判断项目金额和质保金 如果无 置为0
-        //合同金额
-        if(null == inventoryProjectInfo.getAmountContract()){
-            inventoryProjectInfo.setAmountContract("0");
-        }
-        //商务费用
-        if(null == inventoryProjectInfo.getAmountBusiness()){
-            inventoryProjectInfo.setAmountBusiness("0");
-        }
-        //质保金
-        if(null == inventoryProjectInfo.getAmountWarranty()){
-            inventoryProjectInfo.setAmountWarranty("0");
-        }
         //商务费用 手动输入
 //        inventoryProjectInfo.setAmountBusiness();
         BigDecimal costIncludingTax = new BigDecimal(0);
