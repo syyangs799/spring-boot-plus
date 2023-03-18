@@ -48,8 +48,8 @@ public class InventoryProjectBusinessServiceImpl extends BaseServiceImpl<Invento
     @Override
     public boolean updateInventoryProjectBusiness(InventoryProjectBusiness inventoryProjectBusiness) throws Exception {
         boolean b = super.updateById(inventoryProjectBusiness);
-        //判断一下如果是出纳 需要更新项目信息
-        if(inventoryProjectBusiness.getStatus().equals(String.valueOf(StatusTypeEnum.CASHI_SUCCESS.getCode()))) {
+        //判断一下如果是出纳或者审核通过 需要更新项目信息
+        if(inventoryProjectBusiness.getStatus().equals(String.valueOf(StatusTypeEnum.CASHI_SUCCESS.getCode())) || inventoryProjectBusiness.getStatus().equals(String.valueOf(StatusTypeEnum.CHECK_SUCCESS.getCode()))) {
             inventoryProjectInfoService.calculateProjectInformation(inventoryProjectBusiness.getProId());
         }
         return b;

@@ -1,5 +1,6 @@
 package com.syyang.inventory.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
 import com.syyang.inventory.entity.InventoryProductInfo;
 import com.syyang.inventory.entity.InventoryProjectBusiness;
@@ -72,6 +73,9 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
     public Paging<InventoryProjectInfo> getInventoryProjectInfoPageList(InventoryProjectInfoPageParam inventoryProjectInfoPageParam) {
         Page<InventoryProjectInfo> page = new PageInfo<>(inventoryProjectInfoPageParam, OrderItem.desc(getLambdaColumn(InventoryProjectInfo::getCreateTime)));
         LambdaQueryWrapper<InventoryProjectInfo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StrUtil.isNotBlank(inventoryProjectInfoPageParam.getStatus()),InventoryProjectInfo::getStatus,inventoryProjectInfoPageParam.getStatus())
+                .eq(StrUtil.isNotBlank(inventoryProjectInfoPageParam.getStep()),InventoryProjectInfo::getStep,inventoryProjectInfoPageParam.getStep())
+                .like(StrUtil.isNotBlank(inventoryProjectInfoPageParam.getKeyword()),InventoryProjectInfo::getProjectName,inventoryProjectInfoPageParam.getKeyword());
         IPage<InventoryProjectInfo> iPage = inventoryProjectInfoMapper.selectPage(page, wrapper);
         return new Paging<InventoryProjectInfo>(iPage);
     }
@@ -79,6 +83,9 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
     @Override
     public List<InventoryProjectInfo> getInventoryProjectInfoList(InventoryProjectInfoPageParam inventoryProjectInfoPageParam) {
         LambdaQueryWrapper<InventoryProjectInfo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StrUtil.isNotBlank(inventoryProjectInfoPageParam.getStatus()),InventoryProjectInfo::getStatus,inventoryProjectInfoPageParam.getStatus())
+                .eq(StrUtil.isNotBlank(inventoryProjectInfoPageParam.getStep()),InventoryProjectInfo::getStep,inventoryProjectInfoPageParam.getStep())
+                .like(StrUtil.isNotBlank(inventoryProjectInfoPageParam.getKeyword()),InventoryProjectInfo::getProjectName,inventoryProjectInfoPageParam.getKeyword());
         return inventoryProjectInfoMapper.selectList(wrapper);
     }
 
@@ -179,12 +186,13 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         for(InventoryProjectBusiness inventoryProjectBusiness:map.getOrDefault(0, Lists.newArrayList())){
             if(StatusTypeEnum.CASHI_SUCCESS.getCode().equals(Integer.valueOf(inventoryProjectBusiness.getStatus()))){
                 totalReceived = totalReceived.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getCashierAmount())));
-            }else if(StatusTypeEnum.CHECK_SUCCESS.getCode().equals(Integer.valueOf(inventoryProjectBusiness.getStatus()))){
-                totalUnreceived = totalUnreceived.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
             }
+//            else if(StatusTypeEnum.CHECK_SUCCESS.getCode().equals(Integer.valueOf(inventoryProjectBusiness.getStatus()))){
+//                totalUnreceived = totalUnreceived.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
+//            }
         }
         inventoryProjectInfo.setTotalReceived(totalReceived.toString());
-        inventoryProjectInfo.setTotalUnreceived(totalUnreceived.toString());
+        inventoryProjectInfo.setTotalUnreceived(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalReceivables())).subtract(totalReceived).toString());
 
         //项目统计-已支付
         BigDecimal totalPaid = new BigDecimal(0);
