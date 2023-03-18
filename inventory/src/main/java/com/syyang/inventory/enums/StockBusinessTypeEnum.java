@@ -24,8 +24,8 @@ import com.syyang.springbootplus.framework.common.enums.BaseEnum;
  * @date 2019-10-24
  **/
 public enum StockBusinessTypeEnum implements BaseEnum {
-    IN(1, "入库"),
-    OUT(2, "出库");
+    IN(0, "入库"),
+    OUT(1, "出库");
 
     private Integer code;
     private String desc;

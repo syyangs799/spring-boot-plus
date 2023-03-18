@@ -7,6 +7,7 @@ import com.syyang.inventory.entity.InventoryProjectBusiness;
 import com.syyang.inventory.entity.InventoryProjectInfo;
 import com.syyang.inventory.entity.InventoryStockBusiness;
 import com.syyang.inventory.enums.StatusTypeEnum;
+import com.syyang.inventory.enums.StockBusinessTypeEnum;
 import com.syyang.inventory.mapper.InventoryProjectBusinessMapper;
 import com.syyang.inventory.mapper.InventoryProjectInfoMapper;
 import com.syyang.inventory.service.InventoryProjectInfoService;
@@ -134,7 +135,7 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         BigDecimal costIncludingTax = new BigDecimal(0);
         BigDecimal costExcludingTax = new BigDecimal(0);
         //支出记录
-        for(InventoryProjectBusiness inventoryProjectBusiness:map.getOrDefault(1, Lists.newArrayList())){
+        for(InventoryProjectBusiness inventoryProjectBusiness:map.getOrDefault(StockBusinessTypeEnum.OUT.getCode(), Lists.newArrayList())){
             costIncludingTax = costIncludingTax.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
             //先加价格 再减去税
             costExcludingTax = costExcludingTax.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())))
@@ -183,7 +184,7 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         BigDecimal totalReceived = new BigDecimal(0);
         //项目统计-待收款
         BigDecimal totalUnreceived = new BigDecimal(0);
-        for(InventoryProjectBusiness inventoryProjectBusiness:map.getOrDefault(0, Lists.newArrayList())){
+        for(InventoryProjectBusiness inventoryProjectBusiness:map.getOrDefault(StockBusinessTypeEnum.IN.getCode(), Lists.newArrayList())){
             if(StatusTypeEnum.CASHI_SUCCESS.getCode().equals(Integer.valueOf(inventoryProjectBusiness.getStatus()))){
                 totalReceived = totalReceived.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getCashierAmount())));
             }
@@ -198,7 +199,7 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         BigDecimal totalPaid = new BigDecimal(0);
         //项目统计-未支付
         BigDecimal totalUnpaid = new BigDecimal(0);
-        for(InventoryProjectBusiness inventoryProjectBusiness:map.getOrDefault(1, Lists.newArrayList())){
+        for(InventoryProjectBusiness inventoryProjectBusiness:map.getOrDefault(StockBusinessTypeEnum.OUT.getCode(), Lists.newArrayList())){
             if(StatusTypeEnum.CASHI_SUCCESS.getCode().equals(Integer.valueOf(inventoryProjectBusiness.getStatus()))){
                 totalPaid = totalPaid.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getCashierAmount())));
             }else if(StatusTypeEnum.CHECK_SUCCESS.getCode().equals(Integer.valueOf(inventoryProjectBusiness.getStatus()))){

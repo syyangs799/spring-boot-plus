@@ -231,9 +231,9 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
         CommonListUtils.listGroup2Map(inventoryStockBusinesses, proInventoryStockBusiness, InventoryStockBusiness.class, "getType");// 输入方法名
 
         //入库
-        List<InventoryStockBusiness> in = proInventoryStockBusiness.getOrDefault(1,Lists.newArrayList());
+        List<InventoryStockBusiness> in = proInventoryStockBusiness.getOrDefault(StockBusinessTypeEnum.IN.getCode(),Lists.newArrayList());
         //出库
-        List<InventoryStockBusiness> out = proInventoryStockBusiness.getOrDefault(2,Lists.newArrayList());
+        List<InventoryStockBusiness> out = proInventoryStockBusiness.getOrDefault(StockBusinessTypeEnum.OUT.getCode(),Lists.newArrayList());
         Map<Integer, List<InventoryStockBusiness>> outMap = new LinkedHashMap<Integer, List<InventoryStockBusiness>>();
         CommonListUtils.listGroup2Map(out, outMap, InventoryStockBusiness.class, "getBachId");// 输入方法名
 
