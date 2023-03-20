@@ -22,7 +22,7 @@ import com.syyang.springbootplus.framework.core.pagination.BasePageOrderParam;
 public class InventoryProjectInfoPageParam extends BasePageOrderParam {
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("项目状态，0表示创建 1表示提交审批 2表示通过 -1表示未通过")
+    @ApiModelProperty("项目状态，1表示提交审批 2表示通过 -1表示未通过")
     private String status;
 
 

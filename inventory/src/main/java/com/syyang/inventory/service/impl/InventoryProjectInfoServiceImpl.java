@@ -1,15 +1,15 @@
 package com.syyang.inventory.service.impl;
 
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
-import com.syyang.inventory.entity.InventoryProductInfo;
-import com.syyang.inventory.entity.InventoryProjectBusiness;
-import com.syyang.inventory.entity.InventoryProjectInfo;
-import com.syyang.inventory.entity.InventoryStockBusiness;
+import com.syyang.inventory.entity.*;
+import com.syyang.inventory.enums.ProjectOperationTypeEnum;
 import com.syyang.inventory.enums.StatusTypeEnum;
 import com.syyang.inventory.enums.StockBusinessTypeEnum;
 import com.syyang.inventory.mapper.InventoryProjectBusinessMapper;
 import com.syyang.inventory.mapper.InventoryProjectInfoMapper;
+import com.syyang.inventory.mapper.InventoryProjectOperationRecordMapper;
 import com.syyang.inventory.service.InventoryProjectInfoService;
 import com.syyang.inventory.param.InventoryProjectInfoPageParam;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -19,6 +19,9 @@ import com.syyang.springbootplus.framework.core.pagination.PageInfo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.syyang.springbootplus.framework.shiro.util.JwtTokenUtil;
+import com.syyang.springbootplus.framework.shiro.util.JwtUtil;
+import com.syyang.springbootplus.framework.util.BeanUtils;
 import com.syyang.springbootplus.framework.util.CommonListUtils;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +48,8 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
     private InventoryProjectInfoMapper inventoryProjectInfoMapper;
     @Autowired
     private InventoryProjectBusinessMapper inventoryProjectBusinessMapper;
+    @Autowired
+    private InventoryProjectOperationRecordMapper inventoryProjectOperationRecordMapper;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -53,14 +58,34 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         inventoryProjectInfo.setStatus(StatusTypeEnum.CHECKING.getCode().toString());
         boolean save = super.save(inventoryProjectInfo);
         calculateProjectInformation(inventoryProjectInfo.getId());
+        //添加项目操作日志 谁创建了项目
+        InventoryProjectOperationRecord inventoryProjectOperationRecord = new InventoryProjectOperationRecord();
+        inventoryProjectOperationRecord.setProjectId(inventoryProjectInfo.getId());
+        //谁+时间+操作类型+内容
+        inventoryProjectOperationRecord.setOperationName("人员[" + JwtUtil.getUsername(JwtTokenUtil.getToken()) + "],时间[" + DateTime.now().toString("yyyy-MM-DD HH:mm:ss") + "],操作[" + ProjectOperationTypeEnum.PROJECT_CREATE_BASE_INFO.getDesc() + "]");
+        inventoryProjectOperationRecord.setOperationType(ProjectOperationTypeEnum.PROJECT_CREATE_BASE_INFO.getDesc());
+        inventoryProjectOperationRecord.setOperationTypeName(ProjectOperationTypeEnum.PROJECT_CREATE_BASE_INFO.getCode().toString());
+        inventoryProjectOperationRecord.setUpdateContent(BeanUtils.getChangedFields(new InventoryProjectInfo(),inventoryProjectInfo));
+        inventoryProjectOperationRecordMapper.insert(inventoryProjectOperationRecord);
         return save;
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean updateInventoryProjectInfo(InventoryProjectInfo inventoryProjectInfo) throws Exception {
+        InventoryProjectInfo old = getById(inventoryProjectInfo.getId());
         boolean b = super.updateById(inventoryProjectInfo);
         calculateProjectInformation(inventoryProjectInfo.getId());
+        //添加项目操作日志 谁创建了项目
+        InventoryProjectOperationRecord inventoryProjectOperationRecord = new InventoryProjectOperationRecord();
+        inventoryProjectOperationRecord.setProjectId(inventoryProjectInfo.getId());
+        //谁+时间+操作类型+内容
+        inventoryProjectOperationRecord.setOperationName("人员[" + JwtUtil.getUsername(JwtTokenUtil.getToken()) + "],时间[" + DateTime.now().toString("yyyy-MM-DD HH:mm:ss") + "],操作[" + ProjectOperationTypeEnum.PROJECT_UPDATE_BASE_INFO.getDesc() + "]");
+        inventoryProjectOperationRecord.setOperationType(ProjectOperationTypeEnum.PROJECT_UPDATE_BASE_INFO.getDesc());
+        inventoryProjectOperationRecord.setOperationTypeName(ProjectOperationTypeEnum.PROJECT_UPDATE_BASE_INFO.getCode().toString());
+        inventoryProjectOperationRecord.setUpdateContent(BeanUtils.getChangedFields(old,inventoryProjectInfo));
+        inventoryProjectOperationRecordMapper.insert(inventoryProjectOperationRecord);
+
         return b;
     }
 

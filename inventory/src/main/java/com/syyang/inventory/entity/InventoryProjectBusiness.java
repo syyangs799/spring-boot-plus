@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.syyang.springbootplus.framework.common.annotationun.LogForUpdate;
 import com.syyang.springbootplus.framework.common.entity.BaseEntity;
 
 import java.time.LocalDateTime;
@@ -42,17 +43,22 @@ public class InventoryProjectBusiness extends BaseEntity {
     private Integer proId;
 
     @ApiModelProperty("交易类型 0收入和1支出")
+    @LogForUpdate(fieldName = "交易类型")
     private Integer type;
 
     @ApiModelProperty("子类型-码表")
     private String subType;
+
     @ApiModelProperty("子类型名称")
+    @LogForUpdate(fieldName = "项目收支类型名称")
     private String subTypeName;
 
     @ApiModelProperty("金额")
+    @LogForUpdate(fieldName = "金额")
     private String amountMoney;
 
     @ApiModelProperty("税金")
+    @LogForUpdate(fieldName = "税金")
     private String amountTaxes;
 
     @ApiModelProperty("交易时间")
@@ -72,7 +78,7 @@ public class InventoryProjectBusiness extends BaseEntity {
     @TableField(fill = FieldFill.INSERT)
     private String createUserName;
 
-    @ApiModelProperty("交易状态 0表示创建 1表示提交审批 2表示通过 -1表示未通过 3表示已入账 4表示未入账")
+    @ApiModelProperty("交易状态 1表示提交审批 2表示通过 -1表示未通过 3表示已入账 4表示未入账")
     private String status;
 
     @ApiModelProperty("审核人")
