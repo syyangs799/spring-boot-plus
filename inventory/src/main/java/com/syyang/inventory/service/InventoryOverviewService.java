@@ -1,0 +1,25 @@
+package com.syyang.inventory.service;
+
+import com.syyang.inventory.entity.InventoryProductInfo;
+import com.syyang.inventory.entity.InventoryProjectInfo;
+import com.syyang.inventory.entity.vo.KeyAndValueVo;
+import com.syyang.inventory.param.InventoryOverviewParam;
+import com.syyang.inventory.param.InventoryProductInfoPageParam;
+import com.syyang.springbootplus.framework.common.service.BaseService;
+import com.syyang.springbootplus.framework.core.pagination.Paging;
+
+import java.util.List;
+
+/**
+ * 产品信息表 服务类
+ *
+ * @author syyang
+ * @since 2023-03-02
+ */
+public interface InventoryOverviewService extends BaseService<InventoryProductInfo> {
+
+
+    List<KeyAndValueVo> getProjectFinance(InventoryOverviewParam inventoryOverviewParam);
+
+    List<KeyAndValueVo> getDailyFinance(InventoryOverviewParam inventoryOverviewParam);
+}

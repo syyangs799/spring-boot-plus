@@ -1,6 +1,7 @@
 package com.syyang.inventory.service;
 
 import com.syyang.inventory.entity.InventoryProjectInfo;
+import com.syyang.inventory.param.InventoryOverviewParam;
 import com.syyang.inventory.param.InventoryProjectInfoPageParam;
 import com.syyang.springbootplus.framework.common.service.BaseService;
 import com.syyang.springbootplus.framework.core.pagination.Paging;
@@ -62,4 +63,5 @@ public interface InventoryProjectInfoService extends BaseService<InventoryProjec
      * @return
      */
     boolean calculateProjectInformation(Integer proId);
+
 }

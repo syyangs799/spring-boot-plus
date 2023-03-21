@@ -39,6 +39,9 @@ public class InventoryStockBusiness extends BaseEntity {
     @ApiModelProperty("产品id")
     private String productId;
 
+    @ApiModelProperty("产品名称")
+    private String productName;
+
     @ApiModelProperty("交易类型，0入库 1出库")
     private Integer type;
 
@@ -70,6 +73,9 @@ public class InventoryStockBusiness extends BaseEntity {
 
     @ApiModelProperty("项目id，当前字段为出库时必填字段")
     private Integer projectId;
+
+    @ApiModelProperty("项目名称，当前字段为出库时必填字段")
+    private String projectName;
 
     @ApiModelProperty("创建时间")
     @TableField(fill = FieldFill.INSERT)
