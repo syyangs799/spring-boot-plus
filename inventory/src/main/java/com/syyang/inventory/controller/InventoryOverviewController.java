@@ -23,6 +23,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 大屏总览效果 控制器
@@ -52,6 +53,17 @@ public class InventoryOverviewController extends BaseController {
     }
 
     /**
+     * 项目收支相关统计
+     */
+    @GetMapping("/projectStatusFinance")
+    @OperationLog(name = "大屏-项目状态相关统计-新建，实施，完成", type = OperationLogType.INFO)
+    @ApiOperation(value = "大屏-项目状态相关统计-新建，实施，完成", response = InventoryProjectInfo.class)
+    public ApiResult<List<KeyAndValueVo>> getProjectStatusFinance(@Validated @RequestBody InventoryOverviewParam inventoryOverviewParam) throws Exception {
+        List<KeyAndValueVo> keyAndValueVos = inventoryOverviewService.getProjectStatusFinance(inventoryOverviewParam);
+        return ApiResult.ok(keyAndValueVos);
+    }
+
+    /**
      * 日常收支相关统计
      */
     @GetMapping("/dailyFinance")
@@ -62,5 +74,27 @@ public class InventoryOverviewController extends BaseController {
         return ApiResult.ok(keyAndValueVos);
     }
 
+    /**
+     * 经营情况相关统计
+     */
+    @GetMapping("/dailyFinance")
+    @OperationLog(name = "大屏-经营情况相关统计", type = OperationLogType.INFO)
+    @ApiOperation(value = "大屏-经营情况相关统计", response = InventoryProjectInfo.class)
+    public ApiResult<List<KeyAndValueVo>> getManageFinance(@Validated @RequestBody InventoryOverviewParam inventoryOverviewParam) throws Exception {
+        List<KeyAndValueVo> keyAndValueVos = inventoryOverviewService.getManageFinance(inventoryOverviewParam);
+        return ApiResult.ok(keyAndValueVos);
+    }
+
+
+    /**
+     * 收入支出相关统计
+     */
+    @GetMapping("/expensesAndEeceiptsFinance")
+    @OperationLog(name = "大屏-经营情况相关统计", type = OperationLogType.INFO)
+    @ApiOperation(value = "大屏-经营情况相关统计", response = InventoryProjectInfo.class)
+    public ApiResult<Map<String,List<KeyAndValueVo>>> getExpensesAndEeceiptsFinance(@Validated @RequestBody InventoryOverviewParam inventoryOverviewParam) throws Exception {
+        Map<String,List<KeyAndValueVo>> keyAndValueVos = inventoryOverviewService.getExpensesAndEeceiptsFinance(inventoryOverviewParam);
+        return ApiResult.ok(keyAndValueVos);
+    }
 }
 

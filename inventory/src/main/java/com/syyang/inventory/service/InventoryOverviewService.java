@@ -9,6 +9,7 @@ import com.syyang.springbootplus.framework.common.service.BaseService;
 import com.syyang.springbootplus.framework.core.pagination.Paging;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 产品信息表 服务类
@@ -22,4 +23,10 @@ public interface InventoryOverviewService extends BaseService<InventoryProductIn
     List<KeyAndValueVo> getProjectFinance(InventoryOverviewParam inventoryOverviewParam);
 
     List<KeyAndValueVo> getDailyFinance(InventoryOverviewParam inventoryOverviewParam);
+
+    List<KeyAndValueVo> getManageFinance(InventoryOverviewParam inventoryOverviewParam);
+
+    List<KeyAndValueVo> getProjectStatusFinance(InventoryOverviewParam inventoryOverviewParam);
+
+    Map<String, List<KeyAndValueVo>> getExpensesAndEeceiptsFinance(InventoryOverviewParam inventoryOverviewParam);
 }
