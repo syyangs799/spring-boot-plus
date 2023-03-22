@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.syyang.inventory.entity.InventoryProductInfo;
 import com.syyang.inventory.entity.InventoryProjectInfo;
+import com.syyang.inventory.entity.vo.EChartVo;
 import com.syyang.inventory.entity.vo.KeyAndValueVo;
 import com.syyang.inventory.mapper.InventoryProductInfoMapper;
 import com.syyang.inventory.param.InventoryOverviewParam;
@@ -44,9 +45,9 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         keyAndValueVos.add(new KeyAndValueVo("总余额","5550000"));
         keyAndValueVos.add(new KeyAndValueVo("应收总金额","5550000"));
         keyAndValueVos.add(new KeyAndValueVo("已收总金额","5550000"));
-        keyAndValueVos.add(new KeyAndValueVo("未收总金额","5550000"));
         keyAndValueVos.add(new KeyAndValueVo("质保金金额","5550000"));
         keyAndValueVos.add(new KeyAndValueVo("应付总金额","5550000"));
+        keyAndValueVos.add(new KeyAndValueVo("已付总金额","5550000"));
         keyAndValueVos.add(new KeyAndValueVo("未支付金额","5550000"));
         return keyAndValueVos;
     }
@@ -74,12 +75,8 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
     }
 
     @Override
-    public List<KeyAndValueVo> getProjectStatusFinance(InventoryOverviewParam inventoryOverviewParam) {
-        List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
-        keyAndValueVos.add(new KeyAndValueVo("售前","10"));
-        keyAndValueVos.add(new KeyAndValueVo("实施","222"));
-        keyAndValueVos.add(new KeyAndValueVo("售后","333"));
-        keyAndValueVos.add(new KeyAndValueVo("完成","33"));
+    public EChartVo getProjectStatusFinance(InventoryOverviewParam inventoryOverviewParam) {
+        EChartVo keyAndValueVos = new EChartVo();
         return keyAndValueVos;
     }
 
