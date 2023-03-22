@@ -11,6 +11,7 @@ import com.syyang.inventory.enums.StockBusinessTypeEnum;
 import com.syyang.inventory.mapper.InventoryProjectBusinessMapper;
 import com.syyang.inventory.mapper.InventoryProjectInfoMapper;
 import com.syyang.inventory.mapper.InventoryProjectOperationRecordMapper;
+import com.syyang.inventory.mapper.InventoryStockBusinessMapper;
 import com.syyang.inventory.service.InventoryProjectInfoService;
 import com.syyang.inventory.param.InventoryProjectInfoPageParam;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -49,6 +50,9 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
     private InventoryProjectInfoMapper inventoryProjectInfoMapper;
     @Autowired
     private InventoryProjectBusinessMapper inventoryProjectBusinessMapper;
+
+    @Autowired
+    private InventoryStockBusinessMapper inventoryStockBusinessMapper;
     @Autowired
     private InventoryProjectOperationRecordMapper inventoryProjectOperationRecordMapper;
 
@@ -134,17 +138,29 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         }
         //查询项目的收支数据
         LambdaQueryWrapper<InventoryProjectBusiness> inventoryProjectBusinessLambdaQueryWrapper= new LambdaQueryWrapper<>();
-        inventoryProjectBusinessLambdaQueryWrapper.eq(InventoryProjectBusiness::getProId,inventoryProjectInfo.getId());
+        inventoryProjectBusinessLambdaQueryWrapper.eq(InventoryProjectBusiness::getProId,inventoryProjectInfo.getId())
+                        .and(wrapper->wrapper.eq(InventoryProjectBusiness::getStatus,StatusTypeEnum.CHECK_SUCCESS.getCode().toString())
+                                .or().eq(InventoryProjectBusiness::getStatus,StatusTypeEnum.CASHI_SUCCESS.getCode().toString()));
         List<InventoryProjectBusiness> inventoryProjectBusinesses = inventoryProjectBusinessMapper.selectList(inventoryProjectBusinessLambdaQueryWrapper);
 
-        Map<Integer, List<InventoryProjectBusiness>> map = new LinkedHashMap<Integer, List<InventoryProjectBusiness>>();
-        CommonListUtils.listGroup2Map(inventoryProjectBusinesses, map, InventoryProjectBusiness.class, "getType");// 输入方法名
+        Map<Integer, List<InventoryProjectBusiness>> businessMap = new LinkedHashMap<Integer, List<InventoryProjectBusiness>>();
+        CommonListUtils.listGroup2Map(inventoryProjectBusinesses, businessMap, InventoryProjectBusiness.class, "getType");// 输入方法名
+
+
+        //查询项目的出库记录
+        LambdaQueryWrapper<InventoryStockBusiness> inventoryStockBusinessLambdaQueryWrapper= new LambdaQueryWrapper<>();
+        inventoryStockBusinessLambdaQueryWrapper.eq(InventoryStockBusiness::getProjectId,inventoryProjectInfo.getId())
+                .eq(InventoryStockBusiness::getType,StockBusinessTypeEnum.OUT.getCode());
+        List<InventoryStockBusiness> inventoryStockBusinesses = inventoryStockBusinessMapper.selectList(inventoryStockBusinessLambdaQueryWrapper);
+
+        Map<Integer, List<InventoryStockBusiness>> stockMap = new LinkedHashMap<Integer, List<InventoryStockBusiness>>();
+        CommonListUtils.listGroup2Map(inventoryStockBusinesses, stockMap, InventoryStockBusiness.class, "getType");// 输入方法名
         //统计项目基本信息
         log.info("开始计算项目的基本金额，proId:{}",proId);
-        calculateProjectForBaseInfo(inventoryProjectInfo,map);
+        calculateProjectForBaseInfo(inventoryProjectInfo,businessMap,stockMap);
         //计算项目的 统计信息
         log.info("开始计算项目的统计金额，proId:{}",proId);
-        calculateProjectForTotalMoney(inventoryProjectInfo,map);
+        calculateProjectForTotalMoney(inventoryProjectInfo,businessMap);
         log.info("计算项目的相关金额完毕，更新项目信息，proId:{}",proId);
         return inventoryProjectInfoMapper.updateById(inventoryProjectInfo) > 0;
     }
@@ -153,26 +169,27 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
      * 计算基础信息的金额
      * @param inventoryProjectInfo
      */
-    private void calculateProjectForBaseInfo(InventoryProjectInfo inventoryProjectInfo,Map<Integer, List<InventoryProjectBusiness>> map) {
+    private void calculateProjectForBaseInfo(InventoryProjectInfo inventoryProjectInfo,Map<Integer, List<InventoryProjectBusiness>> businessMap,Map<Integer, List<InventoryStockBusiness>> stockMap) {
         //商务费用 手动输入
 //        inventoryProjectInfo.setAmountBusiness();
         BigDecimal costIncludingTax = new BigDecimal(0);
-        BigDecimal costExcludingTax = new BigDecimal(0);
-        //支出记录
-        for(InventoryProjectBusiness inventoryProjectBusiness:map.getOrDefault(StockBusinessTypeEnum.OUT.getCode(), Lists.newArrayList())){
-            costIncludingTax = costIncludingTax.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
-            //先加价格 再减去税
-            costExcludingTax = costExcludingTax.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())))
-                    .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountTaxes())));
+        //出库支出记录
+        for(InventoryStockBusiness inventoryStockBusiness:stockMap.getOrDefault(StockBusinessTypeEnum.OUT.getCode(), Lists.newArrayList())){
+            costIncludingTax = costIncludingTax.add(BigDecimal.valueOf(Double.valueOf(inventoryStockBusiness.getProductAmount())));
         }
-        //计算含税成本
+        //计算含税成本  含税成本是指出库记录里面的成本
         inventoryProjectInfo.setAmountCostTax(costIncludingTax.toString());
-        //计算不含税成本
+        BigDecimal costExcludingTax = new BigDecimal(0);
+        //项目支出记录
+        for(InventoryProjectBusiness inventoryProjectBusiness:businessMap.getOrDefault(StockBusinessTypeEnum.OUT.getCode(), Lists.newArrayList())){
+            costExcludingTax = costExcludingTax.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getCashierAmount())));
+        }
+        //计算不含税成本 不含税成本是指项目支出里面的 a及权限审批过后的金额
         inventoryProjectInfo.setAmountCostNoTax(costExcludingTax.toString());
         //计算税务成本 (合同金额一含税成本)*15%
         inventoryProjectInfo.setAmountTax((BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountContract()))
-                .subtract(costIncludingTax)).multiply(BigDecimal.valueOf(0.15)).toString());
-        //计算利润 合同金额一 质保金一含税成本 不含税成本 税务成本
+                .subtract(costIncludingTax)).multiply(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountTaxPaid()))).toString());
+        //计算项目利润 合同金额一 质保金一含税成本 不含税成本 税务成本
         inventoryProjectInfo.setAmountProfit(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountContract()))
                 .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountWarranty())))
                 .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountCostTax())))
@@ -181,16 +198,21 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         //计算业务提成 ( 利润一商务费用]*10%
         inventoryProjectInfo.setAmountCommissionBusiness(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountProfit()))
                 .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountBusiness())))
-                .multiply(BigDecimal.valueOf(0.15)).toString());
+                .multiply(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountCommissionBusinessPaid()))).toString());
         //计算技术提成 ( 利润一商务费用]*10%
         inventoryProjectInfo.setAmountCommissionTechnical(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountProfit()))
                 .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountBusiness())))
-                .multiply(BigDecimal.valueOf(0.15)).toString());
+                .multiply(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountCommissionTechnicalPaid()))).toString());
         //计算管理提成 ( 利润一商务费用]*10%
         inventoryProjectInfo.setAmountCommissionManagement(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountProfit()))
                 .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountBusiness())))
-                .multiply(BigDecimal.valueOf(0.15)).toString());
-
+                .multiply(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountCommissionManagementPaid()))).toString());
+        //计算项目纯利润  项目利润- 业务提成-技术提成-管理提成 -商务费用
+        inventoryProjectInfo.setAmountProfitNet(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountProfit()))
+                .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountCommissionBusiness())))
+                .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountCommissionTechnical())))
+                .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountCommissionManagement())))
+                .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountBusiness()))).toString());
     }
 
     /**

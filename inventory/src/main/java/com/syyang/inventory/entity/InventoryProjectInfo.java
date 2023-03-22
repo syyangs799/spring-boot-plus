@@ -76,57 +76,53 @@ public class InventoryProjectInfo extends BaseEntity {
     @LogForUpdate(fieldName = "质保金截止日期")
     private LocalDateTime amountWarrantyEnding;
 
-    @ApiModelProperty("利润")
-    @LogForUpdate(fieldName = "利润")
+    @ApiModelProperty("项目利润")
     private String amountProfit;
+
+    @ApiModelProperty("项目纯利润")
+    private String amountProfitNet;
 
     @ApiModelProperty("商务费用")
     @LogForUpdate(fieldName = "商务费用")
     private String amountBusiness;
 
-    @ApiModelProperty("商务费用已付 0表示未付 1表示已付")
-    @LogForUpdate(fieldName = "商务已付费用")
-    private String amountBusinessPaid;
+    @ApiModelProperty("商务费用利率 0-1的百分比")
+    @LogForUpdate(fieldName = "商务费用提成")
+    private String amountBusinessPaid = "0.15";
 
     @ApiModelProperty("含税成本")
-    @LogForUpdate(fieldName = "含税成本")
     private String amountCostTax;
 
     @ApiModelProperty("不含税成本")
-    @LogForUpdate(fieldName = "不含税成本")
     private String amountCostNoTax;
 
     @ApiModelProperty("税务成本")
-    @LogForUpdate(fieldName = "税务成本")
     private String amountTax;
 
-    @ApiModelProperty("税务成本已付 0表示未付 1表示已付")
-    @LogForUpdate(fieldName = "税务已付成本")
-    private String amountTaxPaid;
+    @ApiModelProperty("税务成本利率 0-1的百分比")
+    @LogForUpdate(fieldName = "税务已付成本提成")
+    private String amountTaxPaid = "0.15";
 
     @ApiModelProperty("业务提成")
-    @LogForUpdate(fieldName = "业务提成")
     private String amountCommissionBusiness;
 
-    @ApiModelProperty("业务提成已付 0表示未付 1表示已付")
-    @LogForUpdate(fieldName = "业务已付提成")
-    private String amountCommissionBusinessPaid;
+    @ApiModelProperty("业务提成利率 0-1的百分比")
+    @LogForUpdate(fieldName = "业务已付提成提成")
+    private String amountCommissionBusinessPaid = "0.15";
 
     @ApiModelProperty("技术提成")
-    @LogForUpdate(fieldName = "技术提成")
     private String amountCommissionTechnical;
 
-    @ApiModelProperty("技术提成已付 0表示未付 1表示已付")
-    @LogForUpdate(fieldName = "技术已付提成")
-    private String amountCommissionTechnicalPaid;
+    @ApiModelProperty("技术提成利率 0-1的百分比")
+    @LogForUpdate(fieldName = "技术已付提成提成")
+    private String amountCommissionTechnicalPaid = "0.15";
 
     @ApiModelProperty("管理提成")
-    @LogForUpdate(fieldName = "管理提成")
     private String amountCommissionManagement;
 
-    @ApiModelProperty("管理提成已付 0表示未付 1表示已付")
-    @LogForUpdate(fieldName = "管理已付提成")
-    private String amountCommissionManagementPaid;
+    @ApiModelProperty("管理提成利率 0-1的百分比")
+    @LogForUpdate(fieldName = "管理已付提成提成")
+    private String amountCommissionManagementPaid = "0.15";
 
     @ApiModelProperty("项目进度，新建 1  实施 2 完结 3")
     @LogForUpdate(fieldName = "项目进度")

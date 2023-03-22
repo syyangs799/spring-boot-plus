@@ -1,15 +1,18 @@
 package com.syyang.inventory.service.impl;
 
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
-import com.syyang.inventory.entity.InventoryProductInfo;
-import com.syyang.inventory.entity.InventoryProjectBusiness;
-import com.syyang.inventory.entity.InventoryStockBusiness;
-import com.syyang.inventory.entity.InventoryStockInfo;
+import com.syyang.inventory.entity.*;
+import com.syyang.inventory.enums.ProjectOperationTypeEnum;
+import com.syyang.inventory.enums.StatusTypeEnum;
 import com.syyang.inventory.enums.StockBusinessTypeEnum;
 import com.syyang.inventory.mapper.InventoryProductInfoMapper;
+import com.syyang.inventory.mapper.InventoryProjectOperationRecordMapper;
 import com.syyang.inventory.mapper.InventoryStockBusinessMapper;
 import com.syyang.inventory.mapper.InventoryStockInfoMapper;
+import com.syyang.inventory.service.InventoryProductInfoService;
+import com.syyang.inventory.service.InventoryProjectInfoService;
 import com.syyang.inventory.service.InventoryStockBusinessService;
 import com.syyang.inventory.param.InventoryStockBusinessPageParam;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -23,6 +26,7 @@ import com.syyang.springbootplus.framework.shiro.cache.LoginRedisService;
 import com.syyang.springbootplus.framework.shiro.util.JwtTokenUtil;
 import com.syyang.springbootplus.framework.shiro.util.JwtUtil;
 import com.syyang.springbootplus.framework.shiro.vo.LoginSysUserRedisVo;
+import com.syyang.springbootplus.framework.util.BeanUtils;
 import com.syyang.springbootplus.framework.util.CommonListUtils;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +55,10 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
     private InventoryStockInfoMapper inventoryStockInfoMapper;
     @Autowired
     private InventoryProductInfoMapper inventoryProductInfoMapper;
+    @Autowired
+    private InventoryProjectInfoService inventoryProjectInfoService;
+    @Autowired
+    private InventoryProjectOperationRecordMapper inventoryProjectOperationRecordMapper;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -210,6 +218,19 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
             if (!result) {
                 throw new Exception("当前流水新增出错，请联系管理员！！");
             }
+        }
+        for(InventoryStockBusiness entity:inventoryStockBusiness){
+            //新增流水之后添加项目的计算和变动日志
+            inventoryProjectInfoService.calculateProjectInformation(entity.getProjectId());
+            //添加项目操作日志 谁创建了项目
+            InventoryProjectOperationRecord inventoryProjectOperationRecord = new InventoryProjectOperationRecord();
+            inventoryProjectOperationRecord.setProjectId(entity.getProjectId());
+            //谁+时间+操作类型+内容
+            inventoryProjectOperationRecord.setOperationName("人员[" + JwtUtil.getUsername(JwtTokenUtil.getToken()) +  "],时间[" + DateTime.now().toString("yyyy-MM-DD HH:mm:ss") + "],操作[" + ProjectOperationTypeEnum.PROJECT_CREATE_OUTBOUND_INFO.getDesc() + "]");
+            inventoryProjectOperationRecord.setOperationType(ProjectOperationTypeEnum.PROJECT_CREATE_OUTBOUND_INFO.getDesc());
+            inventoryProjectOperationRecord.setOperationTypeName(ProjectOperationTypeEnum.PROJECT_CREATE_OUTBOUND_INFO.getCode().toString());
+            inventoryProjectOperationRecord.setUpdateContent(BeanUtils.getChangedFields(new InventoryStockBusiness(),entity));
+            inventoryProjectOperationRecordMapper.insert(inventoryProjectOperationRecord);
         }
         return result;
     }

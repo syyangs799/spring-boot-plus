@@ -37,13 +37,9 @@ public enum ProjectOperationTypeEnum implements BaseEnum {
     /** 项目收支流水创建 **/
     PROJECT_CREATE_BUSINESS_INFO(2, "项目收支流水创建"),
     /** 项目收支流水审核 **/
-    PROJECT_UPDATE_BUSINESS_INFO(3, "项目收支流水审核"),
-    /** 项目收支流水出纳 **/
-    PROJECT_CASHIER_BUSINESS_INFO(5, "项目收支流水出纳"),
+    PROJECT_UPDATE_BUSINESS_INFO(3, "项目收支流水修改"),
     /** 项目出库记录创建 **/
-    PROJECT_CREATE_Outbound_INFO(6, "项目出库记录创建"),
-    /** 项目出库记录审核 **/
-    PROJECT_CHECK_Outbound_INFO(7, "项目出库记录审核");
+    PROJECT_CREATE_OUTBOUND_INFO(6, "项目出库记录创建");
 
     private Integer code;
     private String desc;
