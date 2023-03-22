@@ -155,7 +155,6 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
         Page<InventoryStockBusiness> page = new PageInfo<>(inventoryStockBusinessPageParam, OrderItem.desc(getLambdaColumn(InventoryStockBusiness::getCreateTime)));
         LambdaQueryWrapper<InventoryStockBusiness> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(StrUtil.isNotBlank(inventoryStockBusinessPageParam.getProductId()),InventoryStockBusiness::getProductId,inventoryStockBusinessPageParam.getProductId());
-        wrapper.eq(StrUtil.isNotBlank(inventoryStockBusinessPageParam.getStatus()), InventoryStockBusiness::getStatus,inventoryStockBusinessPageParam.getStatus());
         IPage<InventoryStockBusiness> iPage = inventoryStockBusinessMapper.selectPage(page, wrapper);
         return new Paging<InventoryStockBusiness>(iPage);
     }
