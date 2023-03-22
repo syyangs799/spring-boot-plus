@@ -18,6 +18,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -29,7 +30,7 @@ import java.time.LocalDateTime;
 @Data
 @Accessors(chain = true)
 @ApiModel(value = "饼图、数值等vo")
-public class KeyAndValueVo {
+public class KeyAndValueVo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("key")
