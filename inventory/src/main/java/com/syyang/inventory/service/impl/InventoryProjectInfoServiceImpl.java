@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import com.syyang.inventory.entity.*;
 import com.syyang.inventory.enums.ProjectOperationTypeEnum;
 import com.syyang.inventory.enums.StatusTypeEnum;
+import com.syyang.inventory.enums.StepTypeEnum;
 import com.syyang.inventory.enums.StockBusinessTypeEnum;
 import com.syyang.inventory.mapper.InventoryProjectBusinessMapper;
 import com.syyang.inventory.mapper.InventoryProjectInfoMapper;
@@ -55,7 +56,7 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
     @Override
     public boolean saveInventoryProjectInfo(InventoryProjectInfo inventoryProjectInfo) throws Exception {
         //项目状态强制置为新建
-        inventoryProjectInfo.setStatus(StatusTypeEnum.CHECKING.getCode().toString());
+        inventoryProjectInfo.setStep(StepTypeEnum.NEW.getCode().toString());
         boolean save = super.save(inventoryProjectInfo);
         calculateProjectInformation(inventoryProjectInfo.getId());
         //添加项目操作日志 谁创建了项目
@@ -99,8 +100,7 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
     public Paging<InventoryProjectInfo> getInventoryProjectInfoPageList(InventoryProjectInfoPageParam inventoryProjectInfoPageParam) {
         Page<InventoryProjectInfo> page = new PageInfo<>(inventoryProjectInfoPageParam, OrderItem.desc(getLambdaColumn(InventoryProjectInfo::getCreateTime)));
         LambdaQueryWrapper<InventoryProjectInfo> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(StrUtil.isNotBlank(inventoryProjectInfoPageParam.getStatus()),InventoryProjectInfo::getStatus,inventoryProjectInfoPageParam.getStatus())
-                .eq(StrUtil.isNotBlank(inventoryProjectInfoPageParam.getStep()),InventoryProjectInfo::getStep,inventoryProjectInfoPageParam.getStep())
+        wrapper.eq(StrUtil.isNotBlank(inventoryProjectInfoPageParam.getStep()),InventoryProjectInfo::getStep,inventoryProjectInfoPageParam.getStep())
                 .like(StrUtil.isNotBlank(inventoryProjectInfoPageParam.getKeyword()),InventoryProjectInfo::getProjectName,inventoryProjectInfoPageParam.getKeyword());
         IPage<InventoryProjectInfo> iPage = inventoryProjectInfoMapper.selectPage(page, wrapper);
         return new Paging<InventoryProjectInfo>(iPage);
@@ -109,8 +109,7 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
     @Override
     public List<InventoryProjectInfo> getInventoryProjectInfoList(InventoryProjectInfoPageParam inventoryProjectInfoPageParam) {
         LambdaQueryWrapper<InventoryProjectInfo> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(StrUtil.isNotBlank(inventoryProjectInfoPageParam.getStatus()),InventoryProjectInfo::getStatus,inventoryProjectInfoPageParam.getStatus())
-                .eq(StrUtil.isNotBlank(inventoryProjectInfoPageParam.getStep()),InventoryProjectInfo::getStep,inventoryProjectInfoPageParam.getStep())
+        wrapper.eq(StrUtil.isNotBlank(inventoryProjectInfoPageParam.getStep()),InventoryProjectInfo::getStep,inventoryProjectInfoPageParam.getStep())
                 .like(StrUtil.isNotBlank(inventoryProjectInfoPageParam.getKeyword()),InventoryProjectInfo::getProjectName,inventoryProjectInfoPageParam.getKeyword());
         return inventoryProjectInfoMapper.selectList(wrapper);
     }

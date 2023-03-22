@@ -132,9 +132,6 @@ public class InventoryProjectInfo extends BaseEntity {
     @LogForUpdate(fieldName = "项目进度")
     private String step;
 
-    @ApiModelProperty("项目状态，1表示提交审批 2表示通过 -1表示未通过")
-    @LogForUpdate(fieldName = "项目状态")
-    private String status;
 
     @ApiModelProperty("项目审批人")
     private String approver;
