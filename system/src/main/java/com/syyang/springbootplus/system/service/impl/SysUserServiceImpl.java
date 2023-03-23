@@ -124,6 +124,7 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserMapper, SysUser> 
 
         // 修改系统用户
         updateSysUser.setNickname(sysUser.getNickname())
+                .setUsername(sysUser.getUsername())
                 .setPhone(sysUser.getPhone())
                 .setGender(sysUser.getGender())
                 .setRemark(sysUser.getRemark())

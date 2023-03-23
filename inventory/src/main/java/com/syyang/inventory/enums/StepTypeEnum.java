@@ -25,9 +25,9 @@ import com.syyang.springbootplus.framework.common.enums.BaseEnum;
  **/
 public enum StepTypeEnum implements BaseEnum {
     NEW(1, "新建"),
-    CHECK_SUCCESS(2, "售前"),
-    CHECK_FAILED(3, "实施"),
-    CASHI_SUCCESS(4, "完成");
+    PRE_SALES(2, "售前"),
+    RUNNING(3, "实施"),
+    FINISHED(4, "完成");
 
     private Integer code;
     private String desc;

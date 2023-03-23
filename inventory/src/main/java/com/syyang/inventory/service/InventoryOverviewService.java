@@ -27,7 +27,7 @@ public interface InventoryOverviewService extends BaseService<InventoryProductIn
 
     List<KeyAndValueVo> getManageFinance(InventoryOverviewParam inventoryOverviewParam);
 
-    EChartVo getProjectStatusFinance(InventoryOverviewParam inventoryOverviewParam);
+    List<KeyAndValueVo> getProjectStatusFinance(InventoryOverviewParam inventoryOverviewParam);
 
-    Map<String, List<KeyAndValueVo>> getExpensesAndEeceiptsFinance(InventoryOverviewParam inventoryOverviewParam);
+    EChartVo getExpensesAndEeceiptsFinance(InventoryOverviewParam inventoryOverviewParam);
 }

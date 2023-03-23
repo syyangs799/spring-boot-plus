@@ -55,6 +55,12 @@ public class InventoryProductInfo extends BaseEntity {
     @ApiModelProperty("单位")
     private String productUnit;
 
+    @ApiModelProperty("产品标准金额")
+    private String productStandAmount;
+
+    @ApiModelProperty("产品厂家")
+    private String productManufactor;
+
     @ApiModelProperty("创建人")
     @TableField(fill = FieldFill.INSERT)
     private String createUser;
