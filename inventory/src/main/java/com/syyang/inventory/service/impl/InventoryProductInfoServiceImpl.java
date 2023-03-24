@@ -1,5 +1,6 @@
 package com.syyang.inventory.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.syyang.inventory.entity.InventoryProductInfo;
 import com.syyang.inventory.mapper.InventoryProductInfoMapper;
 import com.syyang.inventory.service.InventoryProductInfoService;
@@ -54,6 +55,8 @@ public class InventoryProductInfoServiceImpl extends BaseServiceImpl<InventoryPr
     public Paging<InventoryProductInfo> getInventoryProductInfoPageList(InventoryProductInfoPageParam inventoryProductInfoPageParam) throws Exception {
         Page<InventoryProductInfo> page = new PageInfo<>(inventoryProductInfoPageParam, OrderItem.desc(getLambdaColumn(InventoryProductInfo::getCreateTime)));
         LambdaQueryWrapper<InventoryProductInfo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StrUtil.isNotBlank(inventoryProductInfoPageParam.getProductType()),InventoryProductInfo::getProductType,inventoryProductInfoPageParam.getProductType());
+        wrapper.like(StrUtil.isNotBlank(inventoryProductInfoPageParam.getKeyword()),InventoryProductInfo::getProductName,inventoryProductInfoPageParam.getKeyword());
         IPage<InventoryProductInfo> iPage = inventoryProductInfoMapper.selectPage(page, wrapper);
         return new Paging<InventoryProductInfo>(iPage);
     }
@@ -61,6 +64,8 @@ public class InventoryProductInfoServiceImpl extends BaseServiceImpl<InventoryPr
     @Override
     public List<InventoryProductInfo> getInventoryProductInfoList(InventoryProductInfoPageParam inventoryProductInfoPageParam) {
         LambdaQueryWrapper<InventoryProductInfo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StrUtil.isNotBlank(inventoryProductInfoPageParam.getProductType()),InventoryProductInfo::getProductType,inventoryProductInfoPageParam.getProductType());
+        wrapper.like(StrUtil.isNotBlank(inventoryProductInfoPageParam.getKeyword()),InventoryProductInfo::getProductName,inventoryProductInfoPageParam.getKeyword());
         return inventoryProductInfoMapper.selectList(wrapper);
     }
 

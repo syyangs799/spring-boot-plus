@@ -132,7 +132,7 @@ public class InventoryProjectBusiness extends BaseEntity {
     private LocalDateTime cashierTime;
 
 
-    @ApiModelProperty("出纳人")
+    @ApiModelProperty("出纳金额")
     private String cashierAmount;
 
     @ApiModelProperty("出纳附件名称")
