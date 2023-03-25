@@ -27,4 +27,11 @@ public class InventoryProjectBusinessPageParam extends BasePageOrderParam {
 
     @ApiModelProperty("项目id")
     private Integer projectId;
+
+
+    @ApiModelProperty("审核人id")
+    private String approver;
+
+    @ApiModelProperty("出纳人id")
+    private String cashier;
 }

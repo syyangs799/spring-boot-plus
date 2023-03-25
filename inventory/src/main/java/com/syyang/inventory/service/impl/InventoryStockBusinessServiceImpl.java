@@ -163,6 +163,7 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
         Page<InventoryStockBusiness> page = new PageInfo<>(inventoryStockBusinessPageParam, OrderItem.desc(getLambdaColumn(InventoryStockBusiness::getCreateTime)));
         LambdaQueryWrapper<InventoryStockBusiness> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(StrUtil.isNotBlank(inventoryStockBusinessPageParam.getProductId()),InventoryStockBusiness::getProductId,inventoryStockBusinessPageParam.getProductId());
+        wrapper.eq(null != inventoryStockBusinessPageParam.getProjectId(),InventoryStockBusiness::getProjectId,inventoryStockBusinessPageParam.getProjectId());
         IPage<InventoryStockBusiness> iPage = inventoryStockBusinessMapper.selectPage(page, wrapper);
         return new Paging<InventoryStockBusiness>(iPage);
     }
@@ -238,7 +239,8 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
     @Override
     public List<InventoryStockBusiness> getInventoryStockBusinessList(InventoryStockBusinessPageParam inventoryStockBusinessPageParam) {
         LambdaQueryWrapper<InventoryStockBusiness> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(InventoryStockBusiness::getProductId,inventoryStockBusinessPageParam.getProductId());
+        wrapper.eq(StrUtil.isNotBlank(inventoryStockBusinessPageParam.getProductId()),InventoryStockBusiness::getProductId,inventoryStockBusinessPageParam.getProductId());
+        wrapper.eq(null != inventoryStockBusinessPageParam.getProjectId(),InventoryStockBusiness::getProjectId,inventoryStockBusinessPageParam.getProjectId());
         return inventoryStockBusinessMapper.selectList(wrapper);
     }
 

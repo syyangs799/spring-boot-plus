@@ -22,7 +22,11 @@ import com.syyang.springbootplus.framework.core.pagination.BasePageOrderParam;
 public class InventoryStockBusinessPageParam extends BasePageOrderParam {
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("产品码表")
+    @ApiModelProperty("产品id")
     private String productId;
+
+
+    @ApiModelProperty("项目id")
+    private String projectId;
 
 }

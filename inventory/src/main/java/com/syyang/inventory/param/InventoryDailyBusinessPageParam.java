@@ -24,4 +24,14 @@ public class InventoryDailyBusinessPageParam extends BasePageOrderParam {
 
     @ApiModelProperty("交易状态 1表示提交审批 2表示通过 -1表示未通过 3表示已入账 4表示未入账")
     private String status;
+
+    @ApiModelProperty("子类型-字典表-码")
+    private String subType;
+
+    @ApiModelProperty("审核人id")
+    private String approver;
+
+    @ApiModelProperty("出纳人id")
+    private String cashier;
+
 }

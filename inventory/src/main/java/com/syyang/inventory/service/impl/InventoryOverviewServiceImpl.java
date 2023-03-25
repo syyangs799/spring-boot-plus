@@ -180,10 +180,19 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
 //        keyAndValueVos2.add(new KeyAndValueVo("项目A","33"));
 //        map.put("支出",keyAndValueVos2);
         //获取时间区间的横坐标
-        List<String> xList = Lists.newArrayList();
+        List<String> xList = getXDateList(inventoryOverviewParam);
 
         eChartVo.setXAxis(null);
         eChartVo.setSeries(null);
         return eChartVo;
+    }
+
+    /**
+     * 获取x轴
+     * @param inventoryOverviewParam
+     * @return
+     */
+    private List<String> getXDateList(InventoryOverviewParam inventoryOverviewParam) {
+        return Lists.newArrayList();
     }
 }

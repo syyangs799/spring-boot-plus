@@ -97,6 +97,8 @@ public class InventoryProjectBusinessServiceImpl extends BaseServiceImpl<Invento
         Page<InventoryProjectBusiness> page = new PageInfo<>(inventoryProjectBusinessPageParam, OrderItem.desc(getLambdaColumn(InventoryProjectBusiness::getCreateTime)));
         LambdaQueryWrapper<InventoryProjectBusiness> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(StrUtil.isNotBlank(inventoryProjectBusinessPageParam.getStatus()), InventoryProjectBusiness::getStatus,inventoryProjectBusinessPageParam.getStatus());
+        wrapper.eq(StrUtil.isNotBlank(inventoryProjectBusinessPageParam.getApprover()), InventoryProjectBusiness::getApprover,inventoryProjectBusinessPageParam.getApprover());
+        wrapper.eq(StrUtil.isNotBlank(inventoryProjectBusinessPageParam.getCashier()), InventoryProjectBusiness::getCashier,inventoryProjectBusinessPageParam.getCashier());
         wrapper.eq(null != inventoryProjectBusinessPageParam.getProjectId(), InventoryProjectBusiness::getProId,inventoryProjectBusinessPageParam.getProjectId());
         IPage<InventoryProjectBusiness> iPage = inventoryProjectBusinessMapper.selectPage(page, wrapper);
         return new Paging<InventoryProjectBusiness>(iPage);
@@ -106,6 +108,8 @@ public class InventoryProjectBusinessServiceImpl extends BaseServiceImpl<Invento
     public List<InventoryProjectBusiness> getInventoryProjectBusinessList(InventoryProjectBusinessPageParam inventoryProjectBusinessPageParam) {
         LambdaQueryWrapper<InventoryProjectBusiness> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(StrUtil.isNotBlank(inventoryProjectBusinessPageParam.getStatus()), InventoryProjectBusiness::getStatus,inventoryProjectBusinessPageParam.getStatus());
+        wrapper.eq(StrUtil.isNotBlank(inventoryProjectBusinessPageParam.getApprover()), InventoryProjectBusiness::getApprover,inventoryProjectBusinessPageParam.getApprover());
+        wrapper.eq(StrUtil.isNotBlank(inventoryProjectBusinessPageParam.getCashier()), InventoryProjectBusiness::getCashier,inventoryProjectBusinessPageParam.getCashier());
         wrapper.eq(null != inventoryProjectBusinessPageParam.getProjectId(), InventoryProjectBusiness::getProId,inventoryProjectBusinessPageParam.getProjectId());
         return inventoryProjectBusinessMapper.selectList(wrapper);
     }

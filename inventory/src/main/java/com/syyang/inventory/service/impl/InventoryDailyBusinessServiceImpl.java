@@ -55,6 +55,9 @@ public class InventoryDailyBusinessServiceImpl extends BaseServiceImpl<Inventory
         Page<InventoryDailyBusiness> page = new PageInfo<>(inventoryDailyBusinessPageParam, OrderItem.desc(getLambdaColumn(InventoryDailyBusiness::getCreateTime)));
         LambdaQueryWrapper<InventoryDailyBusiness> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(StrUtil.isNotBlank(inventoryDailyBusinessPageParam.getStatus()),InventoryDailyBusiness::getStatus,inventoryDailyBusinessPageParam.getStatus());
+        wrapper.eq(StrUtil.isNotBlank(inventoryDailyBusinessPageParam.getApprover()),InventoryDailyBusiness::getApprover,inventoryDailyBusinessPageParam.getApprover());
+        wrapper.eq(StrUtil.isNotBlank(inventoryDailyBusinessPageParam.getCashier()),InventoryDailyBusiness::getCashier,inventoryDailyBusinessPageParam.getCashier());
+        wrapper.eq(StrUtil.isNotBlank(inventoryDailyBusinessPageParam.getSubType()),InventoryDailyBusiness::getSubType,inventoryDailyBusinessPageParam.getSubType());
         IPage<InventoryDailyBusiness> iPage = inventoryDailyBusinessMapper.selectPage(page, wrapper);
         return new Paging<InventoryDailyBusiness>(iPage);
     }
@@ -63,6 +66,9 @@ public class InventoryDailyBusinessServiceImpl extends BaseServiceImpl<Inventory
     public List<InventoryDailyBusiness> getInventoryDailyBusinessList(InventoryDailyBusinessPageParam inventoryDailyBusinessPageParam) {
         LambdaQueryWrapper<InventoryDailyBusiness> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(StrUtil.isNotBlank(inventoryDailyBusinessPageParam.getStatus()),InventoryDailyBusiness::getStatus,inventoryDailyBusinessPageParam.getStatus());
+        wrapper.eq(StrUtil.isNotBlank(inventoryDailyBusinessPageParam.getApprover()),InventoryDailyBusiness::getApprover,inventoryDailyBusinessPageParam.getApprover());
+        wrapper.eq(StrUtil.isNotBlank(inventoryDailyBusinessPageParam.getCashier()),InventoryDailyBusiness::getCashier,inventoryDailyBusinessPageParam.getCashier());
+        wrapper.eq(StrUtil.isNotBlank(inventoryDailyBusinessPageParam.getSubType()),InventoryDailyBusiness::getSubType,inventoryDailyBusinessPageParam.getSubType());
         return inventoryDailyBusinessMapper.selectList(wrapper);
     }
 
