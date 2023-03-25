@@ -1,7 +1,9 @@
 package com.syyang.inventory.controller;
 
 import com.syyang.inventory.entity.InventoryProjectBusiness;
+import com.syyang.inventory.enums.StatusTypeEnum;
 import com.syyang.inventory.service.InventoryProjectBusinessService;
+import com.syyang.inventory.service.InventoryProjectInfoService;
 import lombok.extern.slf4j.Slf4j;
 import com.syyang.inventory.param.InventoryProjectBusinessPageParam;
 import com.syyang.springbootplus.framework.common.controller.BaseController;
@@ -36,6 +38,8 @@ public class InventoryProjectBusinessController extends BaseController {
 
     @Autowired
     private InventoryProjectBusinessService inventoryProjectBusinessService;
+    @Autowired
+    private InventoryProjectInfoService inventoryProjectInfoService;
 
     /**
      * 添加项目收入与支出交易流水表
@@ -45,6 +49,7 @@ public class InventoryProjectBusinessController extends BaseController {
     @ApiOperation(value = "添加项目收入与支出交易流水表", response = ApiResult.class)
     public ApiResult<Boolean> addInventoryProjectBusiness(@Validated(Add.class) @RequestBody InventoryProjectBusiness inventoryProjectBusiness) throws Exception {
         boolean flag = inventoryProjectBusinessService.saveInventoryProjectBusiness(inventoryProjectBusiness);
+        inventoryProjectInfoService.calculateProjectInformation(inventoryProjectBusiness.getProId());
         return ApiResult.result(flag);
     }
 
@@ -55,7 +60,10 @@ public class InventoryProjectBusinessController extends BaseController {
     @OperationLog(name = "修改项目收入与支出交易流水表", type = OperationLogType.UPDATE)
     @ApiOperation(value = "修改项目收入与支出交易流水表", response = ApiResult.class)
     public ApiResult<Boolean> updateInventoryProjectBusiness(@Validated(Update.class) @RequestBody InventoryProjectBusiness inventoryProjectBusiness) throws Exception {
-        boolean flag = inventoryProjectBusinessService.updateInventoryProjectBusiness(inventoryProjectBusiness);
+        boolean flag = inventoryProjectBusinessService.updateInventoryProjectBusiness(inventoryProjectBusiness);        //判断一下如果是出纳或者审核通过 需要更新项目信息
+        if(inventoryProjectBusiness.getStatus().equals(String.valueOf(StatusTypeEnum.CASHI_SUCCESS.getCode())) || inventoryProjectBusiness.getStatus().equals(String.valueOf(StatusTypeEnum.CHECK_SUCCESS.getCode()))) {
+            inventoryProjectInfoService.calculateProjectInformation(inventoryProjectBusiness.getProId());
+        }
         return ApiResult.result(flag);
     }
 

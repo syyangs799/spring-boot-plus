@@ -1,6 +1,7 @@
 package com.syyang.inventory.controller;
 
 import com.syyang.inventory.entity.InventoryProjectInfo;
+import com.syyang.inventory.enums.StatusTypeEnum;
 import com.syyang.inventory.service.InventoryProjectInfoService;
 import lombok.extern.slf4j.Slf4j;
 import com.syyang.inventory.param.InventoryProjectInfoPageParam;
@@ -45,6 +46,7 @@ public class InventoryProjectInfoController extends BaseController {
     @ApiOperation(value = "添加项目信息表", response = ApiResult.class)
     public ApiResult<Boolean> addInventoryProjectInfo(@Validated(Add.class) @RequestBody InventoryProjectInfo inventoryProjectInfo) throws Exception {
         boolean flag = inventoryProjectInfoService.saveInventoryProjectInfo(inventoryProjectInfo);
+        inventoryProjectInfoService.calculateProjectInformation(inventoryProjectInfo.getId());
         return ApiResult.result(flag);
     }
 
@@ -56,6 +58,7 @@ public class InventoryProjectInfoController extends BaseController {
     @ApiOperation(value = "修改项目信息表", response = ApiResult.class)
     public ApiResult<Boolean> updateInventoryProjectInfo(@Validated(Update.class) @RequestBody InventoryProjectInfo inventoryProjectInfo) throws Exception {
         boolean flag = inventoryProjectInfoService.updateInventoryProjectInfo(inventoryProjectInfo);
+        inventoryProjectInfoService.calculateProjectInformation(inventoryProjectInfo.getId());
         return ApiResult.result(flag);
     }
 

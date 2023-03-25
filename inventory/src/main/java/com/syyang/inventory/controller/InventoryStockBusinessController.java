@@ -1,6 +1,9 @@
 package com.syyang.inventory.controller;
 
+import com.google.common.collect.Sets;
 import com.syyang.inventory.entity.InventoryStockBusiness;
+import com.syyang.inventory.enums.StatusTypeEnum;
+import com.syyang.inventory.service.InventoryProjectInfoService;
 import com.syyang.inventory.service.InventoryStockBusinessService;
 import lombok.extern.slf4j.Slf4j;
 import com.syyang.inventory.param.InventoryStockBusinessPageParam;
@@ -20,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 库存交易流水表 控制器
@@ -36,6 +40,8 @@ public class InventoryStockBusinessController extends BaseController {
 
     @Autowired
     private InventoryStockBusinessService inventoryStockBusinessService;
+    @Autowired
+    private InventoryProjectInfoService inventoryProjectInfoService;
 
     /**
      * 添加库存交易流水表
@@ -100,6 +106,14 @@ public class InventoryStockBusinessController extends BaseController {
     @ApiOperation(value = "库存交易-出库", response = ApiResult.class)
     public ApiResult<Boolean> addOutStockBusiness(@Validated(Add.class) @RequestBody List<InventoryStockBusiness> inventoryStockBusiness) throws Exception {
         boolean flag = inventoryStockBusinessService.addOutStockBusiness(inventoryStockBusiness);
+        Set<Integer> proSets = Sets.newHashSet();
+        //更新项目信息
+        for (InventoryStockBusiness inventoryStockBusiness1 : inventoryStockBusiness) {
+            if(!proSets.contains(inventoryStockBusiness1.getProjectId())) {
+                inventoryProjectInfoService.calculateProjectInformation(inventoryStockBusiness1.getProjectId());
+                proSets.add(inventoryStockBusiness1.getProjectId());
+            }
+        }
         return ApiResult.result(flag);
     }
 

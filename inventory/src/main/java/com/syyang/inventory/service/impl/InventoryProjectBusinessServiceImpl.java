@@ -43,8 +43,8 @@ public class InventoryProjectBusinessServiceImpl extends BaseServiceImpl<Invento
     @Autowired
     private InventoryProjectBusinessMapper inventoryProjectBusinessMapper;
 
-    @Autowired
-    private InventoryProjectInfoService inventoryProjectInfoService;
+//    @Autowired
+//    private InventoryProjectInfoService inventoryProjectInfoService;
     @Autowired
     private InventoryProjectOperationRecordMapper inventoryProjectOperationRecordMapper;
 
@@ -70,10 +70,7 @@ public class InventoryProjectBusinessServiceImpl extends BaseServiceImpl<Invento
     public boolean updateInventoryProjectBusiness(InventoryProjectBusiness inventoryProjectBusiness) throws Exception {
         InventoryProjectBusiness old = getById(inventoryProjectBusiness.getId());
         boolean b = super.updateById(inventoryProjectBusiness);
-        //判断一下如果是出纳或者审核通过 需要更新项目信息
-        if(inventoryProjectBusiness.getStatus().equals(String.valueOf(StatusTypeEnum.CASHI_SUCCESS.getCode())) || inventoryProjectBusiness.getStatus().equals(String.valueOf(StatusTypeEnum.CHECK_SUCCESS.getCode()))) {
-            inventoryProjectInfoService.calculateProjectInformation(inventoryProjectBusiness.getProId());
-        }
+
         //添加项目操作日志 谁创建了项目
         InventoryProjectOperationRecord inventoryProjectOperationRecord = new InventoryProjectOperationRecord();
         inventoryProjectOperationRecord.setProjectId(inventoryProjectBusiness.getProId());

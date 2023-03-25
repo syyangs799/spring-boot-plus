@@ -83,8 +83,8 @@ public class InventoryOverviewController extends BaseController {
      * 应收款和未收款-----时间
      */
     @PostMapping("/manageFinance")
-    @OperationLog(name = "大屏-中下-经营情况相关统计（折线图还是饼图）", type = OperationLogType.INFO)
-    @ApiOperation(value = "大屏-中下-经营情况相关统计（折线图还是饼图）", response = InventoryProjectInfo.class)
+    @OperationLog(name = "大屏-中下-经营情况相关统计（级联饼图）", type = OperationLogType.INFO)
+    @ApiOperation(value = "大屏-中下-经营情况相关统计（级联饼图）", response = InventoryProjectInfo.class)
     public ApiResult<List<KeyAndValueVo>> getManageFinance(@Validated @RequestBody InventoryOverviewParam inventoryOverviewParam) throws Exception {
         List<KeyAndValueVo> keyAndValueVos = inventoryOverviewService.getManageFinance(inventoryOverviewParam);
         return ApiResult.ok(keyAndValueVos);
@@ -105,8 +105,8 @@ public class InventoryOverviewController extends BaseController {
      * 10.应收款=各项支出+利润（）
      */
     @PostMapping("/receivablesFinance")
-    @OperationLog(name = "大屏-右上-因收款-相关统计-时间-折线图", type = OperationLogType.INFO)
-    @ApiOperation(value = "大屏-右上-因收款-相关统计-时间-折线图", response = InventoryProjectInfo.class)
+    @OperationLog(name = "【已完成】大屏-右上-因收款-相关统计-时间-折线图", type = OperationLogType.INFO)
+    @ApiOperation(value = "【已完成】大屏-右上-因收款-相关统计-时间-折线图", response = InventoryProjectInfo.class)
     public ApiResult<List<CollectionStatisticsVo>> getReceivablesFinance(@Validated @RequestBody InventoryOverviewParam inventoryOverviewParam) throws Exception {
         List<CollectionStatisticsVo> collectionStatisticsVos = inventoryOverviewService.getReceivablesFinance(inventoryOverviewParam);
         return ApiResult.ok(collectionStatisticsVos);

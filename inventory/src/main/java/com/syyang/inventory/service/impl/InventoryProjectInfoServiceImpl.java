@@ -62,7 +62,6 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         //项目状态强制置为新建
         inventoryProjectInfo.setStep(StepTypeEnum.NEW.getCode().toString());
         boolean save = super.save(inventoryProjectInfo);
-        calculateProjectInformation(inventoryProjectInfo.getId());
         //添加项目操作日志 谁创建了项目
         InventoryProjectOperationRecord inventoryProjectOperationRecord = new InventoryProjectOperationRecord();
         inventoryProjectOperationRecord.setProjectId(inventoryProjectInfo.getId());
@@ -80,7 +79,7 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
     public boolean updateInventoryProjectInfo(InventoryProjectInfo inventoryProjectInfo) throws Exception {
         InventoryProjectInfo old = getById(inventoryProjectInfo.getId());
         boolean b = super.updateById(inventoryProjectInfo);
-        calculateProjectInformation(inventoryProjectInfo.getId());
+//        calculateProjectInformation(inventoryProjectInfo.getId());
         //添加项目操作日志 谁创建了项目
         InventoryProjectOperationRecord inventoryProjectOperationRecord = new InventoryProjectOperationRecord();
         inventoryProjectOperationRecord.setProjectId(inventoryProjectInfo.getId());
@@ -139,8 +138,9 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         //查询项目的收支数据
         LambdaQueryWrapper<InventoryProjectBusiness> inventoryProjectBusinessLambdaQueryWrapper= new LambdaQueryWrapper<>();
         inventoryProjectBusinessLambdaQueryWrapper.eq(InventoryProjectBusiness::getProId,inventoryProjectInfo.getId())
-                        .and(wrapper->wrapper.eq(InventoryProjectBusiness::getStatus,StatusTypeEnum.CHECK_SUCCESS.getCode().toString())
-                                .or().eq(InventoryProjectBusiness::getStatus,StatusTypeEnum.CASHI_SUCCESS.getCode().toString()));
+//                        .and(wrapper->wrapper.eq(InventoryProjectBusiness::getStatus,StatusTypeEnum.CHECK_SUCCESS.getCode().toString())
+//                                .or().eq(InventoryProjectBusiness::getStatus,StatusTypeEnum.CASHI_SUCCESS.getCode().toString()));
+                .eq(InventoryProjectBusiness::getStatus,StatusTypeEnum.CASHI_SUCCESS.getCode().toString());
         List<InventoryProjectBusiness> inventoryProjectBusinesses = inventoryProjectBusinessMapper.selectList(inventoryProjectBusinessLambdaQueryWrapper);
 
         Map<Integer, List<InventoryProjectBusiness>> businessMap = new LinkedHashMap<Integer, List<InventoryProjectBusiness>>();
@@ -182,7 +182,7 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         BigDecimal costExcludingTax = new BigDecimal(0);
         //项目支出记录
         for(InventoryProjectBusiness inventoryProjectBusiness:businessMap.getOrDefault(StockBusinessTypeEnum.OUT.getCode(), Lists.newArrayList())){
-            costExcludingTax = costExcludingTax.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getCashierAmount())));
+                costExcludingTax = costExcludingTax.add(BigDecimal.valueOf(Double.valueOf(StrUtil.isBlank(inventoryProjectBusiness.getCashierAmount())?"0":inventoryProjectBusiness.getCashierAmount())));
         }
         //计算不含税成本 不含税成本是指项目支出里面的 a及权限审批过后的金额
         inventoryProjectInfo.setAmountCostNoTax(costExcludingTax.toString());
