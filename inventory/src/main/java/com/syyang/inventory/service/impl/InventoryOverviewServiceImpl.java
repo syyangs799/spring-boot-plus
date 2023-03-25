@@ -11,8 +11,7 @@ import com.syyang.inventory.entity.InventoryDailyBusiness;
 import com.syyang.inventory.entity.InventoryProductInfo;
 import com.syyang.inventory.entity.InventoryProjectBusiness;
 import com.syyang.inventory.entity.InventoryProjectInfo;
-import com.syyang.inventory.entity.vo.EChartVo;
-import com.syyang.inventory.entity.vo.KeyAndValueVo;
+import com.syyang.inventory.entity.vo.*;
 import com.syyang.inventory.enums.StatusTypeEnum;
 import com.syyang.inventory.enums.StepTypeEnum;
 import com.syyang.inventory.mapper.InventoryDailyBusinessMapper;
@@ -25,6 +24,10 @@ import com.syyang.inventory.service.InventoryProductInfoService;
 import com.syyang.springbootplus.framework.common.service.impl.BaseServiceImpl;
 import com.syyang.springbootplus.framework.core.pagination.PageInfo;
 import com.syyang.springbootplus.framework.core.pagination.Paging;
+import com.syyang.springbootplus.framework.shiro.cache.LoginRedisService;
+import com.syyang.springbootplus.framework.shiro.util.JwtTokenUtil;
+import com.syyang.springbootplus.framework.shiro.util.JwtUtil;
+import com.syyang.springbootplus.framework.shiro.vo.LoginSysUserRedisVo;
 import com.syyang.springbootplus.framework.util.CommonListUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +57,8 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
     private InventoryDailyBusinessMapper inventoryDailyBusinessMapper;
     @Autowired
     private InventoryProjectInfoMapper inventoryProjectInfoMapper;
+    @Autowired
+    private LoginRedisService loginRedisService;
 
     @Override
     public List<KeyAndValueVo> getProjectFinance(InventoryOverviewParam inventoryOverviewParam) {
@@ -165,26 +171,70 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
 
     @Override
     public EChartVo getExpensesAndEeceiptsFinance(InventoryOverviewParam inventoryOverviewParam) {
+        LoginSysUserRedisVo loginSysUserRedisVo = loginRedisService.getLoginSysUserRedisVo(JwtUtil.getUsername(JwtTokenUtil.getToken()));
+        Long departmentId = loginSysUserRedisVo.getDepartmentId();
+        //判断一下当前时间是否为null，默认填充最近7天的日期
+        isNullForInventoryOverviewParam(inventoryOverviewParam);
         EChartVo eChartVo = new EChartVo();
-//        List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
-//        keyAndValueVos.add(new KeyAndValueVo("日常","10"));
-//        keyAndValueVos.add(new KeyAndValueVo("项目A","222"));
-//        keyAndValueVos.add(new KeyAndValueVo("项目B","333"));
-//        keyAndValueVos.add(new KeyAndValueVo("项目C","33"));
-//        map.put("收入",keyAndValueVos);
-//
-//        List<KeyAndValueVo> keyAndValueVos2 = Lists.newArrayList();
-//        keyAndValueVos2.add(new KeyAndValueVo("日常","10"));
-//        keyAndValueVos2.add(new KeyAndValueVo("项目C","222"));
-//        keyAndValueVos2.add(new KeyAndValueVo("项目B","333"));
-//        keyAndValueVos2.add(new KeyAndValueVo("项目A","33"));
-//        map.put("支出",keyAndValueVos2);
-        //获取时间区间的横坐标
-        List<String> xList = getXDateList(inventoryOverviewParam);
-
-        eChartVo.setXAxis(null);
-        eChartVo.setSeries(null);
+        //获取时间范围内的公司的出纳的项目收支数据和日常支出数据
+        List<CompanyCashierVo> companyCashierByDates = inventoryProjectInfoMapper.getCompanyCashierByDates(inventoryOverviewParam,departmentId);
+        List<String> xList = Lists.newArrayList();
+        EChartSeriesVo shouru = new EChartSeriesVo();
+        EChartSeriesVo zhichu = new EChartSeriesVo();
+        List<String> shouruLists = Lists.newArrayList();
+        List<String> zhichuLists = Lists.newArrayList();
+        for(CompanyCashierVo companyCashierVo:companyCashierByDates){
+            xList.add(companyCashierVo.getRiqi());
+            shouruLists.add(companyCashierVo.getShouru());
+            zhichuLists.add(companyCashierVo.getShouru());
+        }
+        shouru.setData(shouruLists);
+        shouru.setName("收入");
+        zhichu.setData(zhichuLists);
+        zhichu.setName("支出");
+        EChartXAxisVo eChartXAxisVo = new EChartXAxisVo();
+        eChartXAxisVo.setName("日期");
+        eChartXAxisVo.setData(xList);
+        eChartVo.setXAxis(eChartXAxisVo);
+        List<EChartSeriesVo> ydata = Lists.newArrayList();
+        ydata.add(shouru);
+        ydata.add(zhichu);
+        eChartVo.setSeries(ydata);
         return eChartVo;
+    }
+
+    @Override
+    public List<KeyAndValueVo> getProfitFinance(InventoryOverviewParam inventoryOverviewParam) {
+        List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
+        List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,true);
+        for(InventoryProjectInfo inventoryProjectInfo:inventoryProjectInfos){
+            keyAndValueVos.add(new KeyAndValueVo(inventoryProjectInfo.getProjectName(),inventoryProjectInfo.getAmountProfitNet()));
+        }
+        return keyAndValueVos;
+    }
+
+    @Override
+    public List<CollectionStatisticsVo> getReceivablesFinance(InventoryOverviewParam inventoryOverviewParam) {
+        List<CollectionStatisticsVo> collectionStatisticsVos = Lists.newArrayList();
+        List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,true);
+        for(InventoryProjectInfo inventoryProjectInfo:inventoryProjectInfos){
+            collectionStatisticsVos.add(new CollectionStatisticsVo(inventoryProjectInfo.getProjectName()
+                    ,inventoryProjectInfo.getTotalReceivables()
+                    ,inventoryProjectInfo.getTotalReceived()
+                    ,inventoryProjectInfo.getTotalUnreceived()));
+        }
+        return collectionStatisticsVos;
+    }
+
+    /**
+     * 判断时间是否为null 否则默认查询最近7天的数据
+     * @param inventoryOverviewParam
+     */
+    private void isNullForInventoryOverviewParam(InventoryOverviewParam inventoryOverviewParam) {
+        if(null == inventoryOverviewParam.getStarTime() || null == inventoryOverviewParam.getEndTime()){
+            inventoryOverviewParam.setEndTime(LocalDateTime.now());
+            inventoryOverviewParam.setStarTime(LocalDateTime.now().plusDays(-7));
+        }
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.syyang.inventory.controller;
 
 import com.syyang.inventory.entity.InventoryProjectInfo;
+import com.syyang.inventory.entity.vo.CollectionStatisticsVo;
 import com.syyang.inventory.entity.vo.EChartVo;
 import com.syyang.inventory.entity.vo.KeyAndValueVo;
 import com.syyang.inventory.param.InventoryOverviewParam;
@@ -94,8 +95,8 @@ public class InventoryOverviewController extends BaseController {
      * 收入支出相关统计
      */
     @PostMapping("/expensesAndEeceiptsFinance")
-    @OperationLog(name = "大屏-左上-收支-出纳相关统计-时间-折线图", type = OperationLogType.INFO)
-    @ApiOperation(value = "大屏-左上-收支-出纳相关统计-时间-折线图", response = InventoryProjectInfo.class)
+    @OperationLog(name = "【已完成】大屏-左上-收支-出纳相关统计-时间-折线图", type = OperationLogType.INFO)
+    @ApiOperation(value = "【已完成】大屏-左上-收支-出纳相关统计-时间-折线图", response = InventoryProjectInfo.class)
     public ApiResult<EChartVo> getExpensesAndEeceiptsFinance(@Validated @RequestBody InventoryOverviewParam inventoryOverviewParam) throws Exception {
         EChartVo keyAndValueVos = inventoryOverviewService.getExpensesAndEeceiptsFinance(inventoryOverviewParam);
         return ApiResult.ok(keyAndValueVos);
@@ -106,9 +107,9 @@ public class InventoryOverviewController extends BaseController {
     @PostMapping("/receivablesFinance")
     @OperationLog(name = "大屏-右上-因收款-相关统计-时间-折线图", type = OperationLogType.INFO)
     @ApiOperation(value = "大屏-右上-因收款-相关统计-时间-折线图", response = InventoryProjectInfo.class)
-    public ApiResult<EChartVo> getReceivablesFinance(@Validated @RequestBody InventoryOverviewParam inventoryOverviewParam) throws Exception {
-        EChartVo keyAndValueVos = inventoryOverviewService.getExpensesAndEeceiptsFinance(inventoryOverviewParam);
-        return ApiResult.ok(keyAndValueVos);
+    public ApiResult<List<CollectionStatisticsVo>> getReceivablesFinance(@Validated @RequestBody InventoryOverviewParam inventoryOverviewParam) throws Exception {
+        List<CollectionStatisticsVo> collectionStatisticsVos = inventoryOverviewService.getReceivablesFinance(inventoryOverviewParam);
+        return ApiResult.ok(collectionStatisticsVos);
     }
 
 
@@ -116,10 +117,10 @@ public class InventoryOverviewController extends BaseController {
      * 10.应收款=各项支出+利润（）
      */
     @PostMapping("/profitFinance")
-    @OperationLog(name = "大屏-左中-利润-相关统计-时间-折线图", type = OperationLogType.INFO)
-    @ApiOperation(value = "大屏-左中-利润-相关统计-时间-折线图", response = InventoryProjectInfo.class)
-    public ApiResult<EChartVo> getProfitFinance(@Validated @RequestBody InventoryOverviewParam inventoryOverviewParam) throws Exception {
-        EChartVo keyAndValueVos = inventoryOverviewService.getExpensesAndEeceiptsFinance(inventoryOverviewParam);
+    @OperationLog(name = "【已完成】大屏-左中-利润-相关统计-", type = OperationLogType.INFO)
+    @ApiOperation(value = "【已完成】大屏-左中-利润-相关统计", response = InventoryProjectInfo.class)
+    public ApiResult<List<KeyAndValueVo>> getProfitFinance(@Validated @RequestBody InventoryOverviewParam inventoryOverviewParam) throws Exception {
+        List<KeyAndValueVo> keyAndValueVos = inventoryOverviewService.getProfitFinance(inventoryOverviewParam);
         return ApiResult.ok(keyAndValueVos);
     }
 
