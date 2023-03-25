@@ -29,4 +29,7 @@ public class InventoryStockBusinessPageParam extends BasePageOrderParam {
     @ApiModelProperty("项目id")
     private String projectId;
 
+    @ApiModelProperty("类型")
+    private Integer type;
+
 }

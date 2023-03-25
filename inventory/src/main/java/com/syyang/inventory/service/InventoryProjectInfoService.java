@@ -1,6 +1,7 @@
 package com.syyang.inventory.service;
 
 import com.syyang.inventory.entity.InventoryProjectInfo;
+import com.syyang.inventory.entity.vo.KeyAndValueVo;
 import com.syyang.inventory.param.InventoryOverviewParam;
 import com.syyang.inventory.param.InventoryProjectInfoPageParam;
 import com.syyang.springbootplus.framework.common.service.BaseService;
@@ -64,4 +65,5 @@ public interface InventoryProjectInfoService extends BaseService<InventoryProjec
      */
     boolean calculateProjectInformation(Integer proId);
 
+    List<KeyAndValueVo> getTotalProjectAmount(InventoryProjectInfoPageParam inventoryProjectInfoPageParam);
 }

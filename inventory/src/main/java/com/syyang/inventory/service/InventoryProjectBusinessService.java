@@ -1,6 +1,7 @@
 package com.syyang.inventory.service;
 
 import com.syyang.inventory.entity.InventoryProjectBusiness;
+import com.syyang.inventory.entity.vo.KeyAndValueVo;
 import com.syyang.inventory.param.InventoryProjectBusinessPageParam;
 import com.syyang.springbootplus.framework.common.service.BaseService;
 import com.syyang.springbootplus.framework.core.pagination.Paging;
@@ -53,4 +54,6 @@ public interface InventoryProjectBusinessService extends BaseService<InventoryPr
     Paging<InventoryProjectBusiness> getInventoryProjectBusinessPageList(InventoryProjectBusinessPageParam inventoryProjectBusinessPageParam) throws Exception;
 
     List<InventoryProjectBusiness> getInventoryProjectBusinessList(InventoryProjectBusinessPageParam inventoryProjectBusinessPageParam);
+
+    List<KeyAndValueVo> getProjectBusinessAmount(InventoryProjectBusinessPageParam inventoryProjectBusinessPageParam);
 }

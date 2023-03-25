@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
 import com.syyang.inventory.entity.*;
+import com.syyang.inventory.entity.vo.KeyAndValueVo;
 import com.syyang.inventory.enums.ProjectOperationTypeEnum;
 import com.syyang.inventory.enums.StatusTypeEnum;
 import com.syyang.inventory.enums.StepTypeEnum;
@@ -124,23 +125,23 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         InventoryProjectInfo inventoryProjectInfo = inventoryProjectInfoMapper.selectById(proId);
         //判断项目金额和质保金 如果无 置为0
         //合同金额
-        if(null == inventoryProjectInfo.getAmountContract()){
+        if(StrUtil.isEmpty(inventoryProjectInfo.getAmountContract())){
             inventoryProjectInfo.setAmountContract("0");
         }
         //商务费用
-        if(null == inventoryProjectInfo.getAmountBusiness()){
+        if(StrUtil.isEmpty(inventoryProjectInfo.getAmountBusiness())){
             inventoryProjectInfo.setAmountBusiness("0");
         }
         //质保金
-        if(null == inventoryProjectInfo.getAmountWarranty()){
+        if(StrUtil.isEmpty(inventoryProjectInfo.getAmountWarranty())){
             inventoryProjectInfo.setAmountWarranty("0");
         }
         //查询项目的收支数据
         LambdaQueryWrapper<InventoryProjectBusiness> inventoryProjectBusinessLambdaQueryWrapper= new LambdaQueryWrapper<>();
         inventoryProjectBusinessLambdaQueryWrapper.eq(InventoryProjectBusiness::getProId,inventoryProjectInfo.getId())
-//                        .and(wrapper->wrapper.eq(InventoryProjectBusiness::getStatus,StatusTypeEnum.CHECK_SUCCESS.getCode().toString())
-//                                .or().eq(InventoryProjectBusiness::getStatus,StatusTypeEnum.CASHI_SUCCESS.getCode().toString()));
-                .eq(InventoryProjectBusiness::getStatus,StatusTypeEnum.CASHI_SUCCESS.getCode().toString());
+                        .and(wrapper->wrapper.eq(InventoryProjectBusiness::getStatus,StatusTypeEnum.CHECK_SUCCESS.getCode().toString())
+                                .or().eq(InventoryProjectBusiness::getStatus,StatusTypeEnum.CASHI_SUCCESS.getCode().toString()));
+//                .eq(InventoryProjectBusiness::getStatus,StatusTypeEnum.CASHI_SUCCESS.getCode().toString());
         List<InventoryProjectBusiness> inventoryProjectBusinesses = inventoryProjectBusinessMapper.selectList(inventoryProjectBusinessLambdaQueryWrapper);
 
         Map<Integer, List<InventoryProjectBusiness>> businessMap = new LinkedHashMap<Integer, List<InventoryProjectBusiness>>();
@@ -165,6 +166,39 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         return inventoryProjectInfoMapper.updateById(inventoryProjectInfo) > 0;
     }
 
+    @Override
+    public List<KeyAndValueVo> getTotalProjectAmount(InventoryProjectInfoPageParam inventoryProjectInfoPageParam) {
+        LambdaQueryWrapper<InventoryProjectInfo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StrUtil.isNotBlank(inventoryProjectInfoPageParam.getStep()), InventoryProjectInfo::getStep, inventoryProjectInfoPageParam.getStep())
+                .like(StrUtil.isNotBlank(inventoryProjectInfoPageParam.getKeyword()), InventoryProjectInfo::getProjectName, inventoryProjectInfoPageParam.getKeyword());
+        List<InventoryProjectInfo> inventoryProjectInfos = inventoryProjectInfoMapper.selectList(wrapper);
+        List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
+        BigDecimal amountContract = new BigDecimal(0);
+        BigDecimal amountWarranty = new BigDecimal(0);
+        BigDecimal amountProfitNet = new BigDecimal(0);
+        BigDecimal totalReceivables = new BigDecimal(0);
+        BigDecimal totalReceived = new BigDecimal(0);
+        BigDecimal totalPayable = new BigDecimal(0);
+        BigDecimal totalPaid = new BigDecimal(0);
+        for (InventoryProjectInfo inventoryProjectInfo : inventoryProjectInfos) {
+            amountContract = amountContract.add(BigDecimal.valueOf(Double.valueOf(StrUtil.isEmpty(inventoryProjectInfo.getAmountContract())?"0":inventoryProjectInfo.getAmountContract())));
+            amountWarranty = amountWarranty.add(BigDecimal.valueOf(Double.valueOf(StrUtil.isEmpty(inventoryProjectInfo.getAmountWarranty())?"0":inventoryProjectInfo.getAmountWarranty())));
+            amountProfitNet = amountProfitNet.add(BigDecimal.valueOf(Double.valueOf(StrUtil.isEmpty(inventoryProjectInfo.getAmountProfitNet())?"0":inventoryProjectInfo.getAmountProfitNet())));
+            totalReceivables = totalReceivables.add(BigDecimal.valueOf(Double.valueOf(StrUtil.isEmpty(inventoryProjectInfo.getTotalReceivables())?"0":inventoryProjectInfo.getTotalReceivables())));
+            totalReceived = totalReceived.add(BigDecimal.valueOf(Double.valueOf(StrUtil.isEmpty(inventoryProjectInfo.getTotalReceived())?"0":inventoryProjectInfo.getTotalReceived())));
+            totalPayable = totalPayable.add(BigDecimal.valueOf(Double.valueOf(StrUtil.isEmpty(inventoryProjectInfo.getTotalPayable())?"0":inventoryProjectInfo.getTotalPayable())));
+            totalPaid = totalPaid.add(BigDecimal.valueOf(Double.valueOf(StrUtil.isEmpty(inventoryProjectInfo.getTotalPaid())?"0":inventoryProjectInfo.getTotalPaid())));
+        }
+        keyAndValueVos.add(new KeyAndValueVo("合同金额统计", amountContract.toString()));
+        keyAndValueVos.add(new KeyAndValueVo("质保金统计", amountWarranty.toString()));
+        keyAndValueVos.add(new KeyAndValueVo("项目纯利润统计", amountProfitNet.toString()));
+        keyAndValueVos.add(new KeyAndValueVo("应收款统计", totalReceivables.toString()));
+        keyAndValueVos.add(new KeyAndValueVo("已收款统计", totalReceived.toString()));
+        keyAndValueVos.add(new KeyAndValueVo("应支付统计", totalPayable.toString()));
+        keyAndValueVos.add(new KeyAndValueVo("已支付统计", totalPaid.toString()));
+        return keyAndValueVos;
+    }
+
     /**
      * 计算基础信息的金额
      * @param inventoryProjectInfo
@@ -182,7 +216,14 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         BigDecimal costExcludingTax = new BigDecimal(0);
         //项目支出记录
         for(InventoryProjectBusiness inventoryProjectBusiness:businessMap.getOrDefault(StockBusinessTypeEnum.OUT.getCode(), Lists.newArrayList())){
-                costExcludingTax = costExcludingTax.add(BigDecimal.valueOf(Double.valueOf(StrUtil.isBlank(inventoryProjectBusiness.getCashierAmount())?"0":inventoryProjectBusiness.getCashierAmount())));
+            if(inventoryProjectBusiness.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode().toString())) {
+                //如果为出纳成功进行统计出纳金额
+//                costExcludingTax = costExcludingTax.add(BigDecimal.valueOf(Double.valueOf(StrUtil.isBlank(inventoryProjectBusiness.getCashierAmount()) ? "0" : inventoryProjectBusiness.getCashierAmount())));
+                costExcludingTax = costExcludingTax.add(BigDecimal.valueOf(Double.valueOf(StrUtil.isBlank(inventoryProjectBusiness.getAmountMoney()) ? "0" : inventoryProjectBusiness.getAmountMoney())));
+            }else{
+                //如果审批状态则统计支出金额
+                costExcludingTax = costExcludingTax.add(BigDecimal.valueOf(Double.valueOf(StrUtil.isBlank(inventoryProjectBusiness.getAmountMoney()) ? "0" : inventoryProjectBusiness.getAmountMoney())));
+            }
         }
         //计算不含税成本 不含税成本是指项目支出里面的 a及权限审批过后的金额
         inventoryProjectInfo.setAmountCostNoTax(costExcludingTax.toString());

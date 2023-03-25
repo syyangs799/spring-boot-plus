@@ -1,6 +1,7 @@
 package com.syyang.inventory.service;
 
 import com.syyang.inventory.entity.InventoryDailyBusiness;
+import com.syyang.inventory.entity.vo.KeyAndValueVo;
 import com.syyang.inventory.param.InventoryDailyBusinessPageParam;
 import com.syyang.springbootplus.framework.common.service.BaseService;
 import com.syyang.springbootplus.framework.core.pagination.Paging;
@@ -53,4 +54,6 @@ public interface InventoryDailyBusinessService extends BaseService<InventoryDail
     Paging<InventoryDailyBusiness> getInventoryDailyBusinessPageList(InventoryDailyBusinessPageParam inventoryDailyBusinessPageParam) throws Exception;
 
     List<InventoryDailyBusiness> getInventoryDailyBusinessList(InventoryDailyBusinessPageParam inventoryDailyBusinessPageParam);
+
+    List<KeyAndValueVo> getDailyBusinessAmount(InventoryDailyBusinessPageParam inventoryDailyBusinessPageParam);
 }

@@ -1,7 +1,11 @@
 package com.syyang.inventory.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.syyang.inventory.entity.InventoryDailyBusiness;
+import com.syyang.inventory.entity.InventoryStockInfo;
+import com.syyang.inventory.entity.vo.KeyAndValueVo;
 import com.syyang.inventory.mapper.InventoryDailyBusinessMapper;
 import com.syyang.inventory.service.InventoryDailyBusinessService;
 import com.syyang.inventory.param.InventoryDailyBusinessPageParam;
@@ -17,7 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 日常收入与支出交易流水表 服务实现类
@@ -70,6 +76,30 @@ public class InventoryDailyBusinessServiceImpl extends BaseServiceImpl<Inventory
         wrapper.eq(StrUtil.isNotBlank(inventoryDailyBusinessPageParam.getCashier()),InventoryDailyBusiness::getCashier,inventoryDailyBusinessPageParam.getCashier());
         wrapper.eq(StrUtil.isNotBlank(inventoryDailyBusinessPageParam.getSubType()),InventoryDailyBusiness::getSubType,inventoryDailyBusinessPageParam.getSubType());
         return inventoryDailyBusinessMapper.selectList(wrapper);
+    }
+
+    @Override
+    public List<KeyAndValueVo> getDailyBusinessAmount(InventoryDailyBusinessPageParam inventoryDailyBusinessPageParam) {
+        List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
+        LambdaQueryWrapper<InventoryDailyBusiness> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StrUtil.isNotBlank(inventoryDailyBusinessPageParam.getStatus()),InventoryDailyBusiness::getStatus,inventoryDailyBusinessPageParam.getStatus());
+        wrapper.eq(StrUtil.isNotBlank(inventoryDailyBusinessPageParam.getApprover()),InventoryDailyBusiness::getApprover,inventoryDailyBusinessPageParam.getApprover());
+        wrapper.eq(StrUtil.isNotBlank(inventoryDailyBusinessPageParam.getCashier()),InventoryDailyBusiness::getCashier,inventoryDailyBusinessPageParam.getCashier());
+        wrapper.eq(StrUtil.isNotBlank(inventoryDailyBusinessPageParam.getSubType()),InventoryDailyBusiness::getSubType,inventoryDailyBusinessPageParam.getSubType());
+        List<InventoryDailyBusiness> inventoryDailyBusinesses = inventoryDailyBusinessMapper.selectList(wrapper);
+        Map<String,BigDecimal> outAmountMap = Maps.newConcurrentMap();
+        BigDecimal totalAmount = new BigDecimal(0);
+        for (InventoryDailyBusiness inventoryDailyBusiness : inventoryDailyBusinesses) {
+            BigDecimal count = outAmountMap.getOrDefault(inventoryDailyBusiness.getSubTypeName(),
+                    new BigDecimal("0")).add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getAmountMoney())));
+            outAmountMap.put(inventoryDailyBusiness.getSubTypeName(), count);
+            totalAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getAmountMoney())));
+        }
+        for(Map.Entry<String,BigDecimal> entry:outAmountMap.entrySet()) {
+            keyAndValueVos.add(new KeyAndValueVo(entry.getKey(), entry.getValue().toString()));
+        }
+        keyAndValueVos.add(new KeyAndValueVo("日常支出总金额", totalAmount.toString()));
+        return keyAndValueVos;
     }
 
 }

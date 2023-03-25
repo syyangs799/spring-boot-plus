@@ -1,6 +1,9 @@
 package com.syyang.inventory.service.impl;
 
+import com.google.common.collect.Lists;
+import com.syyang.inventory.entity.InventoryProjectInfo;
 import com.syyang.inventory.entity.InventoryStockInfo;
+import com.syyang.inventory.entity.vo.KeyAndValueVo;
 import com.syyang.inventory.mapper.InventoryStockInfoMapper;
 import com.syyang.inventory.service.InventoryStockInfoService;
 import com.syyang.inventory.param.InventoryStockInfoPageParam;
@@ -11,11 +14,13 @@ import com.syyang.springbootplus.framework.core.pagination.PageInfo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.checkerframework.checker.units.qual.K;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -61,6 +66,19 @@ public class InventoryStockInfoServiceImpl extends BaseServiceImpl<InventoryStoc
     public List<InventoryStockInfo> getInventoryStockInfoList(InventoryStockInfoPageParam inventoryStockInfoPageParam) {
         LambdaQueryWrapper<InventoryStockInfo> wrapper = new LambdaQueryWrapper<>();
         return inventoryStockInfoMapper.selectList(wrapper);
+    }
+
+    @Override
+    public List<KeyAndValueVo> getTotalAmount(InventoryStockInfoPageParam inventoryStockInfoPageParam) {
+        List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
+        LambdaQueryWrapper<InventoryStockInfo> wrapper = new LambdaQueryWrapper<>();
+        List<InventoryStockInfo> inventoryStockInfos = inventoryStockInfoMapper.selectList(wrapper);
+        BigDecimal totalAmount = new BigDecimal(0);
+        for (InventoryStockInfo inventoryStockInfo : inventoryStockInfos) {
+            totalAmount = totalAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryStockInfo.getProductAmount())));
+        }
+        keyAndValueVos.add(new KeyAndValueVo("库存总金额", totalAmount.toString()));
+        return keyAndValueVos;
     }
 
 }

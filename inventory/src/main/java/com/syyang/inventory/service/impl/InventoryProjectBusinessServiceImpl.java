@@ -2,12 +2,13 @@ package com.syyang.inventory.service.impl;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.StrUtil;
-import com.syyang.inventory.entity.InventoryDailyBusiness;
-import com.syyang.inventory.entity.InventoryProjectBusiness;
-import com.syyang.inventory.entity.InventoryProjectInfo;
-import com.syyang.inventory.entity.InventoryProjectOperationRecord;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.syyang.inventory.entity.*;
+import com.syyang.inventory.entity.vo.KeyAndValueVo;
 import com.syyang.inventory.enums.ProjectOperationTypeEnum;
 import com.syyang.inventory.enums.StatusTypeEnum;
+import com.syyang.inventory.enums.StockBusinessTypeEnum;
 import com.syyang.inventory.mapper.InventoryProjectBusinessMapper;
 import com.syyang.inventory.mapper.InventoryProjectOperationRecordMapper;
 import com.syyang.inventory.service.InventoryProjectBusinessService;
@@ -28,7 +29,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 项目收入与支出交易流水表 服务实现类
@@ -109,6 +112,44 @@ public class InventoryProjectBusinessServiceImpl extends BaseServiceImpl<Invento
         wrapper.eq(StrUtil.isNotBlank(inventoryProjectBusinessPageParam.getCashier()), InventoryProjectBusiness::getCashier,inventoryProjectBusinessPageParam.getCashier());
         wrapper.eq(null != inventoryProjectBusinessPageParam.getProjectId(), InventoryProjectBusiness::getProId,inventoryProjectBusinessPageParam.getProjectId());
         return inventoryProjectBusinessMapper.selectList(wrapper);
+    }
+
+    @Override
+    public List<KeyAndValueVo> getProjectBusinessAmount(InventoryProjectBusinessPageParam inventoryProjectBusinessPageParam) {
+        List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
+        LambdaQueryWrapper<InventoryProjectBusiness> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StrUtil.isNotBlank(inventoryProjectBusinessPageParam.getStatus()), InventoryProjectBusiness::getStatus,inventoryProjectBusinessPageParam.getStatus());
+        wrapper.eq(StrUtil.isNotBlank(inventoryProjectBusinessPageParam.getApprover()), InventoryProjectBusiness::getApprover,inventoryProjectBusinessPageParam.getApprover());
+        wrapper.eq(StrUtil.isNotBlank(inventoryProjectBusinessPageParam.getCashier()), InventoryProjectBusiness::getCashier,inventoryProjectBusinessPageParam.getCashier());
+        wrapper.eq(null != inventoryProjectBusinessPageParam.getProjectId(), InventoryProjectBusiness::getProId,inventoryProjectBusinessPageParam.getProjectId());
+        List<InventoryProjectBusiness> inventoryProjectBusinesses = inventoryProjectBusinessMapper.selectList(wrapper);
+        Map<String,BigDecimal> inAmountMap = Maps.newConcurrentMap();
+        Map<String,BigDecimal> outAmountMap = Maps.newConcurrentMap();
+        BigDecimal inTotalAmount = new BigDecimal(0);
+        BigDecimal outTotalAmount = new BigDecimal(0);
+        for (InventoryProjectBusiness inventoryProjectBusiness : inventoryProjectBusinesses) {
+            if(inventoryProjectBusiness.getType().equals(StockBusinessTypeEnum.IN.getCode())){
+                BigDecimal count = outAmountMap.getOrDefault(inventoryProjectBusiness.getSubTypeName(),
+                        new BigDecimal("0")).add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
+                inAmountMap.put(inventoryProjectBusiness.getSubTypeName(), count);
+                inTotalAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
+            }else{
+                BigDecimal count = outAmountMap.getOrDefault(inventoryProjectBusiness.getSubTypeName(),
+                        new BigDecimal("0")).add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
+                outAmountMap.put(inventoryProjectBusiness.getSubTypeName(), count);
+                outTotalAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
+            }
+        }
+
+        for(Map.Entry<String,BigDecimal> entry:inAmountMap.entrySet()) {
+            keyAndValueVos.add(new KeyAndValueVo("收入：" + entry.getKey(), entry.getValue().toString()));
+        }
+        for(Map.Entry<String,BigDecimal> entry:outAmountMap.entrySet()) {
+            keyAndValueVos.add(new KeyAndValueVo("支出：" + entry.getKey(), entry.getValue().toString()));
+        }
+        keyAndValueVos.add(new KeyAndValueVo("项目收入总金额", inTotalAmount.toString()));
+        keyAndValueVos.add(new KeyAndValueVo("项目支出总金额", outTotalAmount.toString()));
+        return keyAndValueVos;
     }
 
 }

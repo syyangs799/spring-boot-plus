@@ -1,6 +1,7 @@
 package com.syyang.inventory.controller;
 
 import com.syyang.inventory.entity.InventoryStockInfo;
+import com.syyang.inventory.entity.vo.KeyAndValueVo;
 import com.syyang.inventory.service.InventoryStockInfoService;
 import lombok.extern.slf4j.Slf4j;
 import com.syyang.inventory.param.InventoryStockInfoPageParam;
@@ -101,5 +102,17 @@ public class InventoryStockInfoController extends BaseController {
         List<InventoryStockInfo> paging = inventoryStockInfoService.getInventoryStockInfoList(inventoryStockInfoPageParam);
         return ApiResult.ok(paging);
     }
+
+    /**
+     * 获得总的库存金额
+     */
+    @PostMapping("/getTotalAmount")
+    @OperationLog(name = "获得总的库存金额", type = OperationLogType.LIST)
+    @ApiOperation(value = "获得总的库存金额", response = InventoryStockInfo.class)
+    public ApiResult<List<KeyAndValueVo>> getTotalAmount(@Validated @RequestBody InventoryStockInfoPageParam inventoryStockInfoPageParam) throws Exception {
+        List<KeyAndValueVo> paging = inventoryStockInfoService.getTotalAmount(inventoryStockInfoPageParam);
+        return ApiResult.ok(paging);
+    }
+
 }
 

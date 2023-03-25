@@ -1,6 +1,7 @@
 package com.syyang.inventory.controller;
 
 import com.syyang.inventory.entity.InventoryProjectBusiness;
+import com.syyang.inventory.entity.vo.KeyAndValueVo;
 import com.syyang.inventory.enums.StatusTypeEnum;
 import com.syyang.inventory.service.InventoryProjectBusinessService;
 import com.syyang.inventory.service.InventoryProjectInfoService;
@@ -108,6 +109,17 @@ public class InventoryProjectBusinessController extends BaseController {
     @ApiOperation(value = "项目收入与支出交易流水表列表", response = InventoryProjectBusiness.class)
     public ApiResult<List<InventoryProjectBusiness>> getInventoryProjectBusinessList(@Validated @RequestBody InventoryProjectBusinessPageParam inventoryProjectBusinessPageParam) throws Exception {
         List<InventoryProjectBusiness> paging = inventoryProjectBusinessService.getInventoryProjectBusinessList(inventoryProjectBusinessPageParam);
+        return ApiResult.ok(paging);
+    }
+
+    /**
+     * 项目收入与支出交易流水表分页列表
+     */
+    @PostMapping("/getProjectBusinessAmount")
+    @OperationLog(name = "项目收入与支出总金额统计信息", type = OperationLogType.LIST)
+    @ApiOperation(value = "项目收入与支出总金额统计信息", response = InventoryProjectBusiness.class)
+    public ApiResult<List<KeyAndValueVo>> getProjectBusinessAmount(@Validated @RequestBody InventoryProjectBusinessPageParam inventoryProjectBusinessPageParam) throws Exception {
+        List<KeyAndValueVo> paging = inventoryProjectBusinessService.getProjectBusinessAmount(inventoryProjectBusinessPageParam);
         return ApiResult.ok(paging);
     }
 

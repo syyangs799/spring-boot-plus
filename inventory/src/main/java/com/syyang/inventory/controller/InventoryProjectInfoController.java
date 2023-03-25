@@ -1,6 +1,7 @@
 package com.syyang.inventory.controller;
 
 import com.syyang.inventory.entity.InventoryProjectInfo;
+import com.syyang.inventory.entity.vo.KeyAndValueVo;
 import com.syyang.inventory.enums.StatusTypeEnum;
 import com.syyang.inventory.service.InventoryProjectInfoService;
 import lombok.extern.slf4j.Slf4j;
@@ -104,6 +105,17 @@ public class InventoryProjectInfoController extends BaseController {
     public ApiResult<List<InventoryProjectInfo>> getInventoryProjectInfoList(@Validated @RequestBody InventoryProjectInfoPageParam inventoryProjectInfoPageParam) throws Exception {
         List<InventoryProjectInfo> inventoryProjectInfos = inventoryProjectInfoService.getInventoryProjectInfoList(inventoryProjectInfoPageParam);
         return ApiResult.ok(inventoryProjectInfos);
+    }
+
+    /**
+     * 项目金额统计信息列表
+     */
+    @PostMapping("/getTotalProjectAmount")
+    @OperationLog(name = "项目金额统计信息列表", type = OperationLogType.LIST)
+    @ApiOperation(value = "项目金额统计信息列表", response = InventoryProjectInfo.class)
+    public ApiResult<List<KeyAndValueVo>> getTotalProjectAmount(@Validated @RequestBody InventoryProjectInfoPageParam inventoryProjectInfoPageParam) throws Exception {
+        List<KeyAndValueVo> list = inventoryProjectInfoService.getTotalProjectAmount(inventoryProjectInfoPageParam);
+        return ApiResult.ok(list);
     }
 
 }

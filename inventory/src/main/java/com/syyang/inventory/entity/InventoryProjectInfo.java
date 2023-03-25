@@ -63,11 +63,11 @@ public class InventoryProjectInfo extends BaseEntity {
 
     @ApiModelProperty("合同金额")
     @LogForUpdate(fieldName = "合同金额")
-    private String amountContract;
+    private String amountContract = "0";
 
     @ApiModelProperty("质保金")
     @LogForUpdate(fieldName = "质保金")
-    private String amountWarranty;
+    private String amountWarranty = "0";
 
     @ApiModelProperty("质保金截止日期")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -77,48 +77,48 @@ public class InventoryProjectInfo extends BaseEntity {
     private LocalDateTime amountWarrantyEnding;
 
     @ApiModelProperty("项目利润")
-    private String amountProfit;
+    private String amountProfit = "0";
 
     @ApiModelProperty("项目纯利润")
-    private String amountProfitNet;
+    private String amountProfitNet = "0";
 
     @ApiModelProperty("商务费用")
     @LogForUpdate(fieldName = "商务费用")
-    private String amountBusiness;
+    private String amountBusiness = "0";
 
     @ApiModelProperty("商务费用利率 0-1的百分比")
     @LogForUpdate(fieldName = "商务费用提成")
     private String amountBusinessPaid = "0.15";
 
     @ApiModelProperty("含税成本")
-    private String amountCostTax;
+    private String amountCostTax = "0";
 
     @ApiModelProperty("不含税成本")
-    private String amountCostNoTax;
+    private String amountCostNoTax = "0";
 
     @ApiModelProperty("税务成本")
-    private String amountTax;
+    private String amountTax = "0";
 
     @ApiModelProperty("税务成本利率 0-1的百分比")
     @LogForUpdate(fieldName = "税务已付成本提成")
     private String amountTaxPaid = "0.15";
 
     @ApiModelProperty("业务提成")
-    private String amountCommissionBusiness;
+    private String amountCommissionBusiness = "0";
 
     @ApiModelProperty("业务提成利率 0-1的百分比")
     @LogForUpdate(fieldName = "业务已付提成提成")
     private String amountCommissionBusinessPaid = "0.15";
 
     @ApiModelProperty("技术提成")
-    private String amountCommissionTechnical;
+    private String amountCommissionTechnical = "0";
 
     @ApiModelProperty("技术提成利率 0-1的百分比")
     @LogForUpdate(fieldName = "技术已付提成提成")
     private String amountCommissionTechnicalPaid = "0.15";
 
     @ApiModelProperty("管理提成")
-    private String amountCommissionManagement;
+    private String amountCommissionManagement = "0";
 
     @ApiModelProperty("管理提成利率 0-1的百分比")
     @LogForUpdate(fieldName = "管理已付提成提成")
@@ -170,16 +170,16 @@ public class InventoryProjectInfo extends BaseEntity {
 
 
     @ApiModelProperty("项目统计-应收款")
-    private String totalReceivables;
+    private String totalReceivables = "0";
     @ApiModelProperty("项目统计-已收款")
-    private String totalReceived;
+    private String totalReceived = "0";
     @ApiModelProperty("项目统计-待收款")
-    private String totalUnreceived;
+    private String totalUnreceived = "0";
     @ApiModelProperty("项目统计-应支付")
-    private String totalPayable;
+    private String totalPayable = "0";
     @ApiModelProperty("项目统计-已支付")
-    private String totalPaid;
+    private String totalPaid = "0";
     @ApiModelProperty("项目统计-未支付")
-    private String totalUnpaid;
+    private String totalUnpaid = "0";
 
 }

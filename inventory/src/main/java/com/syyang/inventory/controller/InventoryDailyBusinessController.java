@@ -1,6 +1,7 @@
 package com.syyang.inventory.controller;
 
 import com.syyang.inventory.entity.InventoryDailyBusiness;
+import com.syyang.inventory.entity.vo.KeyAndValueVo;
 import com.syyang.inventory.service.InventoryDailyBusinessService;
 import lombok.extern.slf4j.Slf4j;
 import com.syyang.inventory.param.InventoryDailyBusinessPageParam;
@@ -103,5 +104,17 @@ public class InventoryDailyBusinessController extends BaseController {
         List<InventoryDailyBusiness> paging = inventoryDailyBusinessService.getInventoryDailyBusinessList(inventoryDailyBusinessPageParam);
         return ApiResult.ok(paging);
     }
+
+    /**
+     * 日常收入与支出总金额统计信息
+     */
+    @PostMapping("/getDailyBusinessAmount")
+    @OperationLog(name = "日常收入与支出总金额统计信息", type = OperationLogType.LIST)
+    @ApiOperation(value = "日常收入与支出总金额统计信息", response = InventoryDailyBusiness.class)
+    public ApiResult<List<KeyAndValueVo>> getDailyBusinessAmount(@Validated @RequestBody InventoryDailyBusinessPageParam inventoryDailyBusinessPageParam) throws Exception {
+        List<KeyAndValueVo> paging = inventoryDailyBusinessService.getDailyBusinessAmount(inventoryDailyBusinessPageParam);
+        return ApiResult.ok(paging);
+    }
+
 }
 
