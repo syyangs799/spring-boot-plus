@@ -82,6 +82,9 @@ public class InventoryDailyBusiness extends BaseEntity {
     @ApiModelProperty("审核人名称")
     private String approverName;
 
+    @ApiModelProperty("审核人意见")
+    private String approverIdea;
+
     @ApiModelProperty("审核时间")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -118,6 +121,8 @@ public class InventoryDailyBusiness extends BaseEntity {
     @ApiModelProperty("出纳人名称")
     private String cashierName;
 
+    @ApiModelProperty("出纳人意见")
+    private String cashierIdea;
 
     @ApiModelProperty("出纳时间")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)

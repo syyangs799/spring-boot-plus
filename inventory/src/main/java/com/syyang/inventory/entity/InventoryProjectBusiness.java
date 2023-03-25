@@ -42,6 +42,9 @@ public class InventoryProjectBusiness extends BaseEntity {
     @ApiModelProperty("项目id")
     private Integer proId;
 
+    @ApiModelProperty("项目名称")
+    private String proName;
+
     @ApiModelProperty("交易类型 0收入和1支出")
     @LogForUpdate(fieldName = "交易类型")
     private Integer type;
@@ -87,6 +90,9 @@ public class InventoryProjectBusiness extends BaseEntity {
     @ApiModelProperty("审核人名称")
     private String approverName;
 
+    @ApiModelProperty("审核人意见")
+    private String approverIdea;
+
     @ApiModelProperty("审核时间")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -124,6 +130,9 @@ public class InventoryProjectBusiness extends BaseEntity {
 
     @ApiModelProperty("出纳人名称")
     private String cashierName;
+
+    @ApiModelProperty("出纳人意见")
+    private String cashierIdea;
 
     @ApiModelProperty("出纳时间")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
