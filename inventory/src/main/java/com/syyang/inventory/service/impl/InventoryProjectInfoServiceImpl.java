@@ -261,7 +261,6 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
      * @param inventoryProjectInfo
      */
     private void calculateProjectForTotalMoney(InventoryProjectInfo inventoryProjectInfo,Map<Integer, List<InventoryProjectBusiness>> map) {
-
         //说明 项目应收款 = 合同金额
         //已收款 出纳确认过的项目收入的金额
         //未收 = 应收-已收
@@ -282,23 +281,25 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         inventoryProjectInfo.setTotalReceived(totalReceived.toString());
         inventoryProjectInfo.setTotalUnreceived(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalReceivables())).subtract(totalReceived).toString());
 
-        //项目统计-已支付
+        //项目统计-因支付 ==审核过的价格和出纳没关系
+        BigDecimal totalPayable = new BigDecimal(0);
+        //项目统计-已支付 --出纳的价格
         BigDecimal totalPaid = new BigDecimal(0);
-        //项目统计-未支付
+        //项目统计-未支付  因支付-已支付
         BigDecimal totalUnpaid = new BigDecimal(0);
         for(InventoryProjectBusiness inventoryProjectBusiness:map.getOrDefault(StockBusinessTypeEnum.OUT.getCode(), Lists.newArrayList())){
+            totalPayable = totalPayable.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
             if(StatusTypeEnum.CASHI_SUCCESS.getCode().equals(Integer.valueOf(inventoryProjectBusiness.getStatus()))){
                 totalPaid = totalPaid.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getCashierAmount())));
-            }else if(StatusTypeEnum.CHECK_SUCCESS.getCode().equals(Integer.valueOf(inventoryProjectBusiness.getStatus()))){
-                totalUnpaid = totalUnpaid.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
             }
         }
         //应支付 审批通过的项目支出金额
         // 已支付 出纳确认过的项目支出金额
         // 未支付 应支付-已支付
-        inventoryProjectInfo.setTotalPayable(totalUnpaid.toString());
+        totalUnpaid = totalPayable.subtract(totalPaid);
+        inventoryProjectInfo.setTotalPayable(totalPayable.toString());
         inventoryProjectInfo.setTotalPaid(totalPaid.toString());
-        inventoryProjectInfo.setTotalUnpaid(totalUnpaid.subtract(totalPaid).toString());
+        inventoryProjectInfo.setTotalUnpaid(totalUnpaid.toString());
     }
 
 

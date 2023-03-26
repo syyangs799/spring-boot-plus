@@ -61,7 +61,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
     @Override
     public List<KeyAndValueVo> getProjectFinance(InventoryOverviewParam inventoryOverviewParam) {
         List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
-        List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,true);
+        List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,false);
         BigDecimal yue = new BigDecimal(0);
         BigDecimal yingshou = new BigDecimal(0);
         BigDecimal yishou = new BigDecimal(0);
@@ -75,7 +75,6 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
             zhibao = zhibao.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountWarranty())));
             yinfu = yinfu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalPayable())));
             yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalPaid())));
-            weifu = weifu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalUnpaid())));
             //加上收入-支出
             yue = yue.add(yishou)
                     .subtract(yifu);
@@ -86,7 +85,10 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         for(InventoryDailyBusiness inventoryDailyBusiness:inventoryDailyBusinesses){
             //减去日常的支出
             yue = yue.subtract(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
+            yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
         }
+        //12.未付 --- 应付-已付
+        weifu = yinfu.subtract(yifu);
         //获取当前所有的出库信息
         keyAndValueVos.add(new KeyAndValueVo("总余额",yue.toString()));
         keyAndValueVos.add(new KeyAndValueVo("应收总金额",yingshou.toString()));
@@ -133,7 +135,6 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         List<InventoryDailyBusiness> inventoryProjectInfosByInventoryOverview = getInventoryDailyBusinessesByInventoryOverview(inventoryOverviewParam);
         Map<String, List<InventoryDailyBusiness>> dailyMap = new LinkedHashMap<String, List<InventoryDailyBusiness>>();
         CommonListUtils.listGroup2Map(inventoryProjectInfosByInventoryOverview, dailyMap, InventoryDailyBusiness.class, "getSubTypeName");// 输入方法名
-
         //查看所有的子收支类型
         LambdaQueryWrapper<SyDictData> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SyDictData::getDictType,"daily_sub_type");
@@ -223,7 +224,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
     @Override
     public List<CollectionStatisticsVo> getReceivablesFinance(InventoryOverviewParam inventoryOverviewParam) {
         List<CollectionStatisticsVo> collectionStatisticsVos = Lists.newArrayList();
-        List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,true);
+        List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,false);
         for(InventoryProjectInfo inventoryProjectInfo:inventoryProjectInfos){
             collectionStatisticsVos.add(new CollectionStatisticsVo(inventoryProjectInfo.getProjectName()
                     ,inventoryProjectInfo.getTotalReceivables()
