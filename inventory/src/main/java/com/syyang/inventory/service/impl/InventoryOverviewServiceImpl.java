@@ -7,16 +7,14 @@ import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.syyang.inventory.entity.InventoryDailyBusiness;
-import com.syyang.inventory.entity.InventoryProductInfo;
-import com.syyang.inventory.entity.InventoryProjectBusiness;
-import com.syyang.inventory.entity.InventoryProjectInfo;
+import com.syyang.inventory.entity.*;
 import com.syyang.inventory.entity.vo.*;
 import com.syyang.inventory.enums.StatusTypeEnum;
 import com.syyang.inventory.enums.StepTypeEnum;
 import com.syyang.inventory.mapper.InventoryDailyBusinessMapper;
 import com.syyang.inventory.mapper.InventoryProductInfoMapper;
 import com.syyang.inventory.mapper.InventoryProjectInfoMapper;
+import com.syyang.inventory.mapper.SyDictDataMapper;
 import com.syyang.inventory.param.InventoryOverviewParam;
 import com.syyang.inventory.param.InventoryProductInfoPageParam;
 import com.syyang.inventory.service.InventoryOverviewService;
@@ -52,7 +50,7 @@ import java.util.Objects;
 public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProductInfoMapper, InventoryProductInfo> implements InventoryOverviewService {
 
     @Autowired
-    private InventoryProductInfoMapper inventoryProductInfoMapper;
+    private SyDictDataMapper syDictDataMapper;
     @Autowired
     private InventoryDailyBusinessMapper inventoryDailyBusinessMapper;
     @Autowired
@@ -135,12 +133,21 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         List<InventoryDailyBusiness> inventoryProjectInfosByInventoryOverview = getInventoryDailyBusinessesByInventoryOverview(inventoryOverviewParam);
         Map<String, List<InventoryDailyBusiness>> dailyMap = new LinkedHashMap<String, List<InventoryDailyBusiness>>();
         CommonListUtils.listGroup2Map(inventoryProjectInfosByInventoryOverview, dailyMap, InventoryDailyBusiness.class, "getSubTypeName");// 输入方法名
-        for(Map.Entry<String, List<InventoryDailyBusiness>> daily:dailyMap.entrySet()){
-            BigDecimal amount = new BigDecimal(0);
-            for(InventoryDailyBusiness inventoryDailyBusiness:daily.getValue()){
-                amount = amount.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
+
+        //查看所有的子收支类型
+        LambdaQueryWrapper<SyDictData> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SyDictData::getDictType,"daily_sub_type");
+        List<SyDictData> dataLists = syDictDataMapper.selectList(wrapper);
+        for(SyDictData syDictData:dataLists) {
+            if (dailyMap.containsKey(syDictData.getLabel())) {
+                BigDecimal amount = new BigDecimal(0);
+                for (InventoryDailyBusiness inventoryDailyBusiness : dailyMap.get(syDictData.getLabel())) {
+                    amount = amount.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
+                }
+                keyAndValueVos.add(new KeyAndValueVo(syDictData.getLabel(), amount.toString()));
+            } else {
+                keyAndValueVos.add(new KeyAndValueVo(syDictData.getLabel(), "0"));
             }
-            keyAndValueVos.add(new KeyAndValueVo(daily.getKey(),amount.toString()));
         }
         return keyAndValueVos;
     }
@@ -186,7 +193,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         for(CompanyCashierVo companyCashierVo:companyCashierByDates){
             xList.add(companyCashierVo.getRiqi());
             shouruLists.add(companyCashierVo.getShouru());
-            zhichuLists.add(companyCashierVo.getShouru());
+            zhichuLists.add(companyCashierVo.getZhichu());
         }
         shouru.setData(shouruLists);
         shouru.setName("收入");
