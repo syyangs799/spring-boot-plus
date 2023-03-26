@@ -68,5 +68,21 @@ public class InventoryStockInfo extends BaseEntity {
     @ApiModelProperty("部门id，用作区分不同的部门权限")
     @TableField(fill = FieldFill.INSERT)
     private Integer departmentId;
+    @ApiModelProperty("产品描述")
+    private String productDesc;
 
+    @ApiModelProperty("产品类型")
+    private String productType;
+
+    @ApiModelProperty("产品型号")
+    private String productModel;
+
+    @ApiModelProperty("产品参数")
+    private String productParam;
+
+    @ApiModelProperty("产品标准金额")
+    private String productStandAmount;
+
+    @ApiModelProperty("产品厂家")
+    private String productManufactor;
 }

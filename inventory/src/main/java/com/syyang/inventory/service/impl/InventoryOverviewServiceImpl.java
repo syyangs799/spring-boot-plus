@@ -72,7 +72,10 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         for(InventoryProjectInfo inventoryProjectInfo:inventoryProjectInfos){
             yingshou = yingshou.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalReceivables())));
             yishou = yishou.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalReceived())));
-            zhibao = zhibao.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountWarranty())));
+            if(inventoryProjectInfo.getStep().equals(StepTypeEnum.FINISHED.getCode().toString())) {
+                //质保金走完结项目
+                zhibao = zhibao.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountWarranty())));
+            }
             yinfu = yinfu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalPayable())));
             yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalPaid())));
             //加上收入-支出
@@ -90,13 +93,13 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         //12.未付 --- 应付-已付
         weifu = yinfu.subtract(yifu);
         //获取当前所有的出库信息
-        keyAndValueVos.add(new KeyAndValueVo("总余额",yue.toString()));
-        keyAndValueVos.add(new KeyAndValueVo("应收总金额",yingshou.toString()));
-        keyAndValueVos.add(new KeyAndValueVo("已收总金额",yishou.toString()));
-        keyAndValueVos.add(new KeyAndValueVo("质保金金额",zhibao.toString()));
-        keyAndValueVos.add(new KeyAndValueVo("应付总金额",yinfu.toString()));
-        keyAndValueVos.add(new KeyAndValueVo("已付总金额",yifu.toString()));
-        keyAndValueVos.add(new KeyAndValueVo("未支付金额",weifu.toString()));
+        keyAndValueVos.add(new KeyAndValueVo("总余额",yue.divide(BigDecimal.valueOf(10000)).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("应收总金额",yingshou.divide(BigDecimal.valueOf(10000)).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("已收总金额",yishou.divide(BigDecimal.valueOf(10000)).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("质保金金额",zhibao.divide(BigDecimal.valueOf(10000)).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("应付总金额",yinfu.divide(BigDecimal.valueOf(10000)).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("已付总金额",yifu.divide(BigDecimal.valueOf(10000)).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("未支付金额",weifu.divide(BigDecimal.valueOf(10000)).toString()));
         return keyAndValueVos;
     }
 
@@ -145,7 +148,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
                 for (InventoryDailyBusiness inventoryDailyBusiness : dailyMap.get(syDictData.getLabel())) {
                     amount = amount.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
                 }
-                keyAndValueVos.add(new KeyAndValueVo(syDictData.getLabel(), amount.toString()));
+                keyAndValueVos.add(new KeyAndValueVo(syDictData.getLabel(), amount.divide(BigDecimal.valueOf(10000)).toString()));
             } else {
                 keyAndValueVos.add(new KeyAndValueVo(syDictData.getLabel(), "0"));
             }
@@ -216,7 +219,8 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
         List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,true);
         for(InventoryProjectInfo inventoryProjectInfo:inventoryProjectInfos){
-            keyAndValueVos.add(new KeyAndValueVo(inventoryProjectInfo.getProjectName(),inventoryProjectInfo.getAmountProfitNet()));
+            keyAndValueVos.add(new KeyAndValueVo(inventoryProjectInfo.getProjectName(),
+                    BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountProfitNet())).divide(BigDecimal.valueOf(10000)).toString()));
         }
         return keyAndValueVos;
     }
@@ -227,9 +231,9 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,false);
         for(InventoryProjectInfo inventoryProjectInfo:inventoryProjectInfos){
             collectionStatisticsVos.add(new CollectionStatisticsVo(inventoryProjectInfo.getProjectName()
-                    ,inventoryProjectInfo.getTotalReceivables()
-                    ,inventoryProjectInfo.getTotalReceived()
-                    ,inventoryProjectInfo.getTotalUnreceived()));
+                    ,BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalReceivables())).divide(BigDecimal.valueOf(10000)).toString()
+                    ,BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalReceived())).divide(BigDecimal.valueOf(10000)).toString()
+                    ,BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalUnreceived())).divide(BigDecimal.valueOf(10000)).toString()));
         }
         return collectionStatisticsVos;
     }
@@ -241,16 +245,8 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
     private void isNullForInventoryOverviewParam(InventoryOverviewParam inventoryOverviewParam) {
         if(null == inventoryOverviewParam.getStarTime() || null == inventoryOverviewParam.getEndTime()){
             inventoryOverviewParam.setEndTime(LocalDateTime.now());
-            inventoryOverviewParam.setStarTime(LocalDateTime.now().plusDays(-7));
+            inventoryOverviewParam.setStarTime(LocalDateTime.now().plusYears(-6));
         }
     }
 
-    /**
-     * 获取x轴
-     * @param inventoryOverviewParam
-     * @return
-     */
-    private List<String> getXDateList(InventoryOverviewParam inventoryOverviewParam) {
-        return Lists.newArrayList();
-    }
 }

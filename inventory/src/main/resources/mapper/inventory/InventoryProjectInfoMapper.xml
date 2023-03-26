@@ -5,46 +5,87 @@
 
 
     <select id="getCompanyCashierByDates" resultType="com.syyang.inventory.entity.vo.CompanyCashierVo">
+<!--        SELECT-->
+<!--        d.days AS `riqi`,-->
+<!--        IFNULL( SUM( CASE WHEN b.type = 0 THEN b.cashier_amount ELSE 0 END )*0.0001, 0 ) AS `shouru`,-->
+<!--        IFNULL( SUM( CASE WHEN b.type = 1 THEN b.cashier_amount ELSE 0 END )*0.0001, 0 ) AS `zhichu`-->
+<!--        FROM-->
+<!--        (-->
+<!--        SELECT-->
+<!--        date_format( date_sub( DATE(#{inventoryOverviewParam.starTime}), INTERVAL ( @i := @i - 1 ) DAY ), '%Y-%m-%d' ) AS days-->
+<!--        FROM-->
+<!--        mysql.help_topic-->
+<!--        JOIN ( SELECT @i := 1 ) c-->
+<!--        WHERE-->
+<!--        help_topic_id &lt;= (-->
+<!--        TIMESTAMPDIFF( DAY, DATE(#{inventoryOverviewParam.starTime}), DATE(#{inventoryOverviewParam.endTime}) ))-->
+<!--        ) AS d-->
+<!--        LEFT JOIN-->
+<!--        (-->
+<!--            SELECT-->
+<!--                type,-->
+<!--                cashier_time,-->
+<!--                cashier_amount-->
+<!--            FROM-->
+<!--                inventory_daily_business-->
+<!--            WHERE-->
+<!--                inventory_daily_business.`status` = 3-->
+<!--              AND inventory_daily_business.department_id = ${departmentId}-->
+<!--            UNION ALL-->
+<!--            SELECT-->
+<!--                type,-->
+<!--                cashier_time,-->
+<!--                cashier_amount-->
+<!--            FROM-->
+<!--                inventory_project_business-->
+<!--            WHERE-->
+<!--                inventory_project_business.`status` = 3-->
+<!--              AND inventory_project_business.department_id = ${departmentId}-->
+<!--        ) b ON DATE( b.cashier_time ) = d.days-->
+<!--        GROUP BY-->
+<!--            d.days-->
+<!--        ORDER BY-->
+<!--            d.days-->
         SELECT
-        d.days AS `riqi`,
-        IFNULL( SUM( CASE WHEN b.type = 0 THEN b.cashier_amount ELSE 0 END ), 0 ) AS `shouru`,
-        IFNULL( SUM( CASE WHEN b.type = 1 THEN b.cashier_amount ELSE 0 END ), 0 ) AS `zhichu`
+        d.MONTHS AS `riqi`,
+        IFNULL( SUM( CASE WHEN b.type = 0 THEN b.cashier_amount ELSE 0 END )*0.0001, 0 ) AS `shouru`,
+        IFNULL( SUM( CASE WHEN b.type = 1 THEN b.cashier_amount ELSE 0 END )*0.0001, 0 ) AS `zhichu`
         FROM
         (
         SELECT
-        date_format( date_sub( DATE(#{inventoryOverviewParam.starTime}), INTERVAL ( @i := @i - 1 ) DAY ), '%Y-%m-%d' ) AS days
+        date_format( date_sub( DATE(#{inventoryOverviewParam.starTime}), INTERVAL ( @i := @i - 1 ) MONTH ), '%Y-%m' ) AS MONTHS
         FROM
         mysql.help_topic
         JOIN ( SELECT @i := 1 ) c
         WHERE
         help_topic_id &lt;= (
-        TIMESTAMPDIFF( DAY, DATE(#{inventoryOverviewParam.starTime}), DATE(#{inventoryOverviewParam.endTime}) ))
+        TIMESTAMPDIFF( MONTH, DATE(#{inventoryOverviewParam.starTime}), DATE(#{inventoryOverviewParam.endTime}) ))
         ) AS d
         LEFT JOIN
         (
-            SELECT
-                type,
-                cashier_time,
-                cashier_amount
-            FROM
-                inventory_daily_business
-            WHERE
-                inventory_daily_business.`status` = 3
-              AND inventory_daily_business.department_id = ${departmentId}
-            UNION ALL
-            SELECT
-                type,
-                cashier_time,
-                cashier_amount
-            FROM
-                inventory_project_business
-            WHERE
-                inventory_project_business.`status` = 3
-              AND inventory_project_business.department_id = ${departmentId}
-        ) b ON DATE( b.cashier_time ) = d.days
+        SELECT
+        type,
+        cashier_time,
+        cashier_amount
+        FROM
+        inventory_daily_business
+        WHERE
+        inventory_daily_business.`status` = 3
+        AND inventory_daily_business.department_id = ${departmentId}
+        UNION ALL
+        SELECT
+        type,
+        cashier_time,
+        cashier_amount
+        FROM
+        inventory_project_business
+        WHERE
+        inventory_project_business.`status` = 3
+        AND inventory_project_business.department_id = ${departmentId}
+        ) b ON DATE( b.cashier_time ) = d.MONTHS
         GROUP BY
-            d.days
+        d.MONTHS
         ORDER BY
-            d.days
+        d.MONTHS
     </select>
 </mapper>

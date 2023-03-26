@@ -63,6 +63,9 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean saveInventoryStockBusiness(InventoryStockBusiness inventoryStockBusiness) throws Exception {
+        //修改总金额
+        inventoryStockBusiness.setProductAmount(BigDecimal.valueOf(Double.valueOf(inventoryStockBusiness.getProductPrice()))
+                .multiply(BigDecimal.valueOf(inventoryStockBusiness.getProductNum())).toString());
         boolean result = false;
         boolean save = super.save(inventoryStockBusiness);
         //添加库存信息的逻辑
@@ -90,6 +93,11 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
                     throw new Exception("当前流水新增出错，请联系管理员！！");
                 }
                 inventoryStockInfo.setProductName(inventoryProductInfo.getProductName());
+                inventoryStockInfo.setProductType(inventoryProductInfo.getProductType());
+                inventoryStockInfo.setProductModel(inventoryProductInfo.getProductModel());
+                inventoryStockInfo.setProductParam(inventoryProductInfo.getProductParam());
+                inventoryStockInfo.setProductStandAmount(inventoryProductInfo.getProductStandAmount());
+                inventoryStockInfo.setProductManufactor(inventoryProductInfo.getProductManufactor());
                 result = inventoryStockInfoMapper.insert(inventoryStockInfo) > 0;
             } else if (inventoryStockInfos.size() == 1) {
                 inventoryStockInfo = inventoryStockInfos.get(0);
@@ -136,6 +144,11 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
                     throw new Exception("当前流水新增出错，请联系管理员！！");
                 }
                 inventoryStockInfo.setProductName(inventoryProductInfo.getProductName());
+                inventoryStockInfo.setProductType(inventoryProductInfo.getProductType());
+                inventoryStockInfo.setProductModel(inventoryProductInfo.getProductModel());
+                inventoryStockInfo.setProductParam(inventoryProductInfo.getProductParam());
+                inventoryStockInfo.setProductStandAmount(inventoryProductInfo.getProductStandAmount());
+                inventoryStockInfo.setProductManufactor(inventoryProductInfo.getProductManufactor());
                 result = inventoryStockInfoMapper.insert(inventoryStockInfo) > 0;
             }
             if (!result) {
@@ -176,6 +189,12 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
         }
         boolean result = false;
         String proid = inventoryStockBusiness.get(0).getProductId();
+        //计算出库金额
+        for(InventoryStockBusiness inventoryStockBusiness1:inventoryStockBusiness){
+            //修改出库总金额
+            inventoryStockBusiness1.setProductAmount(BigDecimal.valueOf(Double.valueOf(inventoryStockBusiness1.getProductPrice()))
+                    .multiply(BigDecimal.valueOf(inventoryStockBusiness1.getProductNum())).toString());
+        }
         boolean save = super.saveBatch(inventoryStockBusiness);
         if(save) {
             //重新计算库存信息
@@ -216,6 +235,11 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
                 throw new Exception("当前流水新增出错，请联系管理员！！");
             }
             inventoryStockInfo.setProductName(inventoryProductInfo.getProductName());
+            inventoryStockInfo.setProductType(inventoryProductInfo.getProductType());
+            inventoryStockInfo.setProductModel(inventoryProductInfo.getProductModel());
+            inventoryStockInfo.setProductParam(inventoryProductInfo.getProductParam());
+            inventoryStockInfo.setProductStandAmount(inventoryProductInfo.getProductStandAmount());
+            inventoryStockInfo.setProductManufactor(inventoryProductInfo.getProductManufactor());
             result = inventoryStockInfoMapper.insert(inventoryStockInfo) > 0;
             if (!result) {
                 throw new Exception("当前流水新增出错，请联系管理员！！");
