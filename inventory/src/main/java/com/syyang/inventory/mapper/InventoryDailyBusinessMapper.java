@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 日常收入与支出交易流水表 Mapper 接口
@@ -21,9 +22,13 @@ import java.io.Serializable;
  * @since 2023-03-02
  */
 @Repository
+@ProjectDataPermission
 public interface InventoryDailyBusinessMapper extends BaseMapper<InventoryDailyBusiness> {
 
 
     @ProjectDataPermission(isCreateUserPermi = false,isDepartmentPermi = true)
     <E extends IPage<InventoryDailyBusiness>> E selectPage(E page, @Param("ew") Wrapper<InventoryDailyBusiness> queryWrapper);
+
+    @ProjectDataPermission(isCreateUserPermi = false,isDepartmentPermi = true)
+    List<InventoryDailyBusiness> selectList(@Param("ew") Wrapper<InventoryDailyBusiness> queryWrapper);
 }

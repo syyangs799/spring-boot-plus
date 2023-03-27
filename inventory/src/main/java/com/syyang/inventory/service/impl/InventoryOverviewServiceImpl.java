@@ -93,13 +93,13 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         //12.未付 --- 应付-已付
         weifu = yinfu.subtract(yifu);
         //获取当前所有的出库信息
-        keyAndValueVos.add(new KeyAndValueVo("总余额",yue.divide(BigDecimal.valueOf(10000)).toString()));
-        keyAndValueVos.add(new KeyAndValueVo("应收总金额",yingshou.divide(BigDecimal.valueOf(10000)).toString()));
-        keyAndValueVos.add(new KeyAndValueVo("已收总金额",yishou.divide(BigDecimal.valueOf(10000)).toString()));
-        keyAndValueVos.add(new KeyAndValueVo("质保金金额",zhibao.divide(BigDecimal.valueOf(10000)).toString()));
-        keyAndValueVos.add(new KeyAndValueVo("应付总金额",yinfu.divide(BigDecimal.valueOf(10000)).toString()));
-        keyAndValueVos.add(new KeyAndValueVo("已付总金额",yifu.divide(BigDecimal.valueOf(10000)).toString()));
-        keyAndValueVos.add(new KeyAndValueVo("未支付金额",weifu.divide(BigDecimal.valueOf(10000)).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("总余额",yue.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("应收总金额",yingshou.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("已收总金额",yishou.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("质保金金额",zhibao.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("应付总金额",yinfu.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("已付总金额",yifu.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("未支付金额",weifu.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
         return keyAndValueVos;
     }
 
@@ -148,7 +148,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
                 for (InventoryDailyBusiness inventoryDailyBusiness : dailyMap.get(syDictData.getLabel())) {
                     amount = amount.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
                 }
-                keyAndValueVos.add(new KeyAndValueVo(syDictData.getLabel(), amount.divide(BigDecimal.valueOf(10000)).toString()));
+                keyAndValueVos.add(new KeyAndValueVo(syDictData.getLabel(), amount.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
             } else {
                 keyAndValueVos.add(new KeyAndValueVo(syDictData.getLabel(), "0"));
             }
@@ -220,7 +220,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,true);
         for(InventoryProjectInfo inventoryProjectInfo:inventoryProjectInfos){
             keyAndValueVos.add(new KeyAndValueVo(inventoryProjectInfo.getProjectName(),
-                    BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountProfitNet())).divide(BigDecimal.valueOf(10000)).toString()));
+                    BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountProfitNet())).divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
         }
         return keyAndValueVos;
     }
@@ -231,9 +231,9 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,false);
         for(InventoryProjectInfo inventoryProjectInfo:inventoryProjectInfos){
             collectionStatisticsVos.add(new CollectionStatisticsVo(inventoryProjectInfo.getProjectName()
-                    ,BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalReceivables())).divide(BigDecimal.valueOf(10000)).toString()
-                    ,BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalReceived())).divide(BigDecimal.valueOf(10000)).toString()
-                    ,BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalUnreceived())).divide(BigDecimal.valueOf(10000)).toString()));
+                    ,BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalReceivables())).divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()
+                    ,BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalReceived())).divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()
+                    ,BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalUnreceived())).divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
         }
         return collectionStatisticsVos;
     }
@@ -245,7 +245,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
     private void isNullForInventoryOverviewParam(InventoryOverviewParam inventoryOverviewParam) {
         if(null == inventoryOverviewParam.getStarTime() || null == inventoryOverviewParam.getEndTime()){
             inventoryOverviewParam.setEndTime(LocalDateTime.now());
-            inventoryOverviewParam.setStarTime(LocalDateTime.now().plusYears(-6));
+            inventoryOverviewParam.setStarTime(LocalDateTime.now().plusMonths(-6));
         }
     }
 

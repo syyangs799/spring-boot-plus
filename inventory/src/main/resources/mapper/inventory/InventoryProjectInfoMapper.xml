@@ -48,8 +48,8 @@
 <!--            d.days-->
         SELECT
         d.MONTHS AS `riqi`,
-        IFNULL( SUM( CASE WHEN b.type = 0 THEN b.cashier_amount ELSE 0 END )*0.0001, 0 ) AS `shouru`,
-        IFNULL( SUM( CASE WHEN b.type = 1 THEN b.cashier_amount ELSE 0 END )*0.0001, 0 ) AS `zhichu`
+        convert(IFNULL( SUM( CASE WHEN b.type = 0 THEN b.cashier_amount ELSE 0 END )*0.0001, 0 ),decimal(16,2)) AS `shouru`,
+        convert(IFNULL( SUM( CASE WHEN b.type = 1 THEN b.cashier_amount ELSE 0 END )*0.0001, 0 ),decimal(16,2)) AS `zhichu`
         FROM
         (
         SELECT
@@ -82,7 +82,7 @@
         WHERE
         inventory_project_business.`status` = 3
         AND inventory_project_business.department_id = ${departmentId}
-        ) b ON DATE( b.cashier_time ) = d.MONTHS
+        ) b ON date_format( DATE(b.cashier_time) ,'%Y-%m') = d.MONTHS
         GROUP BY
         d.MONTHS
         ORDER BY

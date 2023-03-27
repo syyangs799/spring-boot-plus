@@ -22,6 +22,7 @@ import java.util.List;
  * @since 2023-03-02
  */
 @Repository
+@ProjectDataPermission
 public interface InventoryStockBusinessMapper extends BaseMapper<InventoryStockBusiness> {
 
 

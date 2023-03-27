@@ -2,6 +2,7 @@ package com.syyang.inventory.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.syyang.inventory.entity.InventoryProjectBusiness;
 import com.syyang.inventory.entity.InventoryProjectInfo;
 import com.syyang.inventory.entity.InventoryStockBusiness;
 import com.syyang.inventory.entity.vo.CompanyCashierVo;
@@ -25,11 +26,16 @@ import java.util.List;
  * @since 2023-03-02
  */
 @Repository
+@ProjectDataPermission
 public interface InventoryProjectInfoMapper extends BaseMapper<InventoryProjectInfo> {
 
 
-    @ProjectDataPermission(isCreateUserPermi = false, isDepartmentPermi = true)
+    @ProjectDataPermission(isCreateUserPermi = false,isDepartmentPermi = true)
     <E extends IPage<InventoryProjectInfo>> E selectPage(E page, @Param("ew") Wrapper<InventoryProjectInfo> queryWrapper);
+
+    @ProjectDataPermission(isCreateUserPermi = false,isDepartmentPermi = true)
+    List<InventoryProjectInfo> selectList(@Param("ew") Wrapper<InventoryProjectInfo> queryWrapper);
+
 
     List<CompanyCashierVo> getCompanyCashierByDates(@Param("inventoryOverviewParam") InventoryOverviewParam inventoryOverviewParam,@Param("departmentId") Long departmentId);
 }

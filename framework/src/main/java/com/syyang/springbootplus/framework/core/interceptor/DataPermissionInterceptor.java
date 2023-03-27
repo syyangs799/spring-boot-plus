@@ -5,6 +5,7 @@ import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
 import com.google.errorprone.annotations.concurrent.LazyInit;
+import com.syyang.springbootplus.config.constant.CacheKey;
 import com.syyang.springbootplus.framework.common.annotationun.ProjectDataPermission;
 import com.syyang.springbootplus.framework.shiro.cache.LoginRedisService;
 import com.syyang.springbootplus.framework.shiro.service.LoginToken;
@@ -109,6 +110,7 @@ public class DataPermissionInterceptor implements Interceptor {
             String newId = mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf("."));
             // 如果不是指定的方法，直接结束拦截
             if (!classNames.contains(newId)) {
+                logger.info("当前方法【{}】，不需要进行数据过滤",newId);
                 return invocation.proceed();
             }
             String newName = mappedStatement.getId().substring(mappedStatement.getId().lastIndexOf(".") + 1, mappedStatement.getId().length());
@@ -136,6 +138,7 @@ public class DataPermissionInterceptor implements Interceptor {
                 // 解析并返回新的SQL语句，只处理查询sql
                 if (mappedStatement.getSqlCommandType().toString().equals("SELECT")) {
                     //                    String newSql = getNewSql(sql,deptIds,user.getUserId());
+                    logger.info("当前位select查询语句，添加权限认证");
                     sql = getSql(sql,deptId,loginSysUserRedisVo.getId().toString(),isDepartmentPermi,isCreateUserPermi);
                 }
                 // 修改sql
