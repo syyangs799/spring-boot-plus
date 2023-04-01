@@ -59,6 +59,7 @@ public class InventoryStockInfoServiceImpl extends BaseServiceImpl<InventoryStoc
         Page<InventoryStockInfo> page = new PageInfo<>(inventoryStockInfoPageParam, OrderItem.desc(getLambdaColumn(InventoryStockInfo::getCreateTime)));
         LambdaQueryWrapper<InventoryStockInfo> wrapper = new LambdaQueryWrapper<>();
         IPage<InventoryStockInfo> iPage = inventoryStockInfoMapper.selectPage(page, wrapper);
+        iPage.setTotal(inventoryStockInfoMapper.selectCount(wrapper));
         return new Paging<InventoryStockInfo>(iPage);
     }
 

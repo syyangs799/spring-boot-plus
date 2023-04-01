@@ -101,6 +101,7 @@ public class InventoryProjectBusinessServiceImpl extends BaseServiceImpl<Invento
         wrapper.eq(StrUtil.isNotBlank(inventoryProjectBusinessPageParam.getCashier()), InventoryProjectBusiness::getCashier,inventoryProjectBusinessPageParam.getCashier());
         wrapper.eq(null != inventoryProjectBusinessPageParam.getProjectId(), InventoryProjectBusiness::getProId,inventoryProjectBusinessPageParam.getProjectId());
         IPage<InventoryProjectBusiness> iPage = inventoryProjectBusinessMapper.selectPage(page, wrapper);
+        iPage.setTotal(inventoryProjectBusinessMapper.selectCount(wrapper));
         return new Paging<InventoryProjectBusiness>(iPage);
     }
 

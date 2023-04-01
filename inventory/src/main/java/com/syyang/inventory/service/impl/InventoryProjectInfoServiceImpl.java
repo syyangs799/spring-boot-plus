@@ -107,6 +107,7 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         wrapper.eq(StrUtil.isNotBlank(inventoryProjectInfoPageParam.getStep()),InventoryProjectInfo::getStep,inventoryProjectInfoPageParam.getStep())
                 .like(StrUtil.isNotBlank(inventoryProjectInfoPageParam.getKeyword()),InventoryProjectInfo::getProjectName,inventoryProjectInfoPageParam.getKeyword());
         IPage<InventoryProjectInfo> iPage = inventoryProjectInfoMapper.selectPage(page, wrapper);
+        iPage.setTotal(inventoryProjectInfoMapper.selectCount(wrapper));
         return new Paging<InventoryProjectInfo>(iPage);
     }
 

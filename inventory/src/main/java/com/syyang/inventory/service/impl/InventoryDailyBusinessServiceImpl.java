@@ -65,6 +65,7 @@ public class InventoryDailyBusinessServiceImpl extends BaseServiceImpl<Inventory
         wrapper.eq(StrUtil.isNotBlank(inventoryDailyBusinessPageParam.getCashier()),InventoryDailyBusiness::getCashier,inventoryDailyBusinessPageParam.getCashier());
         wrapper.eq(StrUtil.isNotBlank(inventoryDailyBusinessPageParam.getSubType()),InventoryDailyBusiness::getSubType,inventoryDailyBusinessPageParam.getSubType());
         IPage<InventoryDailyBusiness> iPage = inventoryDailyBusinessMapper.selectPage(page, wrapper);
+        iPage.setTotal(inventoryDailyBusinessMapper.selectCount(wrapper));
         return new Paging<InventoryDailyBusiness>(iPage);
     }
 

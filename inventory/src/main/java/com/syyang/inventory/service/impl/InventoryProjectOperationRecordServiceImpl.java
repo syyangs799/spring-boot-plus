@@ -54,6 +54,7 @@ public class InventoryProjectOperationRecordServiceImpl extends BaseServiceImpl<
         LambdaQueryWrapper<InventoryProjectOperationRecord> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(null!= inventoryProjectOperationRecordPageParam.getProjectId(),InventoryProjectOperationRecord::getProjectId,inventoryProjectOperationRecordPageParam.getProjectId());
         IPage<InventoryProjectOperationRecord> iPage = inventoryProjectOperationRecordMapper.selectPage(page, wrapper);
+        iPage.setTotal(inventoryProjectOperationRecordMapper.selectCount(wrapper));
         return new Paging<InventoryProjectOperationRecord>(iPage);
     }
     @Override

@@ -118,5 +118,28 @@ public class InventoryProjectInfoController extends BaseController {
         return ApiResult.ok(list);
     }
 
+
+    /**
+     * 查询用户当前待审核信息的数据 项目开支+日常开支
+     */
+    @PostMapping("/getTotalTaskForCheck")
+    @OperationLog(name = "查询用户当前待审核信息的数据 项目开支+日常开支", type = OperationLogType.LIST)
+    @ApiOperation(value = "查询用户当前待审核信息的数据 项目开支+日常开支", response = InventoryProjectInfo.class)
+    public ApiResult<Integer> getTotalTaskForCheck() throws Exception {
+//        List<KeyAndValueVo> list = inventoryProjectInfoService.getTotalTaskForCheck(inventoryProjectInfoPageParam);
+        return ApiResult.ok(1);
+    }
+
+    /**
+     * 查询用户当前待出纳信息的数据 项目开支+日常开支
+     */
+    @PostMapping("/getTotalTaskForCashier")
+    @OperationLog(name = "查询用户当前待出纳信息的数据 项目开支+日常开支", type = OperationLogType.LIST)
+    @ApiOperation(value = "查询用户当前待出纳信息的数据 项目开支+日常开支", response = InventoryProjectInfo.class)
+    public ApiResult<Integer> getTotalTaskForCashier() throws Exception {
+//        Integer list = inventoryProjectInfoService.getTotalTaskForCashier(inventoryProjectInfoPageParam);
+        return ApiResult.ok(1);
+    }
+
 }
 

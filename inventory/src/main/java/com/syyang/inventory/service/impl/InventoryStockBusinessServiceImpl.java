@@ -179,6 +179,7 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
         wrapper.eq(null != inventoryStockBusinessPageParam.getProjectId(),InventoryStockBusiness::getProjectId,inventoryStockBusinessPageParam.getProjectId());
         wrapper.eq(null != inventoryStockBusinessPageParam.getType(),InventoryStockBusiness::getType,inventoryStockBusinessPageParam.getType());
         IPage<InventoryStockBusiness> iPage = inventoryStockBusinessMapper.selectPage(page, wrapper);
+        iPage.setTotal(inventoryStockBusinessMapper.selectCount(wrapper));
         return new Paging<InventoryStockBusiness>(iPage);
     }
 

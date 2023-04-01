@@ -29,6 +29,8 @@ public interface InventoryProjectBusinessMapper extends BaseMapper<InventoryProj
 
 
     @ProjectDataPermission(isCreateUserPermi = false,isDepartmentPermi = true)
+    Integer selectCount(@Param("ew") Wrapper<InventoryProjectBusiness> queryWrapper);
+    @ProjectDataPermission(isCreateUserPermi = false,isDepartmentPermi = true)
     <E extends IPage<InventoryProjectBusiness>> E selectPage(E page, @Param("ew") Wrapper<InventoryProjectBusiness> queryWrapper);
 
     @ProjectDataPermission(isCreateUserPermi = false,isDepartmentPermi = true)

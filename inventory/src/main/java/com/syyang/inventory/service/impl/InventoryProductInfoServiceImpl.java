@@ -58,6 +58,7 @@ public class InventoryProductInfoServiceImpl extends BaseServiceImpl<InventoryPr
         wrapper.eq(StrUtil.isNotBlank(inventoryProductInfoPageParam.getProductType()),InventoryProductInfo::getProductType,inventoryProductInfoPageParam.getProductType());
         wrapper.like(StrUtil.isNotBlank(inventoryProductInfoPageParam.getKeyword()),InventoryProductInfo::getProductName,inventoryProductInfoPageParam.getKeyword());
         IPage<InventoryProductInfo> iPage = inventoryProductInfoMapper.selectPage(page, wrapper);
+        iPage.setTotal(inventoryProductInfoMapper.selectCount(wrapper));
         return new Paging<InventoryProductInfo>(iPage);
     }
 

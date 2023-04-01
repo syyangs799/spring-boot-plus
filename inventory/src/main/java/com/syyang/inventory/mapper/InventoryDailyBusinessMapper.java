@@ -27,6 +27,8 @@ public interface InventoryDailyBusinessMapper extends BaseMapper<InventoryDailyB
 
 
     @ProjectDataPermission(isCreateUserPermi = false,isDepartmentPermi = true)
+    Integer selectCount(@Param("ew") Wrapper<InventoryDailyBusiness> queryWrapper);
+    @ProjectDataPermission(isCreateUserPermi = false,isDepartmentPermi = true)
     <E extends IPage<InventoryDailyBusiness>> E selectPage(E page, @Param("ew") Wrapper<InventoryDailyBusiness> queryWrapper);
 
     @ProjectDataPermission(isCreateUserPermi = false,isDepartmentPermi = true)

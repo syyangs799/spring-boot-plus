@@ -2,6 +2,7 @@ package com.syyang.inventory.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.syyang.inventory.entity.InventoryDailyBusiness;
 import com.syyang.inventory.entity.InventoryProjectBusiness;
 import com.syyang.inventory.entity.InventoryProjectInfo;
 import com.syyang.inventory.entity.InventoryStockBusiness;
@@ -30,6 +31,8 @@ import java.util.List;
 public interface InventoryProjectInfoMapper extends BaseMapper<InventoryProjectInfo> {
 
 
+    @ProjectDataPermission(isCreateUserPermi = false,isDepartmentPermi = true)
+    Integer selectCount(@Param("ew") Wrapper<InventoryProjectInfo> queryWrapper);
     @ProjectDataPermission(isCreateUserPermi = false,isDepartmentPermi = true)
     <E extends IPage<InventoryProjectInfo>> E selectPage(E page, @Param("ew") Wrapper<InventoryProjectInfo> queryWrapper);
 
