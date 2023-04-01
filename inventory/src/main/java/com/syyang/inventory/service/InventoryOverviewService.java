@@ -4,6 +4,7 @@ import com.syyang.inventory.entity.InventoryProductInfo;
 import com.syyang.inventory.entity.InventoryProjectInfo;
 import com.syyang.inventory.entity.vo.CollectionStatisticsVo;
 import com.syyang.inventory.entity.vo.EChartVo;
+import com.syyang.inventory.entity.vo.KeyAndValue2Vo;
 import com.syyang.inventory.entity.vo.KeyAndValueVo;
 import com.syyang.inventory.param.InventoryOverviewParam;
 import com.syyang.inventory.param.InventoryProductInfoPageParam;
@@ -26,7 +27,7 @@ public interface InventoryOverviewService extends BaseService<InventoryProductIn
 
     List<KeyAndValueVo> getDailyFinance(InventoryOverviewParam inventoryOverviewParam);
 
-    List<KeyAndValueVo> getManageFinance(InventoryOverviewParam inventoryOverviewParam);
+    List<KeyAndValue2Vo> getManageFinance(InventoryOverviewParam inventoryOverviewParam);
 
     List<KeyAndValueVo> getProjectStatusFinance(InventoryOverviewParam inventoryOverviewParam);
 

@@ -133,23 +133,23 @@ public class InventoryProjectBusinessServiceImpl extends BaseServiceImpl<Invento
                 BigDecimal count = outAmountMap.getOrDefault(inventoryProjectBusiness.getSubTypeName(),
                         new BigDecimal("0")).add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
                 inAmountMap.put(inventoryProjectBusiness.getSubTypeName(), count);
-                inTotalAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
+                inTotalAmount = inTotalAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
             }else{
                 BigDecimal count = outAmountMap.getOrDefault(inventoryProjectBusiness.getSubTypeName(),
                         new BigDecimal("0")).add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
                 outAmountMap.put(inventoryProjectBusiness.getSubTypeName(), count);
-                outTotalAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
+                outTotalAmount = outTotalAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
             }
         }
 
-        for(Map.Entry<String,BigDecimal> entry:inAmountMap.entrySet()) {
-            keyAndValueVos.add(new KeyAndValueVo("收入：" + entry.getKey(), entry.getValue().toString()));
-        }
-        for(Map.Entry<String,BigDecimal> entry:outAmountMap.entrySet()) {
-            keyAndValueVos.add(new KeyAndValueVo("支出：" + entry.getKey(), entry.getValue().toString()));
-        }
-        keyAndValueVos.add(new KeyAndValueVo("项目收入总金额", inTotalAmount.toString()));
-        keyAndValueVos.add(new KeyAndValueVo("项目支出总金额", outTotalAmount.toString()));
+//        for(Map.Entry<String,BigDecimal> entry:inAmountMap.entrySet()) {
+//            keyAndValueVos.add(new KeyAndValueVo("收入：" + entry.getKey(), entry.getValue().toString()));
+//        }
+//        for(Map.Entry<String,BigDecimal> entry:outAmountMap.entrySet()) {
+//            keyAndValueVos.add(new KeyAndValueVo("支出：" + entry.getKey(), entry.getValue().toString()));
+//        }
+        keyAndValueVos.add(new KeyAndValueVo("项目收入总金额", inTotalAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("项目支出总金额", outTotalAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()));
         return keyAndValueVos;
     }
 

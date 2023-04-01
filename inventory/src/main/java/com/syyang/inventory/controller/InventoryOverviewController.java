@@ -3,6 +3,7 @@ package com.syyang.inventory.controller;
 import com.syyang.inventory.entity.InventoryProjectInfo;
 import com.syyang.inventory.entity.vo.CollectionStatisticsVo;
 import com.syyang.inventory.entity.vo.EChartVo;
+import com.syyang.inventory.entity.vo.KeyAndValue2Vo;
 import com.syyang.inventory.entity.vo.KeyAndValueVo;
 import com.syyang.inventory.param.InventoryOverviewParam;
 import com.syyang.inventory.param.InventoryProductInfoPageParam;
@@ -85,8 +86,8 @@ public class InventoryOverviewController extends BaseController {
     @PostMapping("/manageFinance")
     @OperationLog(name = "大屏-中下-经营情况相关统计（级联饼图）", type = OperationLogType.INFO)
     @ApiOperation(value = "大屏-中下-经营情况相关统计（级联饼图）", response = InventoryProjectInfo.class)
-    public ApiResult<List<KeyAndValueVo>> getManageFinance(@Validated @RequestBody InventoryOverviewParam inventoryOverviewParam) throws Exception {
-        List<KeyAndValueVo> keyAndValueVos = inventoryOverviewService.getManageFinance(inventoryOverviewParam);
+    public ApiResult<List<KeyAndValue2Vo>> getManageFinance(@Validated @RequestBody InventoryOverviewParam inventoryOverviewParam) throws Exception {
+        List<KeyAndValue2Vo> keyAndValueVos = inventoryOverviewService.getManageFinance(inventoryOverviewParam);
         return ApiResult.ok(keyAndValueVos);
     }
 

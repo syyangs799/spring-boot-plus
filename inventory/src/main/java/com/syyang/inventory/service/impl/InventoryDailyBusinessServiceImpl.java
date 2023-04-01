@@ -96,10 +96,11 @@ public class InventoryDailyBusinessServiceImpl extends BaseServiceImpl<Inventory
             outAmountMap.put(inventoryDailyBusiness.getSubTypeName(), count);
             totalAmount = totalAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getAmountMoney())));
         }
-        for(Map.Entry<String,BigDecimal> entry:outAmountMap.entrySet()) {
-            keyAndValueVos.add(new KeyAndValueVo(entry.getKey(), entry.getValue().divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
-        }
-        keyAndValueVos.add(new KeyAndValueVo("日常支出总金额", totalAmount.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        //去掉其他类型的总金额统计
+//        for(Map.Entry<String,BigDecimal> entry:outAmountMap.entrySet()) {
+//            keyAndValueVos.add(new KeyAndValueVo(entry.getKey(), entry.getValue().divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+//        }
+        keyAndValueVos.add(new KeyAndValueVo("日常支出总金额", totalAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()));
         return keyAndValueVos;
     }
 

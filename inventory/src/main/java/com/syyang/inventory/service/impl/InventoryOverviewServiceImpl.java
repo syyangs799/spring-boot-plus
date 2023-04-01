@@ -12,10 +12,8 @@ import com.syyang.inventory.entity.*;
 import com.syyang.inventory.entity.vo.*;
 import com.syyang.inventory.enums.StatusTypeEnum;
 import com.syyang.inventory.enums.StepTypeEnum;
-import com.syyang.inventory.mapper.InventoryDailyBusinessMapper;
-import com.syyang.inventory.mapper.InventoryProductInfoMapper;
-import com.syyang.inventory.mapper.InventoryProjectInfoMapper;
-import com.syyang.inventory.mapper.SyDictDataMapper;
+import com.syyang.inventory.enums.StockBusinessTypeEnum;
+import com.syyang.inventory.mapper.*;
 import com.syyang.inventory.param.InventoryOverviewParam;
 import com.syyang.inventory.param.InventoryProductInfoPageParam;
 import com.syyang.inventory.service.InventoryOverviewService;
@@ -52,11 +50,13 @@ import java.util.Objects;
 public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProductInfoMapper, InventoryProductInfo> implements InventoryOverviewService {
 
     @Autowired
-    private SyDictDataMapper syDictDataMapper;
+    private InventoryDailyTypeMapper inventoryDailyTypeMapper;
     @Autowired
     private InventoryDailyBusinessMapper inventoryDailyBusinessMapper;
     @Autowired
     private InventoryProjectInfoMapper inventoryProjectInfoMapper;
+    @Autowired
+    private InventoryProjectBusinessMapper inventoryProjectBusinessMapper;
     @Autowired
     private LoginRedisService loginRedisService;
 
@@ -134,6 +134,21 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         return inventoryProjectInfos;
     }
 
+    /**
+     * 根据日期获取相应的项目信息
+     * @param inventoryOverviewParam
+     * @return
+     */
+    private List<InventoryProjectBusiness> getInventoryProjectBusinessByInventoryOverview(InventoryOverviewParam inventoryOverviewParam,Boolean isFinished,Boolean isTimer) {
+        //获取当前所有的项目信息
+        LambdaQueryWrapper<InventoryProjectBusiness> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(isFinished,InventoryProjectBusiness::getStatus, StatusTypeEnum.CASHI_SUCCESS.getCode().toString())
+                .between(isTimer&&Objects.nonNull(inventoryOverviewParam.getStarTime()),InventoryProjectBusiness::getCashierTime
+                        , inventoryOverviewParam.getStarTime(), inventoryOverviewParam.getEndTime());
+        List<InventoryProjectBusiness> inventoryProjectBusinesses = inventoryProjectBusinessMapper.selectList(wrapper);
+        return inventoryProjectBusinesses;
+    }
+
     @Override
     public List<KeyAndValueVo> getDailyFinance(InventoryOverviewParam inventoryOverviewParam) {
         List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
@@ -141,31 +156,68 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         Map<String, List<InventoryDailyBusiness>> dailyMap = new LinkedHashMap<String, List<InventoryDailyBusiness>>();
         CommonListUtils.listGroup2Map(inventoryProjectInfosByInventoryOverview, dailyMap, InventoryDailyBusiness.class, "getSubTypeName");// 输入方法名
         //查看所有的子收支类型
-        LambdaQueryWrapper<SyDictData> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(SyDictData::getDictType,"daily_sub_type");
-        List<SyDictData> dataLists = syDictDataMapper.selectList(wrapper);
-        for(SyDictData syDictData:dataLists) {
-            if (dailyMap.containsKey(syDictData.getLabel())) {
+        LambdaQueryWrapper<InventoryDailyType> wrapper = new LambdaQueryWrapper<>();
+        List<InventoryDailyType> dataLists = inventoryDailyTypeMapper.selectList(wrapper);
+        for(InventoryDailyType syDictData:dataLists) {
+            if (dailyMap.containsKey(syDictData.getDailyName())) {
                 BigDecimal amount = new BigDecimal(0);
-                for (InventoryDailyBusiness inventoryDailyBusiness : dailyMap.get(syDictData.getLabel())) {
+                for (InventoryDailyBusiness inventoryDailyBusiness : dailyMap.get(syDictData.getDailyName())) {
                     amount = amount.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
                 }
-                keyAndValueVos.add(new KeyAndValueVo(syDictData.getLabel(), amount.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+                keyAndValueVos.add(new KeyAndValueVo(syDictData.getDailyName(), amount.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
             } else {
-                keyAndValueVos.add(new KeyAndValueVo(syDictData.getLabel(), "0"));
+                keyAndValueVos.add(new KeyAndValueVo(syDictData.getDailyName(), "0"));
             }
         }
         return keyAndValueVos;
     }
 
     @Override
-    public List<KeyAndValueVo> getManageFinance(InventoryOverviewParam inventoryOverviewParam) {
-        List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
-        keyAndValueVos.add(new KeyAndValueVo("收入总额","5550000"));
-        keyAndValueVos.add(new KeyAndValueVo("项目含税开支总额","5550000"));
-        keyAndValueVos.add(new KeyAndValueVo("项目不含税开支总额","5550000"));
-        keyAndValueVos.add(new KeyAndValueVo("办公费用开支总额","5550000"));
-        keyAndValueVos.add(new KeyAndValueVo("财务费开支总额","5550000"));
+    public List<KeyAndValue2Vo> getManageFinance(InventoryOverviewParam inventoryOverviewParam) {
+        List<KeyAndValue2Vo> keyAndValueVos = Lists.newArrayList();
+        BigDecimal xiangmushouru = new BigDecimal(0);
+        BigDecimal xiangmuzhichu = new BigDecimal(0);
+        BigDecimal richangzhichu = new BigDecimal(0);
+        List<KeyAndValueVo> xshouru = Lists.newArrayList();
+        List<KeyAndValueVo> xzhichu = Lists.newArrayList();
+        List<KeyAndValueVo> rzhichu = Lists.newArrayList();
+        Map<String,BigDecimal> xiangmuInMap = Maps.newConcurrentMap();
+        Map<String,BigDecimal> xiangmuOutMap = Maps.newConcurrentMap();
+        List<InventoryProjectBusiness> inventoryProjectBusinesses = getInventoryProjectBusinessByInventoryOverview(inventoryOverviewParam,true,true);
+        for(InventoryProjectBusiness business:inventoryProjectBusinesses){
+            if(business.getType().equals(StockBusinessTypeEnum.IN.getCode())) {
+                xiangmushouru = xiangmushouru.add(BigDecimal.valueOf(Double.valueOf(business.getCashierAmount())));
+                BigDecimal old = xiangmuInMap.getOrDefault(business.getSubTypeName(),new BigDecimal("0"));
+                old = old.add(BigDecimal.valueOf(Double.valueOf(business.getCashierAmount())));
+                xiangmuInMap.put(business.getSubTypeName(),old);
+            }else{
+                xiangmuzhichu = xiangmuzhichu.add(BigDecimal.valueOf(Double.valueOf(business.getCashierAmount())));
+                BigDecimal old = xiangmuOutMap.getOrDefault(business.getSubTypeName(),new BigDecimal("0"));
+                old = old.add(BigDecimal.valueOf(Double.valueOf(business.getCashierAmount())));
+                xiangmuOutMap.put(business.getSubTypeName(),old);
+            }
+        }
+        for(Map.Entry<String,BigDecimal> entry:xiangmuInMap.entrySet()){
+            xshouru.add(new KeyAndValueVo(entry.getKey(),entry.getValue().divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        }
+        for(Map.Entry<String,BigDecimal> entry:xiangmuOutMap.entrySet()){
+            xzhichu.add(new KeyAndValueVo(entry.getKey(),entry.getValue().divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        }
+
+        Map<String,BigDecimal> dailyMap = Maps.newConcurrentMap();
+        List<InventoryDailyBusiness> inventoryDailyBusinesses = getInventoryDailyBusinessesByInventoryOverview(inventoryOverviewParam);
+        for(InventoryDailyBusiness business:inventoryDailyBusinesses){
+            richangzhichu = richangzhichu.add(BigDecimal.valueOf(Double.valueOf(business.getCashierAmount())));
+            BigDecimal old = dailyMap.getOrDefault(business.getSubTypeName(),new BigDecimal("0"));
+            old = old.add(BigDecimal.valueOf(Double.valueOf(business.getCashierAmount())));
+            dailyMap.put(business.getSubTypeName(),old);
+        }
+        for(Map.Entry<String,BigDecimal> entry:dailyMap.entrySet()){
+            rzhichu.add(new KeyAndValueVo(entry.getKey(),entry.getValue().divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        }
+        keyAndValueVos.add(new KeyAndValue2Vo("项目总收入",xiangmushouru.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),xshouru));
+        keyAndValueVos.add(new KeyAndValue2Vo("项目总支出",xiangmuzhichu.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),xzhichu));
+        keyAndValueVos.add(new KeyAndValue2Vo("日常总支出",richangzhichu.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),rzhichu));
         return keyAndValueVos;
     }
 
