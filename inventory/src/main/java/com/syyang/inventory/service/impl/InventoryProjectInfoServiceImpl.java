@@ -189,13 +189,13 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
             totalPayable = totalPayable.add(BigDecimal.valueOf(Double.valueOf(StrUtil.isEmpty(inventoryProjectInfo.getTotalPayable())?"0":inventoryProjectInfo.getTotalPayable())));
             totalPaid = totalPaid.add(BigDecimal.valueOf(Double.valueOf(StrUtil.isEmpty(inventoryProjectInfo.getTotalPaid())?"0":inventoryProjectInfo.getTotalPaid())));
         }
-        keyAndValueVos.add(new KeyAndValueVo("合同金额统计", amountContract.toString()));
-        keyAndValueVos.add(new KeyAndValueVo("质保金统计", amountWarranty.toString()));
-        keyAndValueVos.add(new KeyAndValueVo("项目纯利润统计", amountProfitNet.toString()));
-        keyAndValueVos.add(new KeyAndValueVo("应收款统计", totalReceivables.toString()));
-        keyAndValueVos.add(new KeyAndValueVo("已收款统计", totalReceived.toString()));
-        keyAndValueVos.add(new KeyAndValueVo("应支付统计", totalPayable.toString()));
-        keyAndValueVos.add(new KeyAndValueVo("已支付统计", totalPaid.toString()));
+        keyAndValueVos.add(new KeyAndValueVo("合同金额统计", amountContract.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("质保金统计", amountWarranty.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("项目纯利润统计", amountProfitNet.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("应收款统计", totalReceivables.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("已收款统计", totalReceived.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("应支付统计", totalPayable.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("已支付统计", totalPaid.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
         return keyAndValueVos;
     }
 

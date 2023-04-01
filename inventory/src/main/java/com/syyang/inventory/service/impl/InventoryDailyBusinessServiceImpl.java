@@ -93,12 +93,12 @@ public class InventoryDailyBusinessServiceImpl extends BaseServiceImpl<Inventory
             BigDecimal count = outAmountMap.getOrDefault(inventoryDailyBusiness.getSubTypeName(),
                     new BigDecimal("0")).add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getAmountMoney())));
             outAmountMap.put(inventoryDailyBusiness.getSubTypeName(), count);
-            totalAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getAmountMoney())));
+            totalAmount = totalAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getAmountMoney())));
         }
         for(Map.Entry<String,BigDecimal> entry:outAmountMap.entrySet()) {
-            keyAndValueVos.add(new KeyAndValueVo(entry.getKey(), entry.getValue().toString()));
+            keyAndValueVos.add(new KeyAndValueVo(entry.getKey(), entry.getValue().divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
         }
-        keyAndValueVos.add(new KeyAndValueVo("日常支出总金额", totalAmount.toString()));
+        keyAndValueVos.add(new KeyAndValueVo("日常支出总金额", totalAmount.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
         return keyAndValueVos;
     }
 

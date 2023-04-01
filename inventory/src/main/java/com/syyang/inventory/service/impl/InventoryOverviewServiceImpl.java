@@ -1,5 +1,6 @@
 package com.syyang.inventory.service.impl;
 
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -34,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +63,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
     @Override
     public List<KeyAndValueVo> getProjectFinance(InventoryOverviewParam inventoryOverviewParam) {
         List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
-        List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,false);
+        List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,false,false);
         BigDecimal yue = new BigDecimal(0);
         BigDecimal yingshou = new BigDecimal(0);
         BigDecimal yishou = new BigDecimal(0);
@@ -122,11 +124,11 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
      * @param inventoryOverviewParam
      * @return
      */
-    private List<InventoryProjectInfo> getInventoryProjectInfosByInventoryOverview(InventoryOverviewParam inventoryOverviewParam,Boolean isFinished) {
+    private List<InventoryProjectInfo> getInventoryProjectInfosByInventoryOverview(InventoryOverviewParam inventoryOverviewParam,Boolean isFinished,Boolean isTimer) {
         //获取当前所有的项目信息
         LambdaQueryWrapper<InventoryProjectInfo> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(isFinished,InventoryProjectInfo::getStep, StepTypeEnum.FINISHED.getCode().toString())
-                .between(Objects.nonNull(inventoryOverviewParam.getStarTime()),InventoryProjectInfo::getCreateTime
+                .between(isTimer&&Objects.nonNull(inventoryOverviewParam.getStarTime()),InventoryProjectInfo::getCreateTime
                         , inventoryOverviewParam.getStarTime(), inventoryOverviewParam.getEndTime());
         List<InventoryProjectInfo> inventoryProjectInfos = inventoryProjectInfoMapper.selectList(wrapper);
         return inventoryProjectInfos;
@@ -169,7 +171,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
 
     @Override
     public List<KeyAndValueVo> getProjectStatusFinance(InventoryOverviewParam inventoryOverviewParam) {
-        List<InventoryProjectInfo> inventoryProjectInfosByInventoryOverview = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,false);
+        List<InventoryProjectInfo> inventoryProjectInfosByInventoryOverview = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,false,true);
         Map<String, List<InventoryProjectInfo>> projectMap = new LinkedHashMap<String, List<InventoryProjectInfo>>();
         CommonListUtils.listGroup2Map(inventoryProjectInfosByInventoryOverview, projectMap, InventoryProjectInfo.class, "getStep");// 输入方法名
         List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
@@ -217,7 +219,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
     @Override
     public List<KeyAndValueVo> getProfitFinance(InventoryOverviewParam inventoryOverviewParam) {
         List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
-        List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,true);
+        List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,true,false);
         for(InventoryProjectInfo inventoryProjectInfo:inventoryProjectInfos){
             keyAndValueVos.add(new KeyAndValueVo(inventoryProjectInfo.getProjectName(),
                     BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountProfitNet())).divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
@@ -228,7 +230,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
     @Override
     public List<CollectionStatisticsVo> getReceivablesFinance(InventoryOverviewParam inventoryOverviewParam) {
         List<CollectionStatisticsVo> collectionStatisticsVos = Lists.newArrayList();
-        List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,false);
+        List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,false,false);
         for(InventoryProjectInfo inventoryProjectInfo:inventoryProjectInfos){
             collectionStatisticsVos.add(new CollectionStatisticsVo(inventoryProjectInfo.getProjectName()
                     ,BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalReceivables())).divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()
@@ -244,8 +246,12 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
      */
     private void isNullForInventoryOverviewParam(InventoryOverviewParam inventoryOverviewParam) {
         if(null == inventoryOverviewParam.getStarTime() || null == inventoryOverviewParam.getEndTime()){
-            inventoryOverviewParam.setEndTime(LocalDateTime.now());
-            inventoryOverviewParam.setStarTime(LocalDateTime.now().plusMonths(-6));
+            inventoryOverviewParam.setEndTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            inventoryOverviewParam.setStarTime(LocalDateTime.now().plusMonths(-6).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        }else{
+            //获取当前月的天数
+            inventoryOverviewParam.setEndTime(LocalDateTime.parse(inventoryOverviewParam.getEndTime(),DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).plusMonths(1).plusDays(-1).format(DateTimeFormatter.ofPattern("yyyy-MM-01 00:00:00")));
+            inventoryOverviewParam.setStarTime(LocalDateTime.parse(inventoryOverviewParam.getStarTime(),DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd 23:59:59")));
         }
     }
 
