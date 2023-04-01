@@ -16,6 +16,7 @@
 
 package com.syyang.springbootplus.system.controller;
 
+import com.google.common.collect.Maps;
 import com.syyang.springbootplus.config.properties.SpringBootPlusProperties;
 import com.syyang.springbootplus.framework.common.api.ApiResult;
 import com.syyang.springbootplus.framework.log.annotation.Module;
@@ -38,6 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 /**
  * 上传控制器
@@ -67,15 +69,16 @@ public class UploadController {
             @ApiImplicitParam(name = "file", value = "文件", required = true,dataType = "__file"),
             @ApiImplicitParam(name = "type", value = "类型 head:头像",required = true)
     })
-    public ApiResult<String> upload(@RequestParam("file") MultipartFile multipartFile,
-                                    @RequestParam("type") String type) throws Exception {
+    public ApiResult<Map<String,String>> upload(@RequestParam("file") MultipartFile multipartFile,
+                                                @RequestParam("type") String type) throws Exception {
         log.info("multipartFile = " + multipartFile);
         log.info("ContentType = " + multipartFile.getContentType());
         log.info("OriginalFilename = " + multipartFile.getOriginalFilename());
         log.info("Name = " + multipartFile.getName());
         log.info("Size = " + multipartFile.getSize());
         log.info("type = " + type);
-
+        Map<String,String> result = Maps.newHashMap();
+        result.put("oriName",multipartFile.getOriginalFilename());
         // 上传文件，返回保存的文件名称
         String saveFileName = UploadUtil.upload(springBootPlusProperties.getUploadPath(), multipartFile, originalFilename -> {
             // 文件后缀
@@ -88,10 +91,11 @@ public class UploadController {
 
         // 上传成功之后，返回访问路径，请根据实际情况设置
 
-        String fileAccessPath = springBootPlusProperties.getResourceAccessUrl() + saveFileName;
-        log.info("fileAccessPath:{}", fileAccessPath);
+//        String fileAccessPath = springBootPlusProperties.getResourceAccessUrl() + saveFileName;
+        log.info("saveFileName:{}", saveFileName);
 
-        return ApiResult.ok(fileAccessPath);
+        result.put("saveFileName",saveFileName);
+        return ApiResult.ok(result);
     }
 
 }

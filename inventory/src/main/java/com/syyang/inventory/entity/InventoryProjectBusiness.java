@@ -46,7 +46,7 @@ public class InventoryProjectBusiness extends BaseEntity {
     private String proName;
 
     @ApiModelProperty("交易类型 0收入和1支出")
-    @LogForUpdate(fieldName = "交易类型")
+    @LogForUpdate(fieldName = "交易类型",isCode = true,codeJson = "{\"0\":\"项目收入\",\"1\":\"项目支出\"}")
     private Integer type;
 
     @ApiModelProperty("子类型-码表")
@@ -82,15 +82,18 @@ public class InventoryProjectBusiness extends BaseEntity {
     private String createUserName;
 
     @ApiModelProperty("交易状态 1表示提交审批 2表示通过 -1表示未通过 3表示已入账 4表示未入账")
+    @LogForUpdate(fieldName = "交易状态",isCode = true,codeJson = "{\"1\":\"提交待审批\",\"2\":\"审批通过待出纳\"，\"-1\":\"审批未通过\",\"3\":\"出纳通过\"}")
     private String status;
 
     @ApiModelProperty("审核人")
     private String approver;
 
     @ApiModelProperty("审核人名称")
+    @LogForUpdate(fieldName = "审核人名称")
     private String approverName;
 
     @ApiModelProperty("审核人意见")
+    @LogForUpdate(fieldName = "审核人意见")
     private String approverIdea;
 
     @ApiModelProperty("审核时间")
@@ -129,9 +132,11 @@ public class InventoryProjectBusiness extends BaseEntity {
     private String cashier;
 
     @ApiModelProperty("出纳人名称")
+    @LogForUpdate(fieldName = "出纳人名称")
     private String cashierName;
 
     @ApiModelProperty("出纳人意见")
+    @LogForUpdate(fieldName = "出纳人意见")
     private String cashierIdea;
 
     @ApiModelProperty("出纳时间")
@@ -142,6 +147,7 @@ public class InventoryProjectBusiness extends BaseEntity {
 
 
     @ApiModelProperty("出纳金额")
+    @LogForUpdate(fieldName = "出纳金额")
     private String cashierAmount;
 
     @ApiModelProperty("出纳附件名称")

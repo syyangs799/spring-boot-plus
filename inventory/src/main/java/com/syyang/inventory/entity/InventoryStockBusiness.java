@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.syyang.springbootplus.framework.common.annotationun.LogForUpdate;
 import com.syyang.springbootplus.framework.common.entity.BaseEntity;
 
 import java.time.LocalDateTime;
@@ -40,12 +41,15 @@ public class InventoryStockBusiness extends BaseEntity {
     private String productId;
 
     @ApiModelProperty("产品名称")
+    @LogForUpdate(fieldName = "产品名称")
     private String productName;
 
     @ApiModelProperty("交易类型，0入库 1出库")
+    @LogForUpdate(fieldName = "交易类型",isCode = true,codeJson = "{\"0\":\"入库\",\"1\":\"出库\"}")
     private Integer type;
 
     @ApiModelProperty("产品数量")
+    @LogForUpdate(fieldName = "产品数量")
     private Integer productNum;
 
     @ApiModelProperty("产品金额-小计")
@@ -75,6 +79,7 @@ public class InventoryStockBusiness extends BaseEntity {
     private Integer projectId;
 
     @ApiModelProperty("项目名称，当前字段为出库时必填字段")
+    @LogForUpdate(fieldName = "项目名称")
     private String projectName;
 
     @ApiModelProperty("创建时间")

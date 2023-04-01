@@ -87,7 +87,6 @@ public class InventoryProjectInfo extends BaseEntity {
     private String amountBusiness = "0";
 
     @ApiModelProperty("商务费用利率 0-1的百分比")
-    @LogForUpdate(fieldName = "商务费用提成")
     private String amountBusinessPaid = "0.15";
 
     @ApiModelProperty("含税成本")
@@ -100,32 +99,32 @@ public class InventoryProjectInfo extends BaseEntity {
     private String amountTax = "0";
 
     @ApiModelProperty("税务成本利率 0-1的百分比")
-    @LogForUpdate(fieldName = "税务已付成本提成")
+    @LogForUpdate(fieldName = "税务成本比例")
     private String amountTaxPaid = "0.15";
 
     @ApiModelProperty("业务提成")
     private String amountCommissionBusiness = "0";
 
     @ApiModelProperty("业务提成利率 0-1的百分比")
-    @LogForUpdate(fieldName = "业务已付提成提成")
+    @LogForUpdate(fieldName = "业务提成比例")
     private String amountCommissionBusinessPaid = "0.15";
 
     @ApiModelProperty("技术提成")
     private String amountCommissionTechnical = "0";
 
     @ApiModelProperty("技术提成利率 0-1的百分比")
-    @LogForUpdate(fieldName = "技术已付提成提成")
+    @LogForUpdate(fieldName = "技术提成比例")
     private String amountCommissionTechnicalPaid = "0.15";
 
     @ApiModelProperty("管理提成")
     private String amountCommissionManagement = "0";
 
     @ApiModelProperty("管理提成利率 0-1的百分比")
-    @LogForUpdate(fieldName = "管理已付提成提成")
+    @LogForUpdate(fieldName = "管理提成比例")
     private String amountCommissionManagementPaid = "0.15";
 
     @ApiModelProperty("项目进度，新建 1  实施 2 完结 3")
-    @LogForUpdate(fieldName = "项目进度")
+    @LogForUpdate(fieldName = "项目进度",isCode = true,codeJson = "{\"1\":\"新建\",\"2\":\"售前\",\"3\":\"实施\",\"4\":\"完成\"}")
     private String step;
 
 

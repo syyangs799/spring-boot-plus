@@ -16,4 +16,11 @@ import java.lang.annotation.*;
 @Documented
 public @interface LogForUpdate {
     String fieldName() default "";
+
+    boolean isCode() default false;
+    /**
+     * json 码表的
+     * @return
+     */
+    String codeJson() default "";
 }

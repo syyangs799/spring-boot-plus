@@ -1,8 +1,10 @@
 package com.syyang.springbootplus.framework.util;
 
+import cn.hutool.json.JSONUtil;
 import com.syyang.springbootplus.framework.common.annotationun.LogForUpdate;
 
 import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -33,11 +35,20 @@ public class BeanUtils {
                     Object oldValue = field.get(oldBean);
                     if(!Objects.equals(newValue, oldValue)) {
                         builder.append(field.getAnnotation(LogForUpdate.class).fieldName()); //获取字段名称
-                        builder.append(": 【更改前：");
-                        builder.append(newValue);
-                        builder.append(", 更改后：");
-                        builder.append(oldValue);
-                        builder.append("】,");
+                        if(!field.getAnnotation(LogForUpdate.class).isCode()) {
+                            builder.append(": 【更改前：");
+                            builder.append(newValue);
+                            builder.append(", 更改后：");
+                            builder.append(oldValue);
+                            builder.append("】,");
+                        }else{
+                            Map<String,String> codeMap = JSONUtil.toBean(field.getAnnotation(LogForUpdate.class).codeJson(),Map.class);
+                            builder.append(": 【更改前：");
+                            builder.append(codeMap.getOrDefault(newValue.toString(),""));
+                            builder.append(", 更改后：");
+                            builder.append(codeMap.getOrDefault(oldValue.toString(),""));
+                            builder.append("】,");
+                        }
                     }
                 } catch (Exception e) {
                     System.out.println(e);
