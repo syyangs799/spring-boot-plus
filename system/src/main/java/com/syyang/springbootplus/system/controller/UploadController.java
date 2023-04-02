@@ -66,17 +66,14 @@ public class UploadController {
     @OperationLog(name = "上传单个文件", type = OperationLogType.UPLOAD)
     @ApiOperation(value = "上传单个文件", response = ApiResult.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "file", value = "文件", required = true,dataType = "__file"),
-            @ApiImplicitParam(name = "type", value = "类型 head:头像",required = true)
+            @ApiImplicitParam(name = "file", value = "文件", required = true,dataType = "__file")
     })
-    public ApiResult<Map<String,String>> upload(@RequestParam("file") MultipartFile multipartFile,
-                                                @RequestParam("type") String type) throws Exception {
+    public ApiResult<Map<String,String>> upload(@RequestParam("file") MultipartFile multipartFile) throws Exception {
         log.info("multipartFile = " + multipartFile);
         log.info("ContentType = " + multipartFile.getContentType());
         log.info("OriginalFilename = " + multipartFile.getOriginalFilename());
         log.info("Name = " + multipartFile.getName());
         log.info("Size = " + multipartFile.getSize());
-        log.info("type = " + type);
         Map<String,String> result = Maps.newHashMap();
         result.put("oriName",multipartFile.getOriginalFilename());
         // 上传文件，返回保存的文件名称
@@ -92,9 +89,9 @@ public class UploadController {
         // 上传成功之后，返回访问路径，请根据实际情况设置
 
 //        String fileAccessPath = springBootPlusProperties.getResourceAccessUrl() + saveFileName;
-        log.info("saveFileName:{}", saveFileName);
+        log.info("filePath:{}", saveFileName);
 
-        result.put("saveFileName",saveFileName);
+        result.put("filePath",saveFileName);
         return ApiResult.ok(result);
     }
 

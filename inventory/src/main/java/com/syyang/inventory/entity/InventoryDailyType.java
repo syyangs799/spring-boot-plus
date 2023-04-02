@@ -45,9 +45,11 @@ public class InventoryDailyType extends BaseEntity {
     private String remark;
 
     @ApiModelProperty("创建者")
+    @TableField(fill = FieldFill.INSERT)
     private String createUser;
 
     @ApiModelProperty("创建人名称")
+    @TableField(fill = FieldFill.INSERT)
     private String createUserName;
 
     @ApiModelProperty("创建日期")

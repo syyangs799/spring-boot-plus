@@ -62,6 +62,8 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
 
     @Override
     public List<KeyAndValueVo> getProjectFinance(InventoryOverviewParam inventoryOverviewParam) {
+        //判断一下当前时间是否为null，默认填充最近7天的日期
+        isNullForInventoryOverviewParam(inventoryOverviewParam);
         List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
         List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,false,false);
         BigDecimal yue = new BigDecimal(0);
@@ -80,18 +82,19 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
             }
             yinfu = yinfu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalPayable())));
             yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalPaid())));
-            //加上收入-支出
-            yue = yue.add(yishou)
-                    .subtract(yifu);
         }
         //获取当前所有的项目收支信息
         //获取当前所有的日常支出信息
         List<InventoryDailyBusiness> inventoryDailyBusinesses = getInventoryDailyBusinessesByInventoryOverview(inventoryOverviewParam);
         for(InventoryDailyBusiness inventoryDailyBusiness:inventoryDailyBusinesses){
             //减去日常的支出
-            yue = yue.subtract(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
+//            yue = yue.subtract(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
             yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
         }
+
+        //加上收入-支出
+        yue = yue.add(yishou)
+                .subtract(yifu);
         //12.未付 --- 应付-已付
         weifu = yinfu.subtract(yifu);
         //获取当前所有的出库信息
@@ -151,6 +154,8 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
 
     @Override
     public List<KeyAndValueVo> getDailyFinance(InventoryOverviewParam inventoryOverviewParam) {
+        //判断一下当前时间是否为null，默认填充最近7天的日期
+        isNullForInventoryOverviewParam(inventoryOverviewParam);
         List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
         List<InventoryDailyBusiness> inventoryProjectInfosByInventoryOverview = getInventoryDailyBusinessesByInventoryOverview(inventoryOverviewParam);
         Map<String, List<InventoryDailyBusiness>> dailyMap = new LinkedHashMap<String, List<InventoryDailyBusiness>>();
@@ -174,6 +179,8 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
 
     @Override
     public List<KeyAndValue2Vo> getManageFinance(InventoryOverviewParam inventoryOverviewParam) {
+        //判断一下当前时间是否为null，默认填充最近7天的日期
+        isNullForInventoryOverviewParam(inventoryOverviewParam);
         List<KeyAndValue2Vo> keyAndValueVos = Lists.newArrayList();
         BigDecimal xiangmushouru = new BigDecimal(0);
         BigDecimal xiangmuzhichu = new BigDecimal(0);
@@ -223,6 +230,8 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
 
     @Override
     public List<KeyAndValueVo> getProjectStatusFinance(InventoryOverviewParam inventoryOverviewParam) {
+        //判断一下当前时间是否为null，默认填充最近7天的日期
+        isNullForInventoryOverviewParam(inventoryOverviewParam);
         List<InventoryProjectInfo> inventoryProjectInfosByInventoryOverview = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,false,true);
         Map<String, List<InventoryProjectInfo>> projectMap = new LinkedHashMap<String, List<InventoryProjectInfo>>();
         CommonListUtils.listGroup2Map(inventoryProjectInfosByInventoryOverview, projectMap, InventoryProjectInfo.class, "getStep");// 输入方法名
@@ -270,6 +279,8 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
 
     @Override
     public List<KeyAndValueVo> getProfitFinance(InventoryOverviewParam inventoryOverviewParam) {
+        //判断一下当前时间是否为null，默认填充最近7天的日期
+        isNullForInventoryOverviewParam(inventoryOverviewParam);
         List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
         List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,true,false);
         for(InventoryProjectInfo inventoryProjectInfo:inventoryProjectInfos){
@@ -281,6 +292,8 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
 
     @Override
     public List<CollectionStatisticsVo> getReceivablesFinance(InventoryOverviewParam inventoryOverviewParam) {
+        //判断一下当前时间是否为null，默认填充最近7天的日期
+        isNullForInventoryOverviewParam(inventoryOverviewParam);
         List<CollectionStatisticsVo> collectionStatisticsVos = Lists.newArrayList();
         List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,false,false);
         for(InventoryProjectInfo inventoryProjectInfo:inventoryProjectInfos){
@@ -302,8 +315,8 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
             inventoryOverviewParam.setStarTime(LocalDateTime.now().plusMonths(-6).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         }else{
             //获取当前月的天数
-            inventoryOverviewParam.setEndTime(LocalDateTime.parse(inventoryOverviewParam.getEndTime(),DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).plusMonths(1).plusDays(-1).format(DateTimeFormatter.ofPattern("yyyy-MM-01 00:00:00")));
-            inventoryOverviewParam.setStarTime(LocalDateTime.parse(inventoryOverviewParam.getStarTime(),DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd 23:59:59")));
+            inventoryOverviewParam.setEndTime(LocalDateTime.parse(inventoryOverviewParam.getEndTime(),DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).plusMonths(1).plusDays(-1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd 23:59:59")));
+            inventoryOverviewParam.setStarTime(LocalDateTime.parse(inventoryOverviewParam.getStarTime(),DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).format(DateTimeFormatter.ofPattern("yyyy-MM-01 00:00:00")));
         }
     }
 

@@ -257,7 +257,9 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
             inventoryProjectOperationRecord.setOperationType(ProjectOperationTypeEnum.PROJECT_CREATE_OUTBOUND_INFO.getDesc());
             inventoryProjectOperationRecord.setOperationTypeName(ProjectOperationTypeEnum.PROJECT_CREATE_OUTBOUND_INFO.getCode().toString());
             inventoryProjectOperationRecord.setUpdateContent(BeanUtils.getChangedFields(new InventoryStockBusiness(),entity));
-            inventoryProjectOperationRecordMapper.insert(inventoryProjectOperationRecord);
+            if(StrUtil.isNotBlank(inventoryProjectOperationRecord.getUpdateContent())) {
+                inventoryProjectOperationRecordMapper.insert(inventoryProjectOperationRecord);
+            }
         }
         return result;
     }

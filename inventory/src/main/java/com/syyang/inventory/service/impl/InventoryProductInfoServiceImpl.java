@@ -1,12 +1,14 @@
 package com.syyang.inventory.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import com.syyang.inventory.entity.InventoryDailyType;
 import com.syyang.inventory.entity.InventoryProductInfo;
 import com.syyang.inventory.mapper.InventoryProductInfoMapper;
 import com.syyang.inventory.service.InventoryProductInfoService;
 import com.syyang.inventory.param.InventoryProductInfoPageParam;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.syyang.springbootplus.framework.common.annotationun.ProjectDataPermission;
+import com.syyang.springbootplus.framework.common.exception.BusinessException;
 import com.syyang.springbootplus.framework.common.service.impl.BaseServiceImpl;
 import com.syyang.springbootplus.framework.core.pagination.Paging;
 import com.syyang.springbootplus.framework.core.pagination.PageInfo;
@@ -36,12 +38,24 @@ public class InventoryProductInfoServiceImpl extends BaseServiceImpl<InventoryPr
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean saveInventoryProductInfo(InventoryProductInfo inventoryProductInfo) throws Exception {
+        valideUniName(inventoryProductInfo);
         return super.save(inventoryProductInfo);
+    }
+
+    private void valideUniName(InventoryProductInfo inventoryProductInfo) throws Exception {
+        LambdaQueryWrapper<InventoryProductInfo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(InventoryProductInfo::getProductName,inventoryProductInfo.getProductName());
+        wrapper.ne(null != inventoryProductInfo.getId(),InventoryProductInfo::getId,inventoryProductInfo.getId());
+        List<InventoryProductInfo> dataLists = inventoryProductInfoMapper.selectList(wrapper);
+        if(dataLists.size() > 0){
+            throw new BusinessException("当前已存在名称【" + inventoryProductInfo.getProductName() + "】的产品，请重新输入");
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean updateInventoryProductInfo(InventoryProductInfo inventoryProductInfo) throws Exception {
+        valideUniName(inventoryProductInfo);
         return super.updateById(inventoryProductInfo);
     }
 

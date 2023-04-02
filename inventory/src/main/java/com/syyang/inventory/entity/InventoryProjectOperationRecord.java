@@ -82,6 +82,6 @@ public class InventoryProjectOperationRecord extends BaseEntity {
 
     @ApiModelProperty("部门id")
     @TableField(fill = FieldFill.INSERT)
-    private Integer departementId;
+    private Integer departmentId;
 
 }

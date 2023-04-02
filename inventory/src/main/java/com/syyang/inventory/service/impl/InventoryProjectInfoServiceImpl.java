@@ -16,6 +16,7 @@ import com.syyang.inventory.mapper.InventoryStockBusinessMapper;
 import com.syyang.inventory.service.InventoryProjectInfoService;
 import com.syyang.inventory.param.InventoryProjectInfoPageParam;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.syyang.springbootplus.framework.common.exception.BusinessException;
 import com.syyang.springbootplus.framework.common.service.impl.BaseServiceImpl;
 import com.syyang.springbootplus.framework.core.pagination.Paging;
 import com.syyang.springbootplus.framework.core.pagination.PageInfo;
@@ -60,6 +61,7 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean saveInventoryProjectInfo(InventoryProjectInfo inventoryProjectInfo) throws Exception {
+        valideUniName(inventoryProjectInfo);
         //项目状态强制置为新建
         inventoryProjectInfo.setStep(StepTypeEnum.NEW.getCode().toString());
         boolean save = super.save(inventoryProjectInfo);
@@ -71,13 +73,26 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         inventoryProjectOperationRecord.setOperationType(ProjectOperationTypeEnum.PROJECT_CREATE_BASE_INFO.getDesc());
         inventoryProjectOperationRecord.setOperationTypeName(ProjectOperationTypeEnum.PROJECT_CREATE_BASE_INFO.getCode().toString());
         inventoryProjectOperationRecord.setUpdateContent(BeanUtils.getChangedFields(new InventoryProjectInfo(),inventoryProjectInfo));
-        inventoryProjectOperationRecordMapper.insert(inventoryProjectOperationRecord);
+        if(StrUtil.isNotBlank(inventoryProjectOperationRecord.getUpdateContent())) {
+            inventoryProjectOperationRecordMapper.insert(inventoryProjectOperationRecord);
+        }
         return save;
+    }
+
+    private void valideUniName(InventoryProjectInfo inventoryProjectInfo) throws Exception {
+        LambdaQueryWrapper<InventoryProjectInfo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(InventoryProjectInfo::getProjectName,inventoryProjectInfo.getProjectName());
+        wrapper.ne(null != inventoryProjectInfo.getId(),InventoryProjectInfo::getId,inventoryProjectInfo.getId());
+        List<InventoryProjectInfo> dataLists = inventoryProjectInfoMapper.selectList(wrapper);
+        if(dataLists.size() > 0){
+            throw new BusinessException("当前已存在名称【" + inventoryProjectInfo.getProjectName() + "】的项目，请重新输入");
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean updateInventoryProjectInfo(InventoryProjectInfo inventoryProjectInfo) throws Exception {
+        valideUniName(inventoryProjectInfo);
         InventoryProjectInfo old = getById(inventoryProjectInfo.getId());
         boolean b = super.updateById(inventoryProjectInfo);
 //        calculateProjectInformation(inventoryProjectInfo.getId());
@@ -89,8 +104,9 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         inventoryProjectOperationRecord.setOperationType(ProjectOperationTypeEnum.PROJECT_UPDATE_BASE_INFO.getDesc());
         inventoryProjectOperationRecord.setOperationTypeName(ProjectOperationTypeEnum.PROJECT_UPDATE_BASE_INFO.getCode().toString());
         inventoryProjectOperationRecord.setUpdateContent(BeanUtils.getChangedFields(old,inventoryProjectInfo));
-        inventoryProjectOperationRecordMapper.insert(inventoryProjectOperationRecord);
-
+        if(StrUtil.isNotBlank(inventoryProjectOperationRecord.getUpdateContent())) {
+            inventoryProjectOperationRecordMapper.insert(inventoryProjectOperationRecord);
+        }
         return b;
     }
 

@@ -1,6 +1,8 @@
 package com.syyang.springbootplus.framework.util;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.google.common.collect.Maps;
 import com.syyang.springbootplus.framework.common.annotationun.LogForUpdate;
 
 import java.lang.reflect.Field;
@@ -33,20 +35,24 @@ public class BeanUtils {
                 try {
                     Object newValue = field.get(newBean);
                     Object oldValue = field.get(oldBean);
-                    if(!Objects.equals(newValue, oldValue)) {
+                    if(!Objects.equals(newValue, oldValue) && StrUtil.isNotBlank(newValue.toString()) && StrUtil.isNotBlank(oldValue.toString())) {
                         builder.append(field.getAnnotation(LogForUpdate.class).fieldName()); //获取字段名称
                         if(!field.getAnnotation(LogForUpdate.class).isCode()) {
                             builder.append(": 【更改前：");
-                            builder.append(newValue);
+                            builder.append(null == newValue?"":newValue);
                             builder.append(", 更改后：");
-                            builder.append(oldValue);
+                            builder.append(null == oldValue?"":oldValue);
                             builder.append("】,");
                         }else{
-                            Map<String,String> codeMap = JSONUtil.toBean(field.getAnnotation(LogForUpdate.class).codeJson(),Map.class);
+                            Map<String,String> codeMap = Maps.newHashMap();
+                            try {
+                                codeMap = JSONUtil.toBean(field.getAnnotation(LogForUpdate.class).codeJson(), Map.class);
+                            }catch (Exception e){
+                            }
                             builder.append(": 【更改前：");
-                            builder.append(codeMap.getOrDefault(newValue.toString(),""));
+                            builder.append(null == newValue?"":codeMap.getOrDefault(newValue.toString(),""));
                             builder.append(", 更改后：");
-                            builder.append(codeMap.getOrDefault(oldValue.toString(),""));
+                            builder.append(null == oldValue?"":codeMap.getOrDefault(oldValue.toString(),""));
                             builder.append("】,");
                         }
                     }

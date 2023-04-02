@@ -29,22 +29,24 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
         try {
 
             //继不继承 BaseEntity 也不继承 SuperEntity
-            if (metaObject.hasSetter("createTime") && Objects.isNull(metaObject.getValue("createTime"))) {
+//            if (metaObject.hasSetter("createTime") && Objects.isNull(metaObject.getValue("createTime")) && StrUtil.isBlank(String.valueOf(metaObject.getValue("createTime")))) {
+            //目前只要存在 就直接覆盖
+            if (metaObject.hasSetter("createTime")) {
                 metaObject.setValue("createTime", LocalDateTime.now());
             }
-            if (metaObject.hasSetter("updateTime") && Objects.isNull(metaObject.getValue("updateTime"))) {
+            if (metaObject.hasSetter("updateTime")) {
                 metaObject.setValue("updateTime", LocalDateTime.now());
             }
 
             if (StrUtil.isNotBlank(JwtUtil.getUsername(JwtTokenUtil.getToken()))) {
                 LoginSysUserRedisVo loginSysUserRedisVo = loginRedisService.getLoginSysUserRedisVo(JwtUtil.getUsername(JwtTokenUtil.getToken()));
-                if (metaObject.hasSetter("createUser") && Objects.isNull(metaObject.getValue("createUser"))) {
+                if (metaObject.hasSetter("createUser")) {
                     metaObject.setValue("createUser", loginSysUserRedisVo.getId().toString());
                 }
-                if (metaObject.hasSetter("createUserName") && Objects.isNull(metaObject.getValue("createUserName"))) {
+                if (metaObject.hasSetter("createUserName")) {
                     metaObject.setValue("createUserName", loginSysUserRedisVo.getUsername());
                 }
-                if (metaObject.hasSetter("departmentId") && Objects.isNull(metaObject.getValue("departmentId"))) {
+                if (metaObject.hasSetter("departmentId")) {
                     metaObject.setValue("departmentId", loginSysUserRedisVo.getDepartmentId().intValue());
                 }
             }

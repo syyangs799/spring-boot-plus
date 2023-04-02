@@ -64,7 +64,9 @@ public class InventoryProjectBusinessServiceImpl extends BaseServiceImpl<Invento
         inventoryProjectOperationRecord.setOperationType(ProjectOperationTypeEnum.PROJECT_CREATE_BUSINESS_INFO.getDesc());
         inventoryProjectOperationRecord.setOperationTypeName(ProjectOperationTypeEnum.PROJECT_CREATE_BUSINESS_INFO.getCode().toString());
         inventoryProjectOperationRecord.setUpdateContent(BeanUtils.getChangedFields(new InventoryProjectBusiness(),inventoryProjectBusiness));
-        inventoryProjectOperationRecordMapper.insert(inventoryProjectOperationRecord);
+        if(StrUtil.isNotBlank(inventoryProjectOperationRecord.getUpdateContent())) {
+            inventoryProjectOperationRecordMapper.insert(inventoryProjectOperationRecord);
+        }
         return save;
     }
 
@@ -82,7 +84,9 @@ public class InventoryProjectBusinessServiceImpl extends BaseServiceImpl<Invento
         inventoryProjectOperationRecord.setOperationType(ProjectOperationTypeEnum.PROJECT_UPDATE_BUSINESS_INFO.getDesc());
         inventoryProjectOperationRecord.setOperationTypeName(ProjectOperationTypeEnum.PROJECT_UPDATE_BUSINESS_INFO.getCode().toString());
         inventoryProjectOperationRecord.setUpdateContent(BeanUtils.getChangedFields(old,inventoryProjectBusiness));
-        inventoryProjectOperationRecordMapper.insert(inventoryProjectOperationRecord);
+        if(StrUtil.isNotBlank(inventoryProjectOperationRecord.getUpdateContent())) {
+            inventoryProjectOperationRecordMapper.insert(inventoryProjectOperationRecord);
+        }
         return b;
     }
 

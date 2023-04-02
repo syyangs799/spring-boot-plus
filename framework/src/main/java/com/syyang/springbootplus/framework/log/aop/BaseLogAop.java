@@ -70,6 +70,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <p>
@@ -600,10 +602,21 @@ public abstract class BaseLogAop {
      */
     protected void printResponseResult(int code, String responseResultString) {
         if (code == ApiCode.SUCCESS.getCode()) {
-            log.info(responseResultString.trim());
+            log.info(replaceAllBlank(responseResultString.trim()));
         } else {
             log.error(responseResultString.trim());
         }
+    }
+
+    private static final String REPLACE_BLANK_ENTER = "\\s{2,}|\t|\r|\n";
+    private static final Pattern REPLACE_P = Pattern.compile(REPLACE_BLANK_ENTER);
+    public static String replaceAllBlank(String str) {
+        String dest = "";
+        if (StringUtils.isNotBlank(str)) {
+            Matcher m = REPLACE_P.matcher(str);
+            dest = m.replaceAll("");
+        }
+        return dest;
     }
 
     /**
