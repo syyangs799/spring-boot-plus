@@ -1,6 +1,8 @@
 package com.syyang.inventory.service.impl;
 
+import cn.hutool.core.date.DateBetween;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
 import com.syyang.inventory.entity.*;
@@ -34,6 +36,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -124,6 +129,15 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
                 .like(StrUtil.isNotBlank(inventoryProjectInfoPageParam.getKeyword()),InventoryProjectInfo::getProjectName,inventoryProjectInfoPageParam.getKeyword());
         IPage<InventoryProjectInfo> iPage = inventoryProjectInfoMapper.selectPage(page, wrapper);
         iPage.setTotal(inventoryProjectInfoMapper.selectCount(wrapper));
+        for(InventoryProjectInfo inventoryProjectInfo:iPage.getRecords()){
+            //添加质保金的截止日期 如果项目处于完结状态
+            if(inventoryProjectInfo.getStep().equals(StepTypeEnum.FINISHED.getCode().toString())){
+                if(null!=inventoryProjectInfo.getAmountWarrantyEnding()){
+                    inventoryProjectInfo.setAmountWarranty(inventoryProjectInfo.getAmountWarranty()
+                            + "（截止日期剩余【" + Duration.between(LocalDateTime.now(),inventoryProjectInfo.getAmountWarrantyEnding()).toDays() + "】天）");
+                }
+            }
+        }
         return new Paging<InventoryProjectInfo>(iPage);
     }
 

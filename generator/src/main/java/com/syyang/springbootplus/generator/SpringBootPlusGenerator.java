@@ -60,8 +60,10 @@ public class SpringBootPlusGenerator {
 //        generatorProperties.addTable("inventory_stock_info","id");
 //        generatorProperties.addTable("sy_dict_data","id");
 //        generatorProperties.addTable("inventory_project_operation_record","id");
-        generatorProperties.addTable("inventory_daily_type","id");
-        generatorProperties.addTable("inventory_product_type","id");
+//        generatorProperties.addTable("inventory_daily_type","id");
+//        generatorProperties.addTable("inventory_product_type","id");
+        generatorProperties.addTable("inventory_project_other_business","id");
+        generatorProperties.addTable("inventory_stock_agreement","id");
         // 设置表前缀
 //         generatorProperties.setTablePrefix(Arrays.asList("foo_"));
 

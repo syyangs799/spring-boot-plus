@@ -78,7 +78,7 @@ public class InventoryStockInfoServiceImpl extends BaseServiceImpl<InventoryStoc
         for (InventoryStockInfo inventoryStockInfo : inventoryStockInfos) {
             totalAmount = totalAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryStockInfo.getProductAmount())));
         }
-        keyAndValueVos.add(new KeyAndValueVo("库存总金额", totalAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("当前库存总金额", totalAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()));
         return keyAndValueVos;
     }
 

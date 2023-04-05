@@ -58,6 +58,10 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
     @Autowired
     private InventoryProjectBusinessMapper inventoryProjectBusinessMapper;
     @Autowired
+    private InventoryProjectOtherBusinessMapper inventoryProjectOtherBusinessMapper;
+    @Autowired
+    private InventoryStockAgreementMapper inventoryStockAgreementMapper;
+    @Autowired
     private LoginRedisService loginRedisService;
 
     @Override
@@ -73,24 +77,76 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         BigDecimal yinfu = new BigDecimal(0);
         BigDecimal yifu = new BigDecimal(0);
         BigDecimal weifu = new BigDecimal(0);
+//        总余额，时间范围内 出纳的收入总金额和支出总金额 项目收支 日常 合同和项目提成
+//        应收总余额 时间范围内 项目的应收总金额  项目创建时间
+//        已收总金额 时间范围内 出纳的收入总金额
+//        质保金 时间范围内 完结的项目的质保金
+//        应付总金额 时间范围内 审核过后的金额 项目支出 日常支出 采购合同 项目提成 金额
+//        已付 时间范围内 出纳的支出总金额 项目收支 日常 合同和项目提成
+//        未支付 应付-已付
         for(InventoryProjectInfo inventoryProjectInfo:inventoryProjectInfos){
             yingshou = yingshou.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalReceivables())));
-            yishou = yishou.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalReceived())));
+//            yishou = yishou.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalReceived())));
             if(inventoryProjectInfo.getStep().equals(StepTypeEnum.FINISHED.getCode().toString())) {
                 //质保金走完结项目
                 zhibao = zhibao.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountWarranty())));
             }
-            yinfu = yinfu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalPayable())));
-            yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalPaid())));
+//            yinfu = yinfu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalPayable())));
+//            yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalPaid())));
         }
         //获取当前所有的项目收支信息
+        List<InventoryProjectBusiness> inventoryProjectBusinesses = getInventoryProjectBusinesssByInventoryOverview(inventoryOverviewParam);
+        for(InventoryProjectBusiness inventoryProjectBusiness:inventoryProjectBusinesses){
+            //通过计算收支
+            if(inventoryProjectBusiness.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode())) {
+                //已出纳
+                if(inventoryProjectBusiness.getType().equals(StockBusinessTypeEnum.IN.getCode())) {
+                    // 已收总金额 时间范围内 出纳的收入总金额
+                    yishou = yishou.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getCashierAmount())));
+                }else {
+                    //已付 时间范围内 出纳的支出总金额 项目收支 日常 合同和项目提成
+                    yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getCashierAmount())));
+                }
+            }
+            //不管是审核通过还是出纳状态，直接计算审核金额
+            if(inventoryProjectBusiness.getType().equals(StockBusinessTypeEnum.OUT.getCode())) {
+                yinfu = yinfu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
+            }
+        }
         //获取当前所有的日常支出信息
         List<InventoryDailyBusiness> inventoryDailyBusinesses = getInventoryDailyBusinessesByInventoryOverview(inventoryOverviewParam);
         for(InventoryDailyBusiness inventoryDailyBusiness:inventoryDailyBusinesses){
             //减去日常的支出
 //            yue = yue.subtract(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
-            yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
+            if(inventoryDailyBusiness.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode().toString())) {
+                yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
+            }
+            yinfu = yinfu.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getAmountMoney())));
         }
+
+        //获取当前所有的项目其他支出信息
+        List<InventoryProjectOtherBusiness> inventoryProjectOtherBusinesses = getInventoryProjectOtherBusinesssByInventoryOverview(inventoryOverviewParam);
+        for(InventoryProjectOtherBusiness inventoryProjectOtherBusiness:inventoryProjectOtherBusinesses){
+            //减去项目的提成的支出
+//            yue = yue.subtract(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
+            if(inventoryProjectOtherBusiness.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode())) {
+                yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectOtherBusiness.getCashierAmount())));
+            }
+            yinfu = yinfu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectOtherBusiness.getAmountMoney())));
+        }
+
+
+        //获取当前采购合同的支出信息
+        List<InventoryStockAgreement> inventoryStockAgreements = getInventoryStockAgreementByInventoryOverview(inventoryOverviewParam);
+        for(InventoryStockAgreement inventoryStockAgreement:inventoryStockAgreements){
+            //减去项目的提成的支出
+//            yue = yue.subtract(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
+            if(inventoryStockAgreement.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode())) {
+                yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryStockAgreement.getCashierAmount())));
+            }
+            yinfu = yinfu.add(BigDecimal.valueOf(Double.valueOf(inventoryStockAgreement.getAgreementAmount())));
+        }
+
 
         //加上收入-支出
         yue = yue.add(yishou)
@@ -108,6 +164,42 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         return keyAndValueVos;
     }
 
+    private List<InventoryStockAgreement> getInventoryStockAgreementByInventoryOverview(InventoryOverviewParam inventoryOverviewParam) {
+        LambdaQueryWrapper<InventoryStockAgreement> wrapper = new LambdaQueryWrapper<>();
+        wrapper.and(req->req.eq(InventoryStockAgreement::getStatus, StatusTypeEnum.CHECK_SUCCESS.getCode().toString())
+                        .or().eq(InventoryStockAgreement::getStatus, StatusTypeEnum.CASHI_SUCCESS.getCode().toString()))
+                .and(req -> req.between(Objects.nonNull(inventoryOverviewParam.getStarTime()),InventoryStockAgreement::getApproverTime
+                        , inventoryOverviewParam.getStarTime(), inventoryOverviewParam.getEndTime())
+                        .or().between(Objects.nonNull(inventoryOverviewParam.getStarTime()),InventoryStockAgreement::getCashierTime
+                        , inventoryOverviewParam.getStarTime(), inventoryOverviewParam.getEndTime()));
+        List<InventoryStockAgreement> inventoryDailyBusinesses = inventoryStockAgreementMapper.selectList(wrapper);
+        return inventoryDailyBusinesses;
+    }
+
+    private List<InventoryProjectOtherBusiness> getInventoryProjectOtherBusinesssByInventoryOverview(InventoryOverviewParam inventoryOverviewParam) {
+        LambdaQueryWrapper<InventoryProjectOtherBusiness> wrapper = new LambdaQueryWrapper<>();
+        wrapper.and(req->req.eq(InventoryProjectOtherBusiness::getStatus, StatusTypeEnum.CHECK_SUCCESS.getCode().toString())
+                        .or().eq(InventoryProjectOtherBusiness::getStatus, StatusTypeEnum.CASHI_SUCCESS.getCode().toString()))
+                .and(req -> req.between(Objects.nonNull(inventoryOverviewParam.getStarTime()),InventoryProjectOtherBusiness::getCreateTime
+                                , inventoryOverviewParam.getStarTime(), inventoryOverviewParam.getEndTime())
+                        .or().between(Objects.nonNull(inventoryOverviewParam.getStarTime()),InventoryProjectOtherBusiness::getCashierTime
+                                , inventoryOverviewParam.getStarTime(), inventoryOverviewParam.getEndTime()));
+        List<InventoryProjectOtherBusiness> inventoryProjectOtherBusinesses = inventoryProjectOtherBusinessMapper.selectList(wrapper);
+        return inventoryProjectOtherBusinesses;
+    }
+
+    private List<InventoryProjectBusiness> getInventoryProjectBusinesssByInventoryOverview(InventoryOverviewParam inventoryOverviewParam) {
+        LambdaQueryWrapper<InventoryProjectBusiness> wrapper = new LambdaQueryWrapper<>();
+        wrapper.and(req->req.eq(InventoryProjectBusiness::getStatus, StatusTypeEnum.CHECK_SUCCESS.getCode().toString())
+                        .or().eq(InventoryProjectBusiness::getStatus, StatusTypeEnum.CASHI_SUCCESS.getCode().toString()))
+                .and(req -> req.between(Objects.nonNull(inventoryOverviewParam.getStarTime()),InventoryProjectBusiness::getApproverTime
+                                , inventoryOverviewParam.getStarTime(), inventoryOverviewParam.getEndTime())
+                        .or().between(Objects.nonNull(inventoryOverviewParam.getStarTime()),InventoryProjectBusiness::getCashierTime
+                                , inventoryOverviewParam.getStarTime(), inventoryOverviewParam.getEndTime()));
+        List<InventoryProjectBusiness> inventoryDailyBusinesses = inventoryProjectBusinessMapper.selectList(wrapper);
+        return inventoryDailyBusinesses;
+    }
+
     /**
      * 获取日常的支出列表
      * @param inventoryOverviewParam
@@ -115,9 +207,12 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
      */
     private List<InventoryDailyBusiness> getInventoryDailyBusinessesByInventoryOverview(InventoryOverviewParam inventoryOverviewParam) {
         LambdaQueryWrapper<InventoryDailyBusiness> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(InventoryDailyBusiness::getStatus, StatusTypeEnum.CASHI_SUCCESS.getCode().toString())
-                .between(Objects.nonNull(inventoryOverviewParam.getStarTime()),InventoryDailyBusiness::getCashierTime
-                        , inventoryOverviewParam.getStarTime(), inventoryOverviewParam.getEndTime());
+        wrapper.and(req->req.eq(InventoryDailyBusiness::getStatus, StatusTypeEnum.CHECK_SUCCESS.getCode().toString())
+                        .or().eq(InventoryDailyBusiness::getStatus, StatusTypeEnum.CASHI_SUCCESS.getCode().toString()))
+                .and(req -> req.between(Objects.nonNull(inventoryOverviewParam.getStarTime()),InventoryDailyBusiness::getApproverTime
+                                , inventoryOverviewParam.getStarTime(), inventoryOverviewParam.getEndTime())
+                        .or().between(Objects.nonNull(inventoryOverviewParam.getStarTime()),InventoryDailyBusiness::getCashierTime
+                                , inventoryOverviewParam.getStarTime(), inventoryOverviewParam.getEndTime()));
         List<InventoryDailyBusiness> inventoryDailyBusinesses = inventoryDailyBusinessMapper.selectList(wrapper);
         return inventoryDailyBusinesses;
     }
@@ -167,7 +262,9 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
             if (dailyMap.containsKey(syDictData.getDailyName())) {
                 BigDecimal amount = new BigDecimal(0);
                 for (InventoryDailyBusiness inventoryDailyBusiness : dailyMap.get(syDictData.getDailyName())) {
-                    amount = amount.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
+                    if(inventoryDailyBusiness.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode().toString())) {
+                        amount = amount.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
+                    }
                 }
                 keyAndValueVos.add(new KeyAndValueVo(syDictData.getDailyName(), amount.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
             } else {
@@ -214,10 +311,12 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         Map<String,BigDecimal> dailyMap = Maps.newConcurrentMap();
         List<InventoryDailyBusiness> inventoryDailyBusinesses = getInventoryDailyBusinessesByInventoryOverview(inventoryOverviewParam);
         for(InventoryDailyBusiness business:inventoryDailyBusinesses){
-            richangzhichu = richangzhichu.add(BigDecimal.valueOf(Double.valueOf(business.getCashierAmount())));
-            BigDecimal old = dailyMap.getOrDefault(business.getSubTypeName(),new BigDecimal("0"));
-            old = old.add(BigDecimal.valueOf(Double.valueOf(business.getCashierAmount())));
-            dailyMap.put(business.getSubTypeName(),old);
+            if(business.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode().toString())) {
+                richangzhichu = richangzhichu.add(BigDecimal.valueOf(Double.valueOf(business.getCashierAmount())));
+                BigDecimal old = dailyMap.getOrDefault(business.getSubTypeName(), new BigDecimal("0"));
+                old = old.add(BigDecimal.valueOf(Double.valueOf(business.getCashierAmount())));
+                dailyMap.put(business.getSubTypeName(), old);
+            }
         }
         for(Map.Entry<String,BigDecimal> entry:dailyMap.entrySet()){
             rzhichu.add(new KeyAndValueVo(entry.getKey(),entry.getValue().divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));

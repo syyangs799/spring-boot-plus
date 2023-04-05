@@ -17,6 +17,7 @@
 package com.syyang.springbootplus.framework.util;
 
 import com.syyang.springbootplus.config.constant.CommonConstant;
+import com.syyang.springbootplus.framework.common.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -84,7 +85,7 @@ public final class DownloadUtil {
         // 从服务器读取文件，然后输出
         File downloadFile = new File(downloadDir, downloadFileName);
         if (!downloadFile.exists()) {
-            throw new IOException("文件不存在");
+            throw new BusinessException("文件不存在");
         }
 
         // 判断文件类型，输出对应ContentType,如果没有对应的内容类型，可在config/mime-type.properties配置
