@@ -21,8 +21,10 @@ import com.syyang.springbootplus.framework.core.pagination.PageInfo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.syyang.springbootplus.framework.shiro.cache.LoginRedisService;
 import com.syyang.springbootplus.framework.shiro.util.JwtTokenUtil;
 import com.syyang.springbootplus.framework.shiro.util.JwtUtil;
+import com.syyang.springbootplus.framework.shiro.vo.LoginSysUserRedisVo;
 import com.syyang.springbootplus.framework.util.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +52,9 @@ public class InventoryProjectBusinessServiceImpl extends BaseServiceImpl<Invento
 //    private InventoryProjectInfoService inventoryProjectInfoService;
     @Autowired
     private InventoryProjectOperationRecordMapper inventoryProjectOperationRecordMapper;
+
+    @Autowired
+    private LoginRedisService loginRedisService;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -121,6 +126,7 @@ public class InventoryProjectBusinessServiceImpl extends BaseServiceImpl<Invento
 
     @Override
     public List<KeyAndValueVo> getProjectBusinessAmount(InventoryProjectBusinessPageParam inventoryProjectBusinessPageParam) {
+        LoginSysUserRedisVo loginSysUserRedisVo = loginRedisService.getLoginSysUserRedisVo(JwtUtil.getUsername(JwtTokenUtil.getToken()));
         List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
         LambdaQueryWrapper<InventoryProjectBusiness> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(StrUtil.isNotBlank(inventoryProjectBusinessPageParam.getStatus()), InventoryProjectBusiness::getStatus,inventoryProjectBusinessPageParam.getStatus());
@@ -132,6 +138,12 @@ public class InventoryProjectBusinessServiceImpl extends BaseServiceImpl<Invento
         Map<String,BigDecimal> outAmountMap = Maps.newConcurrentMap();
         BigDecimal inTotalAmount = new BigDecimal(0);
         BigDecimal outTotalAmount = new BigDecimal(0);
+
+
+        BigDecimal approveAmount = new BigDecimal(0);
+        BigDecimal cashierAmount = new BigDecimal(0);
+        BigDecimal noCashierAmount = new BigDecimal(0);
+
         for (InventoryProjectBusiness inventoryProjectBusiness : inventoryProjectBusinesses) {
             if(inventoryProjectBusiness.getType().equals(StockBusinessTypeEnum.IN.getCode())){
                 BigDecimal count = outAmountMap.getOrDefault(inventoryProjectBusiness.getSubTypeName(),
@@ -144,6 +156,16 @@ public class InventoryProjectBusinessServiceImpl extends BaseServiceImpl<Invento
                 outAmountMap.put(inventoryProjectBusiness.getSubTypeName(), count);
                 outTotalAmount = outTotalAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
             }
+            if(loginSysUserRedisVo.getRoleCode().equals("adminD") && inventoryProjectBusiness.getCreateUser().equals(loginSysUserRedisVo.getId().toString())){
+                //统计个人的统计信息
+                if(inventoryProjectBusiness.getStatus().equals(StatusTypeEnum.CHECK_SUCCESS.getCode().toString())
+                        || inventoryProjectBusiness.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode().toString()) ){
+                    approveAmount = approveAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
+                    if(inventoryProjectBusiness.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode().toString())){
+                        cashierAmount = cashierAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getCashierAmount())));
+                    }
+                }
+            }
         }
 
 //        for(Map.Entry<String,BigDecimal> entry:inAmountMap.entrySet()) {
@@ -152,8 +174,15 @@ public class InventoryProjectBusinessServiceImpl extends BaseServiceImpl<Invento
 //        for(Map.Entry<String,BigDecimal> entry:outAmountMap.entrySet()) {
 //            keyAndValueVos.add(new KeyAndValueVo("支出：" + entry.getKey(), entry.getValue().toString()));
 //        }
-        keyAndValueVos.add(new KeyAndValueVo("项目收入总金额", inTotalAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()));
-        keyAndValueVos.add(new KeyAndValueVo("项目支出总金额", outTotalAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()));
+        noCashierAmount = approveAmount.subtract(cashierAmount);
+        keyAndValueVos.add(new KeyAndValueVo("项目收入总金额", inTotalAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
+        keyAndValueVos.add(new KeyAndValueVo("项目支出总金额", outTotalAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
+        if(loginSysUserRedisVo.getRoleCode().equals("adminD")){
+            keyAndValueVos.add(new KeyAndValueVo("个人已通过总金额", approveAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
+            keyAndValueVos.add(new KeyAndValueVo("个人已报销总金额", cashierAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
+            keyAndValueVos.add(new KeyAndValueVo("个人未报销总金额", noCashierAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
+
+        }
         return keyAndValueVos;
     }
 

@@ -77,6 +77,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         BigDecimal yinfu = new BigDecimal(0);
         BigDecimal yifu = new BigDecimal(0);
         BigDecimal weifu = new BigDecimal(0);
+        BigDecimal yingdelirun = new BigDecimal(0);
 //        总余额，时间范围内 出纳的收入总金额和支出总金额 项目收支 日常 合同和项目提成
 //        应收总余额 时间范围内 项目的应收总金额  项目创建时间
 //        已收总金额 时间范围内 出纳的收入总金额
@@ -153,8 +154,10 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
                 .subtract(yifu);
         //12.未付 --- 应付-已付
         weifu = yinfu.subtract(yifu);
+        yingdelirun = yingshou.subtract(yinfu);
         //获取当前所有的出库信息
-        keyAndValueVos.add(new KeyAndValueVo("总余额",yue.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("总余额(已收-已付)",yue.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("应得利润(应收-应付)",yingdelirun.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
         keyAndValueVos.add(new KeyAndValueVo("应收总金额",yingshou.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
         keyAndValueVos.add(new KeyAndValueVo("已收总金额",yishou.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
         keyAndValueVos.add(new KeyAndValueVo("质保金金额",zhibao.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
@@ -282,9 +285,15 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         BigDecimal xiangmushouru = new BigDecimal(0);
         BigDecimal xiangmuzhichu = new BigDecimal(0);
         BigDecimal richangzhichu = new BigDecimal(0);
+        BigDecimal hetongcaigou = new BigDecimal(0);
+        BigDecimal hetongchuku = new BigDecimal(0);
+        BigDecimal xiangmuqitazhichu = new BigDecimal(0);
         List<KeyAndValueVo> xshouru = Lists.newArrayList();
         List<KeyAndValueVo> xzhichu = Lists.newArrayList();
         List<KeyAndValueVo> rzhichu = Lists.newArrayList();
+        List<KeyAndValueVo> htcaigou = Lists.newArrayList();
+        List<KeyAndValueVo> htchuku = Lists.newArrayList();
+        List<KeyAndValueVo> xmqtzhichu = Lists.newArrayList();
         Map<String,BigDecimal> xiangmuInMap = Maps.newConcurrentMap();
         Map<String,BigDecimal> xiangmuOutMap = Maps.newConcurrentMap();
         List<InventoryProjectBusiness> inventoryProjectBusinesses = getInventoryProjectBusinessByInventoryOverview(inventoryOverviewParam,true,true);
@@ -307,7 +316,8 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         for(Map.Entry<String,BigDecimal> entry:xiangmuOutMap.entrySet()){
             xzhichu.add(new KeyAndValueVo(entry.getKey(),entry.getValue().divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
         }
-
+        
+        //日常支出
         Map<String,BigDecimal> dailyMap = Maps.newConcurrentMap();
         List<InventoryDailyBusiness> inventoryDailyBusinesses = getInventoryDailyBusinessesByInventoryOverview(inventoryOverviewParam);
         for(InventoryDailyBusiness business:inventoryDailyBusinesses){
@@ -321,10 +331,54 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         for(Map.Entry<String,BigDecimal> entry:dailyMap.entrySet()){
             rzhichu.add(new KeyAndValueVo(entry.getKey(),entry.getValue().divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
         }
+
+        //合同收支
+        List<InventoryStockAgreement> inventoryStockAgreements = getInventoryStockAgreementByInventoryOverview(inventoryOverviewParam);
+        for(InventoryStockAgreement stockAgreement:inventoryStockAgreements){
+            if(stockAgreement.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode().toString())) {
+                if (stockAgreement.getType().equals(StockBusinessTypeEnum.IN.getCode())) {
+                    //采购 == 支出
+                    hetongcaigou = hetongcaigou.add(BigDecimal.valueOf(Double.valueOf(stockAgreement.getCashierAmount())));
+                    htcaigou.add(new KeyAndValueVo(stockAgreement.getAgreementName(),stockAgreement.getCashierAmount()));
+                } else {
+                    //出库
+                    hetongchuku = hetongchuku.add(BigDecimal.valueOf(Double.valueOf(stockAgreement.getCashierAmount())));
+                    htchuku.add(new KeyAndValueVo(stockAgreement.getAgreementName(),stockAgreement.getCashierAmount()));
+                }
+            }
+        }
+        //项目其他支出
+        Map<String,BigDecimal> proOtherMap = Maps.newConcurrentMap();
+        List<InventoryProjectOtherBusiness> inventoryProjectOtherBusinesses = getInventoryProjectOtherBusinessByInventoryOverview(inventoryOverviewParam);
+        for(InventoryProjectOtherBusiness business:inventoryProjectOtherBusinesses){
+            if(business.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode().toString())) {
+                xiangmuqitazhichu = xiangmuqitazhichu.add(BigDecimal.valueOf(Double.valueOf(business.getCashierAmount())));
+                BigDecimal old = proOtherMap.getOrDefault(business.getSubTypeName(), new BigDecimal("0"));
+                old = old.add(BigDecimal.valueOf(Double.valueOf(business.getCashierAmount())));
+                proOtherMap.put(business.getSubTypeName(), old);
+            }
+        }
+        for(Map.Entry<String,BigDecimal> entry:proOtherMap.entrySet()){
+            xmqtzhichu.add(new KeyAndValueVo(entry.getKey(),entry.getValue().divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        }
+
         keyAndValueVos.add(new KeyAndValue2Vo("项目总收入",xiangmushouru.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),xshouru));
         keyAndValueVos.add(new KeyAndValue2Vo("项目总支出",xiangmuzhichu.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),xzhichu));
+        keyAndValueVos.add(new KeyAndValue2Vo("项目其他支出",xiangmuqitazhichu.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),xmqtzhichu));
         keyAndValueVos.add(new KeyAndValue2Vo("日常总支出",richangzhichu.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),rzhichu));
+        keyAndValueVos.add(new KeyAndValue2Vo("采购合同",hetongcaigou.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),htcaigou));
+        keyAndValueVos.add(new KeyAndValue2Vo("出库合同",hetongchuku.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),htchuku));
         return keyAndValueVos;
+    }
+
+    private List<InventoryProjectOtherBusiness> getInventoryProjectOtherBusinessByInventoryOverview(InventoryOverviewParam inventoryOverviewParam) {
+        //获取当前所有的项目信息
+        LambdaQueryWrapper<InventoryProjectOtherBusiness> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(InventoryProjectOtherBusiness::getStatus, StatusTypeEnum.CASHI_SUCCESS.getCode().toString())
+                .between(Objects.nonNull(inventoryOverviewParam.getStarTime()),InventoryProjectOtherBusiness::getCashierTime
+                        , inventoryOverviewParam.getStarTime(), inventoryOverviewParam.getEndTime());
+        List<InventoryProjectOtherBusiness> inventoryProjectOtherBusinesses = inventoryProjectOtherBusinessMapper.selectList(wrapper);
+        return inventoryProjectOtherBusinesses;
     }
 
     @Override

@@ -76,6 +76,11 @@ public class InventoryProjectInfo extends BaseEntity {
     @LogForUpdate(fieldName = "质保金截止日期")
     private LocalDateTime amountWarrantyEnding;
 
+    @ApiModelProperty("质保金截止剩余天数")
+    @LogForUpdate(fieldName = "质保金截止剩余天数")
+    @TableField(exist = false)
+    private String warrantyEndingDays = "";
+
     @ApiModelProperty("项目利润")
     private String amountProfit = "0";
 

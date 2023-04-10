@@ -25,8 +25,10 @@ import com.syyang.springbootplus.framework.core.pagination.PageInfo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.syyang.springbootplus.framework.shiro.cache.LoginRedisService;
 import com.syyang.springbootplus.framework.shiro.util.JwtTokenUtil;
 import com.syyang.springbootplus.framework.shiro.util.JwtUtil;
+import com.syyang.springbootplus.framework.shiro.vo.LoginSysUserRedisVo;
 import com.syyang.springbootplus.framework.util.BeanUtils;
 import com.syyang.springbootplus.framework.util.CommonListUtils;
 import io.swagger.annotations.ApiModelProperty;
@@ -62,6 +64,9 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
     private InventoryStockBusinessMapper inventoryStockBusinessMapper;
     @Autowired
     private InventoryProjectOperationRecordMapper inventoryProjectOperationRecordMapper;
+
+    @Autowired
+    private LoginRedisService loginRedisService;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -131,12 +136,14 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         iPage.setTotal(inventoryProjectInfoMapper.selectCount(wrapper));
         for(InventoryProjectInfo inventoryProjectInfo:iPage.getRecords()){
             //添加质保金的截止日期 如果项目处于完结状态
+            String endDays = inventoryProjectInfo.getAmountWarranty();
             if(inventoryProjectInfo.getStep().equals(StepTypeEnum.FINISHED.getCode().toString())){
-                if(null!=inventoryProjectInfo.getAmountWarrantyEnding()){
-                    inventoryProjectInfo.setAmountWarranty(inventoryProjectInfo.getAmountWarranty()
-                            + "（截止日期剩余【" + Duration.between(LocalDateTime.now(),inventoryProjectInfo.getAmountWarrantyEnding()).toDays() + "】天）");
+                if(null!=inventoryProjectInfo.getAmountWarrantyEnding() && Double.valueOf(inventoryProjectInfo.getAmountWarranty())>0){
+                    //判断大于0
+                    endDays = endDays + "(截止日期剩余【" + Duration.between(LocalDateTime.now(),inventoryProjectInfo.getAmountWarrantyEnding()).toDays() + "】天)";
                 }
             }
+            inventoryProjectInfo.setWarrantyEndingDays(endDays);
         }
         return new Paging<InventoryProjectInfo>(iPage);
     }
@@ -220,13 +227,18 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
             totalPayable = totalPayable.add(BigDecimal.valueOf(Double.valueOf(StrUtil.isEmpty(inventoryProjectInfo.getTotalPayable())?"0":inventoryProjectInfo.getTotalPayable())));
             totalPaid = totalPaid.add(BigDecimal.valueOf(Double.valueOf(StrUtil.isEmpty(inventoryProjectInfo.getTotalPaid())?"0":inventoryProjectInfo.getTotalPaid())));
         }
-        keyAndValueVos.add(new KeyAndValueVo("合同金额统计", amountContract.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()));
-        keyAndValueVos.add(new KeyAndValueVo("质保金统计", amountWarranty.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()));
-        keyAndValueVos.add(new KeyAndValueVo("项目纯利润统计", amountProfitNet.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()));
-        keyAndValueVos.add(new KeyAndValueVo("应收款统计", totalReceivables.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()));
-        keyAndValueVos.add(new KeyAndValueVo("已收款统计", totalReceived.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()));
-        keyAndValueVos.add(new KeyAndValueVo("应支付统计", totalPayable.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()));
-        keyAndValueVos.add(new KeyAndValueVo("已支付统计", totalPaid.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()));
+        keyAndValueVos.add(new KeyAndValueVo("合同金额统计", amountContract.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
+        keyAndValueVos.add(new KeyAndValueVo("质保金统计", amountWarranty.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
+        //判断当前是否为D级用户
+
+        LoginSysUserRedisVo loginSysUserRedisVo = loginRedisService.getLoginSysUserRedisVo(JwtUtil.getUsername(JwtTokenUtil.getToken()));
+        if(!loginSysUserRedisVo.getRoleCode().equals("adminD")) {
+            keyAndValueVos.add(new KeyAndValueVo("项目纯利润统计", amountProfitNet.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
+        }
+//        keyAndValueVos.add(new KeyAndValueVo("应收款统计", totalReceivables.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()));
+//        keyAndValueVos.add(new KeyAndValueVo("已收款统计", totalReceived.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()));
+//        keyAndValueVos.add(new KeyAndValueVo("应支付统计", totalPayable.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()));
+//        keyAndValueVos.add(new KeyAndValueVo("已支付统计", totalPaid.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()));
         return keyAndValueVos;
     }
 

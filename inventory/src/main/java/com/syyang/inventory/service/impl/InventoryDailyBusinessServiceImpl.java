@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import com.syyang.inventory.entity.InventoryDailyBusiness;
 import com.syyang.inventory.entity.InventoryStockInfo;
 import com.syyang.inventory.entity.vo.KeyAndValueVo;
+import com.syyang.inventory.enums.StatusTypeEnum;
 import com.syyang.inventory.mapper.InventoryDailyBusinessMapper;
 import com.syyang.inventory.service.InventoryDailyBusinessService;
 import com.syyang.inventory.param.InventoryDailyBusinessPageParam;
@@ -16,6 +17,10 @@ import com.syyang.springbootplus.framework.core.pagination.PageInfo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.syyang.springbootplus.framework.shiro.cache.LoginRedisService;
+import com.syyang.springbootplus.framework.shiro.util.JwtTokenUtil;
+import com.syyang.springbootplus.framework.shiro.util.JwtUtil;
+import com.syyang.springbootplus.framework.shiro.vo.LoginSysUserRedisVo;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -37,6 +42,8 @@ public class InventoryDailyBusinessServiceImpl extends BaseServiceImpl<Inventory
 
     @Autowired
     private InventoryDailyBusinessMapper inventoryDailyBusinessMapper;
+    @Autowired
+    private LoginRedisService loginRedisService;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -81,6 +88,7 @@ public class InventoryDailyBusinessServiceImpl extends BaseServiceImpl<Inventory
 
     @Override
     public List<KeyAndValueVo> getDailyBusinessAmount(InventoryDailyBusinessPageParam inventoryDailyBusinessPageParam) {
+        LoginSysUserRedisVo loginSysUserRedisVo = loginRedisService.getLoginSysUserRedisVo(JwtUtil.getUsername(JwtTokenUtil.getToken()));
         List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
         LambdaQueryWrapper<InventoryDailyBusiness> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(StrUtil.isNotBlank(inventoryDailyBusinessPageParam.getStatus()),InventoryDailyBusiness::getStatus,inventoryDailyBusinessPageParam.getStatus());
@@ -90,17 +98,40 @@ public class InventoryDailyBusinessServiceImpl extends BaseServiceImpl<Inventory
         List<InventoryDailyBusiness> inventoryDailyBusinesses = inventoryDailyBusinessMapper.selectList(wrapper);
         Map<String,BigDecimal> outAmountMap = Maps.newConcurrentMap();
         BigDecimal totalAmount = new BigDecimal(0);
+
+
+        BigDecimal approveAmount = new BigDecimal(0);
+        BigDecimal cashierAmount = new BigDecimal(0);
+        BigDecimal noCashierAmount = new BigDecimal(0);
+
         for (InventoryDailyBusiness inventoryDailyBusiness : inventoryDailyBusinesses) {
             BigDecimal count = outAmountMap.getOrDefault(inventoryDailyBusiness.getSubTypeName(),
                     new BigDecimal("0")).add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getAmountMoney())));
             outAmountMap.put(inventoryDailyBusiness.getSubTypeName(), count);
             totalAmount = totalAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getAmountMoney())));
+            if(loginSysUserRedisVo.getRoleCode().equals("adminD") && inventoryDailyBusiness.getCreateUser().equals(loginSysUserRedisVo.getId().toString())){
+                //统计个人的统计信息
+                if(inventoryDailyBusiness.getStatus().equals(StatusTypeEnum.CHECK_SUCCESS.getCode().toString())
+                        || inventoryDailyBusiness.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode().toString()) ){
+                    approveAmount = approveAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getAmountMoney())));
+                    if(inventoryDailyBusiness.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode().toString())){
+                        cashierAmount = cashierAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
+                    }
+                }
+            }
         }
         //去掉其他类型的总金额统计
 //        for(Map.Entry<String,BigDecimal> entry:outAmountMap.entrySet()) {
 //            keyAndValueVos.add(new KeyAndValueVo(entry.getKey(), entry.getValue().divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
 //        }
-        keyAndValueVos.add(new KeyAndValueVo("日常支出总金额", totalAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()));
+        noCashierAmount = approveAmount.subtract(cashierAmount);
+        keyAndValueVos.add(new KeyAndValueVo("日常支出总金额", totalAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
+        if(loginSysUserRedisVo.getRoleCode().equals("adminD")){
+            keyAndValueVos.add(new KeyAndValueVo("个人已通过总金额", approveAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
+            keyAndValueVos.add(new KeyAndValueVo("个人已报销总金额", cashierAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
+            keyAndValueVos.add(new KeyAndValueVo("个人未报销总金额", noCashierAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
+
+        }
         return keyAndValueVos;
     }
 

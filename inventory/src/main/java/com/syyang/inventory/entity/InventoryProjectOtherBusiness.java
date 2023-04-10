@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.syyang.springbootplus.framework.common.annotationun.LogForUpdate;
 import com.syyang.springbootplus.framework.common.entity.BaseEntity;
 
 import java.time.LocalDateTime;
@@ -45,33 +46,41 @@ public class InventoryProjectOtherBusiness extends BaseEntity {
     private String projectName;
 
     @ApiModelProperty("交易类型 1支出")
+    @LogForUpdate(fieldName = "交易类型",isCode = true, codeJson = "{\"0\":\"项目其他收入\",\"1\":\"项目其他支出\"}")
     private Integer type;
 
     @ApiModelProperty("子类型")
     private String subType;
 
     @ApiModelProperty("项目收支子类型名称")
+    @LogForUpdate(fieldName = "项目其他收支子类型名称")
     private String subTypeName;
 
     @ApiModelProperty("金额")
+    @LogForUpdate(fieldName = "项目其他收支金额")
     private String amountMoney;
 
     @ApiModelProperty("交易时间")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @LogForUpdate(fieldName = "项目其他收支交易时间")
     private LocalDateTime businessTime;
 
     @ApiModelProperty("备注信息")
+    @LogForUpdate(fieldName = "项目其他收支备注信息")
     private String remark;
 
     @ApiModelProperty("创建人")
+    @TableField(fill = FieldFill.INSERT)
     private String createUser;
 
     @ApiModelProperty("审核人名称")
+    @TableField(fill = FieldFill.INSERT)
     private String createUserName;
 
     @ApiModelProperty("交易状态 2表示通过 3表示已入账 4表示未入账")
+    @LogForUpdate(fieldName = "交易状态",isCode = true, codeJson = "{\"1\":\"提交待审批\",\"2\":\"提交待出纳\",\"-1\":\"审批未通过\",\"3\":\"出纳通过\"}")
     private String status;
 
     @ApiModelProperty("创建时间")
@@ -95,12 +104,14 @@ public class InventoryProjectOtherBusiness extends BaseEntity {
     private String uploadFilePath;
 
     @ApiModelProperty("部门id，用作区分不同的部门权限")
+    @TableField(fill = FieldFill.INSERT)
     private Integer departmentId;
 
     @ApiModelProperty("出纳人")
     private String cashier;
 
     @ApiModelProperty("出纳人名称")
+    @LogForUpdate(fieldName = "出纳人名称")
     private String cashierName;
 
     @ApiModelProperty("出纳时间")
@@ -110,6 +121,7 @@ public class InventoryProjectOtherBusiness extends BaseEntity {
     private LocalDateTime cashierTime;
 
     @ApiModelProperty("出纳核对金额")
+    @LogForUpdate(fieldName = "出纳核对金额")
     private String cashierAmount;
 
     @ApiModelProperty("出纳附件")
@@ -119,6 +131,7 @@ public class InventoryProjectOtherBusiness extends BaseEntity {
     private String cashierFilePath;
 
     @ApiModelProperty("出纳意见")
+    @LogForUpdate(fieldName = "出纳意见")
     private String cashierIdea;
 
 }

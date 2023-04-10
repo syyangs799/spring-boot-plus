@@ -1,5 +1,7 @@
 package com.syyang.inventory.service.impl;
 
+import cn.hutool.core.util.StrUtil;
+import com.syyang.inventory.entity.InventoryProjectBusiness;
 import com.syyang.inventory.entity.InventoryStockAgreement;
 import com.syyang.inventory.mapper.InventoryStockAgreementMapper;
 import com.syyang.inventory.service.InventoryStockAgreementService;
@@ -52,6 +54,9 @@ public class InventoryStockAgreementServiceImpl extends BaseServiceImpl<Inventor
     public Paging<InventoryStockAgreement> getInventoryStockAgreementPageList(InventoryStockAgreementPageParam inventoryStockAgreementPageParam) throws Exception {
         Page<InventoryStockAgreement> page = new PageInfo<>(inventoryStockAgreementPageParam, OrderItem.desc(getLambdaColumn(InventoryStockAgreement::getCreateTime)));
         LambdaQueryWrapper<InventoryStockAgreement> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StrUtil.isNotBlank(inventoryStockAgreementPageParam.getStatus()), InventoryStockAgreement::getStatus,inventoryStockAgreementPageParam.getStatus());
+        wrapper.eq(StrUtil.isNotBlank(inventoryStockAgreementPageParam.getApprover()), InventoryStockAgreement::getApprover,inventoryStockAgreementPageParam.getApprover());
+        wrapper.eq(StrUtil.isNotBlank(inventoryStockAgreementPageParam.getCashier()), InventoryStockAgreement::getCashier,inventoryStockAgreementPageParam.getCashier());
         IPage<InventoryStockAgreement> iPage = inventoryStockAgreementMapper.selectPage(page, wrapper);
         iPage.setTotal(inventoryStockAgreementMapper.selectCount(wrapper));
         return new Paging<InventoryStockAgreement>(iPage);
@@ -59,6 +64,9 @@ public class InventoryStockAgreementServiceImpl extends BaseServiceImpl<Inventor
     @Override
     public List<InventoryStockAgreement> getInventoryStockAgreementList(InventoryStockAgreementPageParam inventoryStockAgreementPageParam) throws Exception {
         LambdaQueryWrapper<InventoryStockAgreement> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StrUtil.isNotBlank(inventoryStockAgreementPageParam.getStatus()), InventoryStockAgreement::getStatus,inventoryStockAgreementPageParam.getStatus());
+        wrapper.eq(StrUtil.isNotBlank(inventoryStockAgreementPageParam.getApprover()), InventoryStockAgreement::getApprover,inventoryStockAgreementPageParam.getApprover());
+        wrapper.eq(StrUtil.isNotBlank(inventoryStockAgreementPageParam.getCashier()), InventoryStockAgreement::getCashier,inventoryStockAgreementPageParam.getCashier());
         List<InventoryStockAgreement> dataLists = inventoryStockAgreementMapper.selectList(wrapper);
         return dataLists;
     }
