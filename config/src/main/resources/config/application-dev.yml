@@ -5,6 +5,7 @@ spring-boot-plus:
   server-ip: 127.0.0.1
   # 文件上传下载配置
   upload-path: /data/syyang/jar/upload/
+#  upload-path: E:\inventory\jar\uploader
 
 
 spring:

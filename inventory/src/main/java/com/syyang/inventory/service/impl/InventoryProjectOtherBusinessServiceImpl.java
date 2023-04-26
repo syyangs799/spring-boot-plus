@@ -48,10 +48,10 @@ public class InventoryProjectOtherBusinessServiceImpl extends BaseServiceImpl<In
         InventoryProjectOperationRecord inventoryProjectOperationRecord = new InventoryProjectOperationRecord();
         inventoryProjectOperationRecord.setProjectId(inventoryProjectOtherBusiness.getProjectId());
         //谁+时间+操作类型+内容
-        inventoryProjectOperationRecord.setOperationName("人员[" + JwtUtil.getUsername(JwtTokenUtil.getToken()) + "],时间[" + DateTime.now().toString("yyyy-MM-DD HH:mm:ss") + "],操作[" + ProjectOperationTypeEnum.PROJECT_CREATE_OTHER_BUSINESS.getDesc() + "]");
+        inventoryProjectOperationRecord.setOperationName("人员[" + JwtUtil.getUsername(JwtTokenUtil.getToken()) + "],时间[" + DateTime.now().toString("yyyy-MM-dd HH:mm:ss") + "],操作[" + ProjectOperationTypeEnum.PROJECT_CREATE_OTHER_BUSINESS.getDesc() + "]");
         inventoryProjectOperationRecord.setOperationType(ProjectOperationTypeEnum.PROJECT_CREATE_OTHER_BUSINESS.getDesc());
         inventoryProjectOperationRecord.setOperationTypeName(ProjectOperationTypeEnum.PROJECT_CREATE_OTHER_BUSINESS.getCode().toString());
-        inventoryProjectOperationRecord.setUpdateContent(BeanUtils.getChangedFields(new InventoryStockBusiness(),inventoryProjectOtherBusiness));
+        inventoryProjectOperationRecord.setUpdateContent(BeanUtils.getChangedFields(new InventoryProjectOtherBusiness(),inventoryProjectOtherBusiness));
         if(StrUtil.isNotBlank(inventoryProjectOperationRecord.getUpdateContent())) {
             inventoryProjectOperationRecordMapper.insert(inventoryProjectOperationRecord);
         }
@@ -67,7 +67,7 @@ public class InventoryProjectOtherBusinessServiceImpl extends BaseServiceImpl<In
         InventoryProjectOperationRecord inventoryProjectOperationRecord = new InventoryProjectOperationRecord();
         inventoryProjectOperationRecord.setProjectId(inventoryProjectOtherBusiness.getProjectId());
         //谁+时间+操作类型+内容
-        inventoryProjectOperationRecord.setOperationName("人员[" + JwtUtil.getUsername(JwtTokenUtil.getToken()) +  "],时间[" + DateTime.now().toString("yyyy-MM-DD HH:mm:ss") + "],操作[" + ProjectOperationTypeEnum.PROJECT_UPDATE_OTHER_BUSINESS.getDesc() + "]");
+        inventoryProjectOperationRecord.setOperationName("人员[" + JwtUtil.getUsername(JwtTokenUtil.getToken()) +  "],时间[" + DateTime.now().toString("yyyy-MM-dd HH:mm:ss") + "],操作[" + ProjectOperationTypeEnum.PROJECT_UPDATE_OTHER_BUSINESS.getDesc() + "]");
         inventoryProjectOperationRecord.setOperationType(ProjectOperationTypeEnum.PROJECT_UPDATE_OTHER_BUSINESS.getDesc());
         inventoryProjectOperationRecord.setOperationTypeName(ProjectOperationTypeEnum.PROJECT_UPDATE_OTHER_BUSINESS.getCode().toString());
         inventoryProjectOperationRecord.setUpdateContent(BeanUtils.getChangedFields(old,inventoryProjectOtherBusiness));

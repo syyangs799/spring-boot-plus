@@ -65,7 +65,7 @@ public class InventoryProjectBusinessServiceImpl extends BaseServiceImpl<Invento
         InventoryProjectOperationRecord inventoryProjectOperationRecord = new InventoryProjectOperationRecord();
         inventoryProjectOperationRecord.setProjectId(inventoryProjectBusiness.getProId());
         //谁+时间+操作类型+内容
-        inventoryProjectOperationRecord.setOperationName("人员[" + JwtUtil.getUsername(JwtTokenUtil.getToken()) + "],时间[" + DateTime.now().toString("yyyy-MM-DD HH:mm:ss") + "],操作[" + ProjectOperationTypeEnum.PROJECT_CREATE_BASE_INFO.getDesc() + "]");
+        inventoryProjectOperationRecord.setOperationName("人员[" + JwtUtil.getUsername(JwtTokenUtil.getToken()) + "],时间[" + DateTime.now().toString("yyyy-MM-dd HH:mm:ss") + "],操作[" + ProjectOperationTypeEnum.PROJECT_CREATE_BASE_INFO.getDesc() + "]");
         inventoryProjectOperationRecord.setOperationType(ProjectOperationTypeEnum.PROJECT_CREATE_BUSINESS_INFO.getDesc());
         inventoryProjectOperationRecord.setOperationTypeName(ProjectOperationTypeEnum.PROJECT_CREATE_BUSINESS_INFO.getCode().toString());
         inventoryProjectOperationRecord.setUpdateContent(BeanUtils.getChangedFields(new InventoryProjectBusiness(),inventoryProjectBusiness));
@@ -85,7 +85,7 @@ public class InventoryProjectBusinessServiceImpl extends BaseServiceImpl<Invento
         InventoryProjectOperationRecord inventoryProjectOperationRecord = new InventoryProjectOperationRecord();
         inventoryProjectOperationRecord.setProjectId(inventoryProjectBusiness.getProId());
         //谁+时间+操作类型+内容
-        inventoryProjectOperationRecord.setOperationName("人员[" + JwtUtil.getUsername(JwtTokenUtil.getToken()) +  "],时间[" + DateTime.now().toString("yyyy-MM-DD HH:mm:ss") + "],操作[" + ProjectOperationTypeEnum.PROJECT_UPDATE_BUSINESS_INFO.getDesc() + "]");
+        inventoryProjectOperationRecord.setOperationName("人员[" + JwtUtil.getUsername(JwtTokenUtil.getToken()) +  "],时间[" + DateTime.now().toString("yyyy-MM-dd HH:mm:ss") + "],操作[" + ProjectOperationTypeEnum.PROJECT_UPDATE_BUSINESS_INFO.getDesc() + "]");
         inventoryProjectOperationRecord.setOperationType(ProjectOperationTypeEnum.PROJECT_UPDATE_BUSINESS_INFO.getDesc());
         inventoryProjectOperationRecord.setOperationTypeName(ProjectOperationTypeEnum.PROJECT_UPDATE_BUSINESS_INFO.getCode().toString());
         inventoryProjectOperationRecord.setUpdateContent(BeanUtils.getChangedFields(old,inventoryProjectBusiness));

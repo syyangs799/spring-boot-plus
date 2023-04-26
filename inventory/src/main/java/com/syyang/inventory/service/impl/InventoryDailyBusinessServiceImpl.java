@@ -124,9 +124,9 @@ public class InventoryDailyBusinessServiceImpl extends BaseServiceImpl<Inventory
 //        for(Map.Entry<String,BigDecimal> entry:outAmountMap.entrySet()) {
 //            keyAndValueVos.add(new KeyAndValueVo(entry.getKey(), entry.getValue().divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
 //        }
-        noCashierAmount = approveAmount.subtract(cashierAmount);
         keyAndValueVos.add(new KeyAndValueVo("日常支出总金额", totalAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
         if(loginSysUserRedisVo.getRoleCode().equals("adminD")){
+            noCashierAmount = approveAmount.subtract(cashierAmount);
             keyAndValueVos.add(new KeyAndValueVo("个人已通过总金额", approveAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
             keyAndValueVos.add(new KeyAndValueVo("个人已报销总金额", cashierAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
             keyAndValueVos.add(new KeyAndValueVo("个人未报销总金额", noCashierAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));

@@ -54,6 +54,11 @@ public class InventoryProjectInfo extends BaseEntity {
     @LogForUpdate(fieldName = "项目描述")
     private String projectDesc;
 
+
+    @ApiModelProperty("项目进度描述")
+    @LogForUpdate(fieldName = "项目进度描述")
+    private String projectStepDesc;
+
     @ApiModelProperty("技术负责人id")
     private Integer technicalerId;
 

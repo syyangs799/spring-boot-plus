@@ -253,7 +253,7 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
             InventoryProjectOperationRecord inventoryProjectOperationRecord = new InventoryProjectOperationRecord();
             inventoryProjectOperationRecord.setProjectId(entity.getProjectId());
             //谁+时间+操作类型+内容
-            inventoryProjectOperationRecord.setOperationName("人员[" + JwtUtil.getUsername(JwtTokenUtil.getToken()) +  "],时间[" + DateTime.now().toString("yyyy-MM-DD HH:mm:ss") + "],操作[" + ProjectOperationTypeEnum.PROJECT_CREATE_OUTBOUND_INFO.getDesc() + "]");
+            inventoryProjectOperationRecord.setOperationName("人员[" + JwtUtil.getUsername(JwtTokenUtil.getToken()) +  "],时间[" + DateTime.now().toString("yyyy-MM-dd HH:mm:ss") + "],操作[" + ProjectOperationTypeEnum.PROJECT_CREATE_OUTBOUND_INFO.getDesc() + "]");
             inventoryProjectOperationRecord.setOperationType(ProjectOperationTypeEnum.PROJECT_CREATE_OUTBOUND_INFO.getDesc());
             inventoryProjectOperationRecord.setOperationTypeName(ProjectOperationTypeEnum.PROJECT_CREATE_OUTBOUND_INFO.getCode().toString());
             inventoryProjectOperationRecord.setUpdateContent(BeanUtils.getChangedFields(new InventoryStockBusiness(),entity));

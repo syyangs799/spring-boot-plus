@@ -1,9 +1,13 @@
 package com.syyang.inventory.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
 import com.syyang.inventory.entity.InventoryProjectInfo;
+import com.syyang.inventory.entity.InventoryStockBusiness;
 import com.syyang.inventory.entity.InventoryStockInfo;
 import com.syyang.inventory.entity.vo.KeyAndValueVo;
+import com.syyang.inventory.enums.StockBusinessTypeEnum;
+import com.syyang.inventory.mapper.InventoryStockBusinessMapper;
 import com.syyang.inventory.mapper.InventoryStockInfoMapper;
 import com.syyang.inventory.service.InventoryStockInfoService;
 import com.syyang.inventory.param.InventoryStockInfoPageParam;
@@ -35,6 +39,8 @@ public class InventoryStockInfoServiceImpl extends BaseServiceImpl<InventoryStoc
 
     @Autowired
     private InventoryStockInfoMapper inventoryStockInfoMapper;
+    @Autowired
+    private InventoryStockBusinessMapper inventoryStockBusinessMapper;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -58,6 +64,7 @@ public class InventoryStockInfoServiceImpl extends BaseServiceImpl<InventoryStoc
     public Paging<InventoryStockInfo> getInventoryStockInfoPageList(InventoryStockInfoPageParam inventoryStockInfoPageParam) throws Exception {
         Page<InventoryStockInfo> page = new PageInfo<>(inventoryStockInfoPageParam, OrderItem.desc(getLambdaColumn(InventoryStockInfo::getCreateTime)));
         LambdaQueryWrapper<InventoryStockInfo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(StrUtil.isNotBlank(inventoryStockInfoPageParam.getKeyword()),InventoryStockInfo::getProductName,inventoryStockInfoPageParam.getKeyword());
         IPage<InventoryStockInfo> iPage = inventoryStockInfoMapper.selectPage(page, wrapper);
         iPage.setTotal(inventoryStockInfoMapper.selectCount(wrapper));
         return new Paging<InventoryStockInfo>(iPage);
@@ -66,6 +73,7 @@ public class InventoryStockInfoServiceImpl extends BaseServiceImpl<InventoryStoc
     @Override
     public List<InventoryStockInfo> getInventoryStockInfoList(InventoryStockInfoPageParam inventoryStockInfoPageParam) {
         LambdaQueryWrapper<InventoryStockInfo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(StrUtil.isNotBlank(inventoryStockInfoPageParam.getKeyword()),InventoryStockInfo::getProductName,inventoryStockInfoPageParam.getKeyword());
         return inventoryStockInfoMapper.selectList(wrapper);
     }
 
@@ -79,6 +87,21 @@ public class InventoryStockInfoServiceImpl extends BaseServiceImpl<InventoryStoc
             totalAmount = totalAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryStockInfo.getProductAmount())));
         }
         keyAndValueVos.add(new KeyAndValueVo("当前库存总金额", totalAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
+        //统计当前的入库金额和出库金额
+        LambdaQueryWrapper<InventoryStockBusiness> businessLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        List<InventoryStockBusiness> inventoryStockBusinesses = inventoryStockBusinessMapper.selectList(businessLambdaQueryWrapper);
+        BigDecimal totalInAmount = new BigDecimal(0);
+        BigDecimal totalOutAmount = new BigDecimal(0);
+        for(InventoryStockBusiness inventoryStockBusiness:inventoryStockBusinesses){
+            if(inventoryStockBusiness.getType().equals(StockBusinessTypeEnum.IN.getCode())){
+                totalInAmount = totalInAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryStockBusiness.getProductAmount())));
+            }else{
+                totalOutAmount = totalOutAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryStockBusiness.getProductAmount())));
+            }
+        }
+        keyAndValueVos.add(new KeyAndValueVo("当前入库库存总金额", totalInAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
+        keyAndValueVos.add(new KeyAndValueVo("当前出库库存总金额", totalOutAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
+
         return keyAndValueVos;
     }
 

@@ -71,7 +71,7 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean saveInventoryProjectInfo(InventoryProjectInfo inventoryProjectInfo) throws Exception {
-        valideUniName(inventoryProjectInfo);
+//        valideUniName(inventoryProjectInfo);
         //项目状态强制置为新建
         inventoryProjectInfo.setStep(StepTypeEnum.NEW.getCode().toString());
         boolean save = super.save(inventoryProjectInfo);
@@ -79,7 +79,7 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         InventoryProjectOperationRecord inventoryProjectOperationRecord = new InventoryProjectOperationRecord();
         inventoryProjectOperationRecord.setProjectId(inventoryProjectInfo.getId());
         //谁+时间+操作类型+内容
-        inventoryProjectOperationRecord.setOperationName("人员[" + JwtUtil.getUsername(JwtTokenUtil.getToken()) + "],时间[" + DateTime.now().toString("yyyy-MM-DD HH:mm:ss") + "],操作[" + ProjectOperationTypeEnum.PROJECT_CREATE_BASE_INFO.getDesc() + "]");
+        inventoryProjectOperationRecord.setOperationName("人员[" + JwtUtil.getUsername(JwtTokenUtil.getToken()) + "],时间[" + DateTime.now().toString("yyyy-MM-dd HH:mm:ss") + "],操作[" + ProjectOperationTypeEnum.PROJECT_CREATE_BASE_INFO.getDesc() + "]");
         inventoryProjectOperationRecord.setOperationType(ProjectOperationTypeEnum.PROJECT_CREATE_BASE_INFO.getDesc());
         inventoryProjectOperationRecord.setOperationTypeName(ProjectOperationTypeEnum.PROJECT_CREATE_BASE_INFO.getCode().toString());
         inventoryProjectOperationRecord.setUpdateContent(BeanUtils.getChangedFields(new InventoryProjectInfo(),inventoryProjectInfo));
@@ -110,7 +110,7 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         InventoryProjectOperationRecord inventoryProjectOperationRecord = new InventoryProjectOperationRecord();
         inventoryProjectOperationRecord.setProjectId(inventoryProjectInfo.getId());
         //谁+时间+操作类型+内容
-        inventoryProjectOperationRecord.setOperationName("人员[" + JwtUtil.getUsername(JwtTokenUtil.getToken()) + "],时间[" + DateTime.now().toString("yyyy-MM-DD HH:mm:ss") + "],操作[" + ProjectOperationTypeEnum.PROJECT_UPDATE_BASE_INFO.getDesc() + "]");
+        inventoryProjectOperationRecord.setOperationName("人员[" + JwtUtil.getUsername(JwtTokenUtil.getToken()) + "],时间[" + DateTime.now().toString("yyyy-MM-dd HH:mm:ss") + "],操作[" + ProjectOperationTypeEnum.PROJECT_UPDATE_BASE_INFO.getDesc() + "]");
         inventoryProjectOperationRecord.setOperationType(ProjectOperationTypeEnum.PROJECT_UPDATE_BASE_INFO.getDesc());
         inventoryProjectOperationRecord.setOperationTypeName(ProjectOperationTypeEnum.PROJECT_UPDATE_BASE_INFO.getCode().toString());
         inventoryProjectOperationRecord.setUpdateContent(BeanUtils.getChangedFields(old,inventoryProjectInfo));
