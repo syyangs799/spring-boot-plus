@@ -39,6 +39,7 @@ public class KeyAndValueVo implements Serializable {
     @ApiModelProperty("value")
     private String value;
 
+
     public KeyAndValueVo(String key, String value) {
         this.key = key;
         this.value = value;

@@ -23,7 +23,7 @@ import java.util.Map;
 public interface InventoryOverviewService extends BaseService<InventoryProductInfo> {
 
 
-    List<KeyAndValueVo> getProjectFinance(InventoryOverviewParam inventoryOverviewParam);
+    List<KeyAndValue2Vo> getProjectFinance(InventoryOverviewParam inventoryOverviewParam);
 
     List<KeyAndValueVo> getDailyFinance(InventoryOverviewParam inventoryOverviewParam);
 

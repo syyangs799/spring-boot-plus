@@ -65,10 +65,10 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
     private LoginRedisService loginRedisService;
 
     @Override
-    public List<KeyAndValueVo> getProjectFinance(InventoryOverviewParam inventoryOverviewParam) {
+    public List<KeyAndValue2Vo> getProjectFinance(InventoryOverviewParam inventoryOverviewParam) {
         //判断一下当前时间是否为null，默认填充最近7天的日期
         isNullForInventoryOverviewParam(inventoryOverviewParam);
-        List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
+        List<KeyAndValue2Vo> keyAndValueVos = Lists.newArrayList();
         List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,false,false);
         BigDecimal yue = new BigDecimal(0);
         BigDecimal yingshou = new BigDecimal(0);
@@ -76,6 +76,11 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         BigDecimal zhibao = new BigDecimal(0);
         BigDecimal yinfu = new BigDecimal(0);
         BigDecimal yifu = new BigDecimal(0);
+        List<KeyAndValueVo> yingshouDatas = Lists.newArrayList();
+        List<KeyAndValueVo> yishouDatas = Lists.newArrayList();
+        List<KeyAndValueVo> zhibaoDatas = Lists.newArrayList();
+        List<KeyAndValueVo> yinfuDatas = Lists.newArrayList();
+        List<KeyAndValueVo> yifuDatas = Lists.newArrayList();
         BigDecimal weifu = new BigDecimal(0);
         BigDecimal yingdelirun = new BigDecimal(0);
 //        总余额，时间范围内 出纳的收入总金额和支出总金额 项目收支 日常 合同和项目提成
@@ -87,10 +92,12 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
 //        未支付 应付-已付
         for(InventoryProjectInfo inventoryProjectInfo:inventoryProjectInfos){
             yingshou = yingshou.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalReceivables())));
+            yingshouDatas.add(new KeyAndValueVo("[项目]"+inventoryProjectInfo.getProjectName(),inventoryProjectInfo.getTotalReceivables()));
 //            yishou = yishou.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalReceived())));
             if(inventoryProjectInfo.getStep().equals(StepTypeEnum.FINISHED.getCode().toString())) {
                 //质保金走完结项目
                 zhibao = zhibao.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountWarranty())));
+                zhibaoDatas.add(new KeyAndValueVo("[项目]"+inventoryProjectInfo.getProjectName(),inventoryProjectInfo.getAmountWarranty()));
             }
 //            yinfu = yinfu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalPayable())));
 //            yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalPaid())));
@@ -104,14 +111,20 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
                 if(inventoryProjectBusiness.getType().equals(StockBusinessTypeEnum.IN.getCode())) {
                     // 已收总金额 时间范围内 出纳的收入总金额
                     yishou = yishou.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getCashierAmount())));
+                    yishouDatas.add(new KeyAndValueVo("[项目收入]"+inventoryProjectBusiness.getId() + "_" + inventoryProjectBusiness.getSubTypeName() + "_" + inventoryProjectBusiness.getProName() + "_" + inventoryProjectBusiness.getSubTypeName() + "_" + inventoryProjectBusiness.getCreateUserName() + "_" + inventoryProjectBusiness.getCashierName()
+                            ,inventoryProjectBusiness.getCashierAmount()));
                 }else {
                     //已付 时间范围内 出纳的支出总金额 项目收支 日常 合同和项目提成
                     yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getCashierAmount())));
+                    yifuDatas.add(new KeyAndValueVo("[项目收入]"+inventoryProjectBusiness.getId() + "_" + inventoryProjectBusiness.getSubTypeName() + "_" + inventoryProjectBusiness.getProName() + "_" + inventoryProjectBusiness.getSubTypeName() + "_" + inventoryProjectBusiness.getCreateUserName() + "_" + inventoryProjectBusiness.getCashierName()
+                            ,inventoryProjectBusiness.getCashierAmount()));
                 }
             }
             //不管是审核通过还是出纳状态，直接计算审核金额
             if(inventoryProjectBusiness.getType().equals(StockBusinessTypeEnum.OUT.getCode())) {
                 yinfu = yinfu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
+                yinfuDatas.add(new KeyAndValueVo("[项目支出]"+inventoryProjectBusiness.getId() + "_" + inventoryProjectBusiness.getSubTypeName() + "_" + inventoryProjectBusiness.getProName() + "_" + inventoryProjectBusiness.getSubTypeName() + "_" + inventoryProjectBusiness.getCreateUserName() + "_" + inventoryProjectBusiness.getCashierName()
+                        ,inventoryProjectBusiness.getCashierAmount()));
             }
         }
         //获取当前所有的日常支出信息
@@ -121,8 +134,12 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
 //            yue = yue.subtract(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
             if(inventoryDailyBusiness.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode().toString())) {
                 yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
+                yifuDatas.add(new KeyAndValueVo("[日常支出]"+inventoryDailyBusiness.getId() + "_" + inventoryDailyBusiness.getSubTypeName() + "_" + inventoryDailyBusiness.getCreateUserName() + "_" + inventoryDailyBusiness.getCashierName()
+                        ,inventoryDailyBusiness.getCashierAmount()));
             }
             yinfu = yinfu.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getAmountMoney())));
+            yinfuDatas.add(new KeyAndValueVo("[日常支出]"+inventoryDailyBusiness.getId() + "_" + inventoryDailyBusiness.getSubTypeName() + "_" + inventoryDailyBusiness.getCreateUserName() + "_" + inventoryDailyBusiness.getCashierName()
+                    ,inventoryDailyBusiness.getAmountMoney()));
         }
 
         //获取当前所有的项目其他支出信息
@@ -132,8 +149,12 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
 //            yue = yue.subtract(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
             if(inventoryProjectOtherBusiness.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode())) {
                 yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectOtherBusiness.getCashierAmount())));
+                yifuDatas.add(new KeyAndValueVo("[项目其他支出]"+inventoryProjectOtherBusiness.getId() + "_" + inventoryProjectOtherBusiness.getSubTypeName() + "_" + inventoryProjectOtherBusiness.getCreateUserName() + "_" + inventoryProjectOtherBusiness.getCashierName()
+                        ,inventoryProjectOtherBusiness.getCashierAmount()));
             }
             yinfu = yinfu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectOtherBusiness.getAmountMoney())));
+            yinfuDatas.add(new KeyAndValueVo("[项目其他支出]"+inventoryProjectOtherBusiness.getId() + "_" + inventoryProjectOtherBusiness.getSubTypeName() + "_" + inventoryProjectOtherBusiness.getCreateUserName() + "_" + inventoryProjectOtherBusiness.getCashierName()
+                    ,inventoryProjectOtherBusiness.getAmountMoney()));
         }
 
 
@@ -144,8 +165,12 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
 //            yue = yue.subtract(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
             if(inventoryStockAgreement.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode())) {
                 yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryStockAgreement.getCashierAmount())));
+                yifuDatas.add(new KeyAndValueVo("[合同支出]"+inventoryStockAgreement.getAgreementName() + "_" + inventoryStockAgreement.getAgreementTime() + "_" + inventoryStockAgreement.getCreateUserName() + "_" + inventoryStockAgreement.getCashierName()
+                        ,inventoryStockAgreement.getCashierAmount()));
             }
             yinfu = yinfu.add(BigDecimal.valueOf(Double.valueOf(inventoryStockAgreement.getAgreementAmount())));
+            yinfuDatas.add(new KeyAndValueVo("[合同支出]"+inventoryStockAgreement.getAgreementName() + "_" + inventoryStockAgreement.getAgreementTime() + "_" + inventoryStockAgreement.getCreateUserName() + "_" + inventoryStockAgreement.getCashierName()
+                    ,inventoryStockAgreement.getAgreementAmount()));
         }
 
 
@@ -156,14 +181,14 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         weifu = yinfu.subtract(yifu);
         yingdelirun = yingshou.subtract(yinfu);
         //获取当前所有的出库信息
-        keyAndValueVos.add(new KeyAndValueVo("总余额(已收-已付)",yue.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
-        keyAndValueVos.add(new KeyAndValueVo("应得利润(应收-应付)",yingdelirun.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
-        keyAndValueVos.add(new KeyAndValueVo("应收总金额",yingshou.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
-        keyAndValueVos.add(new KeyAndValueVo("已收总金额",yishou.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
-        keyAndValueVos.add(new KeyAndValueVo("质保金金额",zhibao.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
-        keyAndValueVos.add(new KeyAndValueVo("应付总金额",yinfu.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
-        keyAndValueVos.add(new KeyAndValueVo("已付总金额",yifu.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
-        keyAndValueVos.add(new KeyAndValueVo("未支付金额",weifu.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        keyAndValueVos.add(new KeyAndValue2Vo("总余额(已收-已付)",yue.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),Lists.newArrayList()));
+        keyAndValueVos.add(new KeyAndValue2Vo("应得利润(应收-应付)",yingdelirun.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),Lists.newArrayList()));
+        keyAndValueVos.add(new KeyAndValue2Vo("应收总金额",yingshou.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),yingshouDatas));
+        keyAndValueVos.add(new KeyAndValue2Vo("已收总金额",yishou.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),yishouDatas));
+        keyAndValueVos.add(new KeyAndValue2Vo("质保金金额",zhibao.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),zhibaoDatas));
+        keyAndValueVos.add(new KeyAndValue2Vo("应付总金额",yinfu.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),yinfuDatas));
+        keyAndValueVos.add(new KeyAndValue2Vo("已付总金额",yifu.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),yifuDatas));
+        keyAndValueVos.add(new KeyAndValue2Vo("未支付金额",weifu.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),Lists.newArrayList()));
         return keyAndValueVos;
     }
 

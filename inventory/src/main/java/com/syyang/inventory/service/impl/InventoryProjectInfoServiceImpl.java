@@ -229,11 +229,32 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
         }
         keyAndValueVos.add(new KeyAndValueVo("合同金额统计", amountContract.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
         keyAndValueVos.add(new KeyAndValueVo("质保金统计", amountWarranty.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
+        keyAndValueVos.add(new KeyAndValueVo("已支出统计", totalPaid.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
         //判断当前是否为D级用户
 
         LoginSysUserRedisVo loginSysUserRedisVo = loginRedisService.getLoginSysUserRedisVo(JwtUtil.getUsername(JwtTokenUtil.getToken()));
         if(!loginSysUserRedisVo.getRoleCode().equals("adminD")) {
             keyAndValueVos.add(new KeyAndValueVo("项目纯利润统计", amountProfitNet.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
+        }else {
+            //个人报销信息统计
+            //查询项目的收支数据
+            BigDecimal zongbaoxiao = new BigDecimal(0);
+            BigDecimal yibaoxiao = new BigDecimal(0);
+            BigDecimal weibaoxiao = new BigDecimal(0);
+            LambdaQueryWrapper<InventoryProjectBusiness> inventoryProjectBusinessLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            inventoryProjectBusinessLambdaQueryWrapper.eq(InventoryProjectBusiness::getCreateUser, loginSysUserRedisVo.getId())
+                    .and(wrapper1->wrapper1.eq(InventoryProjectBusiness::getStatus,StatusTypeEnum.CHECK_SUCCESS.getCode().toString())
+                            .or().eq(InventoryProjectBusiness::getStatus,StatusTypeEnum.CASHI_SUCCESS.getCode().toString()));;
+            List<InventoryProjectBusiness> inventoryProjectBusinesses = inventoryProjectBusinessMapper.selectList(inventoryProjectBusinessLambdaQueryWrapper);
+            for (InventoryProjectBusiness projectBusiness : inventoryProjectBusinesses) {
+                zongbaoxiao = zongbaoxiao.add(BigDecimal.valueOf(Double.valueOf(StrUtil.isEmpty(projectBusiness.getAmountMoney()) ? "0" : projectBusiness.getAmountMoney())));
+                yibaoxiao = yibaoxiao.add(BigDecimal.valueOf(Double.valueOf(StrUtil.isEmpty(projectBusiness.getCashierAmount()) ? "0" : projectBusiness.getCashierAmount())));
+            }
+            weibaoxiao = zongbaoxiao.subtract(yibaoxiao);
+            keyAndValueVos.add(new KeyAndValueVo("个人总报销", zongbaoxiao.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()+ "万元"));
+            keyAndValueVos.add(new KeyAndValueVo("个人已报销", yibaoxiao.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()+ "万元"));
+            keyAndValueVos.add(new KeyAndValueVo("个人未报销", weibaoxiao.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()+ "万元"));
+//
         }
 //        keyAndValueVos.add(new KeyAndValueVo("应收款统计", totalReceivables.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()));
 //        keyAndValueVos.add(new KeyAndValueVo("已收款统计", totalReceived.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString()));

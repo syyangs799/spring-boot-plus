@@ -50,8 +50,8 @@ public class InventoryOverviewController extends BaseController {
     @PostMapping("/projectFinance")
     @OperationLog(name = "【已完成】大屏-中上-项目收支相关统计-标签卡", type = OperationLogType.INFO)
     @ApiOperation(value = "【已完成】大屏-中上-项目收支相关统计-标签卡", response = InventoryProjectInfo.class)
-    public ApiResult<List<KeyAndValueVo>> getProjectFinance(@Validated @RequestBody InventoryOverviewParam inventoryOverviewParam) throws Exception {
-        List<KeyAndValueVo> keyAndValueVos = inventoryOverviewService.getProjectFinance(inventoryOverviewParam);
+    public ApiResult<List<KeyAndValue2Vo>> getProjectFinance(@Validated @RequestBody InventoryOverviewParam inventoryOverviewParam) throws Exception {
+        List<KeyAndValue2Vo> keyAndValueVos = inventoryOverviewService.getProjectFinance(inventoryOverviewParam);
         return ApiResult.ok(keyAndValueVos);
     }
 
