@@ -124,7 +124,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
             if(inventoryProjectBusiness.getType().equals(StockBusinessTypeEnum.OUT.getCode())) {
                 yinfu = yinfu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())));
                 yinfuDatas.add(new KeyAndValueVo("[项目支出]"+inventoryProjectBusiness.getId() + "_" + inventoryProjectBusiness.getSubTypeName() + "_" + inventoryProjectBusiness.getProName() + "_" + inventoryProjectBusiness.getSubTypeName() + "_" + inventoryProjectBusiness.getCreateUserName() + "_" + inventoryProjectBusiness.getCashierName()
-                        ,inventoryProjectBusiness.getCashierAmount()));
+                        ,inventoryProjectBusiness.getAmountMoney()));
             }
         }
         //获取当前所有的日常支出信息
