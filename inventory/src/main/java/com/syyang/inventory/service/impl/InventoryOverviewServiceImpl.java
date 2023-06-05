@@ -106,7 +106,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         List<InventoryProjectBusiness> inventoryProjectBusinesses = getInventoryProjectBusinesssByInventoryOverview(inventoryOverviewParam);
         for(InventoryProjectBusiness inventoryProjectBusiness:inventoryProjectBusinesses){
             //通过计算收支
-            if(inventoryProjectBusiness.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode())) {
+            if(inventoryProjectBusiness.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode().toString())) {
                 //已出纳
                 if(inventoryProjectBusiness.getType().equals(StockBusinessTypeEnum.IN.getCode())) {
                     // 已收总金额 时间范围内 出纳的收入总金额
@@ -147,7 +147,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         for(InventoryProjectOtherBusiness inventoryProjectOtherBusiness:inventoryProjectOtherBusinesses){
             //减去项目的提成的支出
 //            yue = yue.subtract(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
-            if(inventoryProjectOtherBusiness.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode())) {
+            if(inventoryProjectOtherBusiness.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode().toString())) {
                 yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectOtherBusiness.getCashierAmount())));
                 yifuDatas.add(new KeyAndValueVo("[项目其他支出]"+inventoryProjectOtherBusiness.getId() + "_" + inventoryProjectOtherBusiness.getSubTypeName() + "_" + inventoryProjectOtherBusiness.getCreateUserName() + "_" + inventoryProjectOtherBusiness.getCashierName()
                         ,inventoryProjectOtherBusiness.getCashierAmount()));
@@ -163,7 +163,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         for(InventoryStockAgreement inventoryStockAgreement:inventoryStockAgreements){
             //减去项目的提成的支出
 //            yue = yue.subtract(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
-            if(inventoryStockAgreement.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode())) {
+            if(inventoryStockAgreement.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode().toString())) {
                 yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryStockAgreement.getCashierAmount())));
                 yifuDatas.add(new KeyAndValueVo("[合同支出]"+inventoryStockAgreement.getAgreementName() + "_" + inventoryStockAgreement.getAgreementTime() + "_" + inventoryStockAgreement.getCreateUserName() + "_" + inventoryStockAgreement.getCashierName()
                         ,inventoryStockAgreement.getCashierAmount()));
