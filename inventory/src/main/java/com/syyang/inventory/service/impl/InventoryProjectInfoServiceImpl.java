@@ -300,18 +300,24 @@ public class InventoryProjectInfoServiceImpl extends BaseServiceImpl<InventoryPr
                 .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountCostTax())))
                 .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountCostNoTax())))
                 .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountTax()))).toString());
-        //计算业务提成 ( 项目利润一商务费用]*10%
-        inventoryProjectInfo.setAmountCommissionBusiness(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountProfit()))
-                .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountBusiness())))
-                .multiply(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountCommissionBusinessPaid()))).toString());
-        //计算技术提成 ( 项目利润一商务费用]*10%
-        inventoryProjectInfo.setAmountCommissionTechnical(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountProfit()))
-                .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountBusiness())))
-                .multiply(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountCommissionTechnicalPaid()))).toString());
-        //计算管理提成 ( 项目利润一商务费用]*10%
-        inventoryProjectInfo.setAmountCommissionManagement(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountProfit()))
-                .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountBusiness())))
-                .multiply(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountCommissionManagementPaid()))).toString());
+        if(StrUtil.isBlank(inventoryProjectInfo.getAmountCommissionBusiness())) {
+            //计算业务提成 ( 项目利润一商务费用]*10%
+            inventoryProjectInfo.setAmountCommissionBusiness(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountProfit()))
+                    .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountBusiness())))
+                    .multiply(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountCommissionBusinessPaid()))).toString());
+        }
+        if(StrUtil.isBlank(inventoryProjectInfo.getAmountCommissionTechnical())) {
+            //计算技术提成 ( 项目利润一商务费用]*10%
+            inventoryProjectInfo.setAmountCommissionTechnical(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountProfit()))
+                    .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountBusiness())))
+                    .multiply(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountCommissionTechnicalPaid()))).toString());
+        }
+        if(StrUtil.isBlank(inventoryProjectInfo.getAmountCommissionManagement())) {
+            //计算管理提成 ( 项目利润一商务费用]*10%
+            inventoryProjectInfo.setAmountCommissionManagement(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountProfit()))
+                    .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountBusiness())))
+                    .multiply(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountCommissionManagementPaid()))).toString());
+        }
         //计算项目纯利润  项目利润- 业务提成-技术提成-管理提成 -商务费用
         inventoryProjectInfo.setAmountProfitNet(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountProfit()))
                 .subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountCommissionBusiness())))
