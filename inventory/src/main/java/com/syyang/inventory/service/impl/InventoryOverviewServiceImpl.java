@@ -69,7 +69,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         //判断一下当前时间是否为null，默认填充最近7天的日期
         isNullForInventoryOverviewParam(inventoryOverviewParam);
         List<KeyAndValue2Vo> keyAndValueVos = Lists.newArrayList();
-        List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,false,false);
+        List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,false,true);
         BigDecimal yue = new BigDecimal(0);
         BigDecimal yingshou = new BigDecimal(0);
         BigDecimal yishou = new BigDecimal(0);
@@ -81,6 +81,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         List<KeyAndValueVo> zhibaoDatas = Lists.newArrayList();
         List<KeyAndValueVo> yinfuDatas = Lists.newArrayList();
         List<KeyAndValueVo> yifuDatas = Lists.newArrayList();
+        List<KeyAndValueVo> weifuDatas = Lists.newArrayList();
         BigDecimal weifu = new BigDecimal(0);
         BigDecimal yingdelirun = new BigDecimal(0);
 //        总余额，时间范围内 出纳的收入总金额和支出总金额 项目收支 日常 合同和项目提成
@@ -105,6 +106,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         //获取当前所有的项目收支信息
         List<InventoryProjectBusiness> inventoryProjectBusinesses = getInventoryProjectBusinesssByInventoryOverview(inventoryOverviewParam);
         for(InventoryProjectBusiness inventoryProjectBusiness:inventoryProjectBusinesses){
+            String yifuAmount = "";
             //通过计算收支
             if(inventoryProjectBusiness.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode().toString())) {
                 //已出纳
@@ -118,6 +120,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
                     yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getCashierAmount())));
                     yifuDatas.add(new KeyAndValueVo("[项目收入]"+inventoryProjectBusiness.getId() + "_" + inventoryProjectBusiness.getSubTypeName() + "_" + inventoryProjectBusiness.getProName() + "_" + inventoryProjectBusiness.getSubTypeName() + "_" + inventoryProjectBusiness.getCreateUserName() + "_" + inventoryProjectBusiness.getCashierName()
                             ,inventoryProjectBusiness.getCashierAmount()));
+                    yifuAmount = inventoryProjectBusiness.getCashierAmount();
                 }
             }
             //不管是审核通过还是出纳状态，直接计算审核金额
@@ -126,51 +129,78 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
                 yinfuDatas.add(new KeyAndValueVo("[项目支出]"+inventoryProjectBusiness.getId() + "_" + inventoryProjectBusiness.getSubTypeName() + "_" + inventoryProjectBusiness.getProName() + "_" + inventoryProjectBusiness.getSubTypeName() + "_" + inventoryProjectBusiness.getCreateUserName() + "_" + inventoryProjectBusiness.getCashierName()
                         ,inventoryProjectBusiness.getAmountMoney()));
             }
+            if(!inventoryProjectBusiness.getAmountMoney().equals(yifuAmount)){
+                //不等于则表示有未付的成分
+                weifuDatas.add(new KeyAndValueVo("[项目支出]"+inventoryProjectBusiness.getId() + "_" + inventoryProjectBusiness.getSubTypeName() + "_" + inventoryProjectBusiness.getProName() + "_" + inventoryProjectBusiness.getSubTypeName() + "_" + inventoryProjectBusiness.getCreateUserName() + "_" + inventoryProjectBusiness.getCashierName()
+                        ,BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getAmountMoney())).subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectBusiness.getCashierAmount()))).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+            }
         }
         //获取当前所有的日常支出信息
         List<InventoryDailyBusiness> inventoryDailyBusinesses = getInventoryDailyBusinessesByInventoryOverview(inventoryOverviewParam);
         for(InventoryDailyBusiness inventoryDailyBusiness:inventoryDailyBusinesses){
+            String yifuAmount = "";
             //减去日常的支出
 //            yue = yue.subtract(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
             if(inventoryDailyBusiness.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode().toString())) {
                 yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
                 yifuDatas.add(new KeyAndValueVo("[日常支出]"+inventoryDailyBusiness.getId() + "_" + inventoryDailyBusiness.getSubTypeName() + "_" + inventoryDailyBusiness.getCreateUserName() + "_" + inventoryDailyBusiness.getCashierName()
                         ,inventoryDailyBusiness.getCashierAmount()));
+                yifuAmount = inventoryDailyBusiness.getCashierAmount();
             }
             yinfu = yinfu.add(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getAmountMoney())));
             yinfuDatas.add(new KeyAndValueVo("[日常支出]"+inventoryDailyBusiness.getId() + "_" + inventoryDailyBusiness.getSubTypeName() + "_" + inventoryDailyBusiness.getCreateUserName() + "_" + inventoryDailyBusiness.getCashierName()
                     ,inventoryDailyBusiness.getAmountMoney()));
+            if(!inventoryDailyBusiness.getAmountMoney().equals(yifuAmount)){
+                //不等于则表示有未付的成分
+                weifuDatas.add(new KeyAndValueVo("[日常支出]"+inventoryDailyBusiness.getId() + "_" + inventoryDailyBusiness.getSubTypeName() + "_" + inventoryDailyBusiness.getCreateUserName() + "_" + inventoryDailyBusiness.getCashierName()
+                        ,BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getAmountMoney())).subtract(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount()))).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+            }
         }
 
         //获取当前所有的项目其他支出信息
         List<InventoryProjectOtherBusiness> inventoryProjectOtherBusinesses = getInventoryProjectOtherBusinesssByInventoryOverview(inventoryOverviewParam);
         for(InventoryProjectOtherBusiness inventoryProjectOtherBusiness:inventoryProjectOtherBusinesses){
+            String yifuAmount = "";
             //减去项目的提成的支出
 //            yue = yue.subtract(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
             if(inventoryProjectOtherBusiness.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode().toString())) {
                 yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectOtherBusiness.getCashierAmount())));
                 yifuDatas.add(new KeyAndValueVo("[项目其他支出]"+inventoryProjectOtherBusiness.getId() + "_" + inventoryProjectOtherBusiness.getSubTypeName() + "_" + inventoryProjectOtherBusiness.getCreateUserName() + "_" + inventoryProjectOtherBusiness.getCashierName()
                         ,inventoryProjectOtherBusiness.getCashierAmount()));
+                yifuAmount = inventoryProjectOtherBusiness.getCashierAmount();
             }
             yinfu = yinfu.add(BigDecimal.valueOf(Double.valueOf(inventoryProjectOtherBusiness.getAmountMoney())));
             yinfuDatas.add(new KeyAndValueVo("[项目其他支出]"+inventoryProjectOtherBusiness.getId() + "_" + inventoryProjectOtherBusiness.getSubTypeName() + "_" + inventoryProjectOtherBusiness.getCreateUserName() + "_" + inventoryProjectOtherBusiness.getCashierName()
                     ,inventoryProjectOtherBusiness.getAmountMoney()));
+            if(!inventoryProjectOtherBusiness.getAmountMoney().equals(yifuAmount)){
+                //不等于则表示有未付的成分
+                weifuDatas.add(new KeyAndValueVo("[项目其他支出]"+inventoryProjectOtherBusiness.getId() + "_" + inventoryProjectOtherBusiness.getSubTypeName() + "_" + inventoryProjectOtherBusiness.getCreateUserName() + "_" + inventoryProjectOtherBusiness.getCashierName()
+                        ,BigDecimal.valueOf(Double.valueOf(inventoryProjectOtherBusiness.getAmountMoney())).subtract(BigDecimal.valueOf(Double.valueOf(inventoryProjectOtherBusiness.getCashierAmount()))).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+            }
         }
 
 
         //获取当前采购合同的支出信息
         List<InventoryStockAgreement> inventoryStockAgreements = getInventoryStockAgreementByInventoryOverview(inventoryOverviewParam);
         for(InventoryStockAgreement inventoryStockAgreement:inventoryStockAgreements){
+            String yifuAmount = "";
             //减去项目的提成的支出
 //            yue = yue.subtract(BigDecimal.valueOf(Double.valueOf(inventoryDailyBusiness.getCashierAmount())));
             if(inventoryStockAgreement.getStatus().equals(StatusTypeEnum.CASHI_SUCCESS.getCode().toString())) {
                 yifu = yifu.add(BigDecimal.valueOf(Double.valueOf(inventoryStockAgreement.getCashierAmount())));
                 yifuDatas.add(new KeyAndValueVo("[合同支出]"+inventoryStockAgreement.getAgreementName() + "_" + inventoryStockAgreement.getAgreementTime() + "_" + inventoryStockAgreement.getCreateUserName() + "_" + inventoryStockAgreement.getCashierName()
                         ,inventoryStockAgreement.getCashierAmount()));
+                yifuAmount = inventoryStockAgreement.getCashierAmount();
             }
             yinfu = yinfu.add(BigDecimal.valueOf(Double.valueOf(inventoryStockAgreement.getAgreementAmount())));
             yinfuDatas.add(new KeyAndValueVo("[合同支出]"+inventoryStockAgreement.getAgreementName() + "_" + inventoryStockAgreement.getAgreementTime() + "_" + inventoryStockAgreement.getCreateUserName() + "_" + inventoryStockAgreement.getCashierName()
                     ,inventoryStockAgreement.getAgreementAmount()));
+            if(!inventoryStockAgreement.getAgreementAmount().equals(yifuAmount)){
+                //不等于则表示有未付的成分
+                weifuDatas.add(new KeyAndValueVo("[合同支出]"+inventoryStockAgreement.getAgreementName() + "_" + inventoryStockAgreement.getAgreementTime() + "_" + inventoryStockAgreement.getCreateUserName() + "_" + inventoryStockAgreement.getCashierName()
+                        ,BigDecimal.valueOf(Double.valueOf(inventoryStockAgreement.getAgreementAmount())).subtract(BigDecimal.valueOf(Double.valueOf(inventoryStockAgreement.getCashierAmount()))).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+            }
+
         }
 
 
@@ -188,7 +218,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         keyAndValueVos.add(new KeyAndValue2Vo("质保金金额",zhibao.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),zhibaoDatas));
         keyAndValueVos.add(new KeyAndValue2Vo("应付总金额",yinfu.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),yinfuDatas));
         keyAndValueVos.add(new KeyAndValue2Vo("已付总金额",yifu.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),yifuDatas));
-        keyAndValueVos.add(new KeyAndValue2Vo("未支付金额",weifu.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),Lists.newArrayList()));
+        keyAndValueVos.add(new KeyAndValue2Vo("未支付金额",weifu.divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString(),weifuDatas));
         return keyAndValueVos;
     }
 
@@ -254,7 +284,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         //获取当前所有的项目信息
         LambdaQueryWrapper<InventoryProjectInfo> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(isFinished,InventoryProjectInfo::getStep, StepTypeEnum.FINISHED.getCode().toString())
-                .between(isTimer&&Objects.nonNull(inventoryOverviewParam.getStarTime()),InventoryProjectInfo::getCreateTime
+                .between(isTimer&&Objects.nonNull(inventoryOverviewParam.getStarTime()),InventoryProjectInfo::getProjectTimes
                         , inventoryOverviewParam.getStarTime(), inventoryOverviewParam.getEndTime());
         List<InventoryProjectInfo> inventoryProjectInfos = inventoryProjectInfoMapper.selectList(wrapper);
         return inventoryProjectInfos;
@@ -460,7 +490,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         //判断一下当前时间是否为null，默认填充最近7天的日期
         isNullForInventoryOverviewParam(inventoryOverviewParam);
         List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
-        List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,true,false);
+        List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,true,true);
         for(InventoryProjectInfo inventoryProjectInfo:inventoryProjectInfos){
             keyAndValueVos.add(new KeyAndValueVo(inventoryProjectInfo.getProjectName(),
                     BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getAmountProfitNet())).divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
@@ -473,7 +503,7 @@ public class InventoryOverviewServiceImpl extends BaseServiceImpl<InventoryProdu
         //判断一下当前时间是否为null，默认填充最近7天的日期
         isNullForInventoryOverviewParam(inventoryOverviewParam);
         List<CollectionStatisticsVo> collectionStatisticsVos = Lists.newArrayList();
-        List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,false,false);
+        List<InventoryProjectInfo> inventoryProjectInfos = getInventoryProjectInfosByInventoryOverview(inventoryOverviewParam,false,true);
         for(InventoryProjectInfo inventoryProjectInfo:inventoryProjectInfos){
             collectionStatisticsVos.add(new CollectionStatisticsVo(inventoryProjectInfo.getProjectName()
                     ,BigDecimal.valueOf(Double.valueOf(inventoryProjectInfo.getTotalReceivables())).divide(BigDecimal.valueOf(10000)).setScale(2, BigDecimal.ROUND_HALF_UP).toString()

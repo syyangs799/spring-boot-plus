@@ -21,6 +21,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -46,6 +47,10 @@ public class InventoryProjectInfoController extends BaseController {
     @OperationLog(name = "添加项目信息表", type = OperationLogType.ADD)
     @ApiOperation(value = "添加项目信息表", response = ApiResult.class)
     public ApiResult<Boolean> addInventoryProjectInfo(@Validated(Add.class) @RequestBody InventoryProjectInfo inventoryProjectInfo) throws Exception {
+        //判断添加时如果没有值 项目时间默认为当前时间
+        if(null == inventoryProjectInfo.getProjectTimes()){
+            inventoryProjectInfo.setProjectTimes(LocalDateTime.now());
+        }
         boolean flag = inventoryProjectInfoService.saveInventoryProjectInfo(inventoryProjectInfo);
         inventoryProjectInfoService.calculateProjectInformation(inventoryProjectInfo.getId());
         return ApiResult.result(flag);

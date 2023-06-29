@@ -43,6 +43,13 @@ public class InventoryProjectInfo extends BaseEntity {
     @LogForUpdate(fieldName = "项目名称")
     private String projectName;
 
+    @ApiModelProperty("项目时间")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @LogForUpdate(fieldName = "项目时间")
+    private LocalDateTime projectTimes;
+
     @ApiModelProperty("商务负责人id")
     private Integer businesserId;
 
