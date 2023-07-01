@@ -2,7 +2,10 @@ package com.syyang.inventory.controller;
 
 import com.google.common.collect.Sets;
 import com.syyang.inventory.entity.InventoryStockBusiness;
+import com.syyang.inventory.entity.InventoryStockInfo;
+import com.syyang.inventory.entity.vo.KeyAndValueVo;
 import com.syyang.inventory.enums.StatusTypeEnum;
+import com.syyang.inventory.param.InventoryStockInfoPageParam;
 import com.syyang.inventory.service.InventoryProjectInfoService;
 import com.syyang.inventory.service.InventoryStockBusinessService;
 import lombok.extern.slf4j.Slf4j;
@@ -137,6 +140,17 @@ public class InventoryStockBusinessController extends BaseController {
     public ApiResult<List<InventoryStockBusiness>> getInventoryStockBusinessDeliveredList(@Validated @RequestBody InventoryStockBusinessPageParam inventoryStockBusinessPageParam) throws Exception {
         List<InventoryStockBusiness> inventoryStockBusinesses = inventoryStockBusinessService.getInventoryStockBusinessDeliveredList(inventoryStockBusinessPageParam);
         return ApiResult.ok(inventoryStockBusinesses);
+    }
+
+    /**
+     * 获得总的库存金额
+     */
+    @PostMapping("/getTotalAmount")
+    @OperationLog(name = "获得当前项目的出库金额", type = OperationLogType.LIST)
+    @ApiOperation(value = "获得当前项目的出库金额", response = InventoryStockInfo.class)
+    public ApiResult<List<KeyAndValueVo>> getTotalAmount(@Validated @RequestBody InventoryStockBusinessPageParam inventoryStockBusinessPageParam) throws Exception {
+        List<KeyAndValueVo> paging = inventoryStockBusinessService.getTotalAmount(inventoryStockBusinessPageParam);
+        return ApiResult.ok(paging);
     }
 
 

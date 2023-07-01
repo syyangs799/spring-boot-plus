@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
 import com.syyang.inventory.entity.*;
+import com.syyang.inventory.entity.vo.KeyAndValueVo;
 import com.syyang.inventory.enums.ProjectOperationTypeEnum;
 import com.syyang.inventory.enums.StatusTypeEnum;
 import com.syyang.inventory.enums.StockBusinessTypeEnum;
@@ -307,6 +308,32 @@ public class InventoryStockBusinessServiceImpl extends BaseServiceImpl<Inventory
             }
         }
         return newIn;
+    }
+
+    @Override
+    public List<KeyAndValueVo> getTotalAmount(InventoryStockBusinessPageParam inventoryStockBusinessPageParam) throws Exception {
+        LambdaQueryWrapper<InventoryStockBusiness> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StrUtil.isNotBlank(inventoryStockBusinessPageParam.getProductId()),InventoryStockBusiness::getProductId,inventoryStockBusinessPageParam.getProductId());
+        wrapper.eq(null != inventoryStockBusinessPageParam.getProjectId(),InventoryStockBusiness::getProjectId,inventoryStockBusinessPageParam.getProjectId());
+        wrapper.eq(null != inventoryStockBusinessPageParam.getType(),InventoryStockBusiness::getType,inventoryStockBusinessPageParam.getType());
+
+        List<KeyAndValueVo> keyAndValueVos = Lists.newArrayList();
+        List<InventoryStockBusiness> inventoryStockBusinesses = inventoryStockBusinessMapper.selectList(wrapper);
+
+        BigDecimal totalAmount = new BigDecimal(0);
+        for (InventoryStockBusiness inventoryStockBusiness : inventoryStockBusinesses) {
+            totalAmount = totalAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryStockBusiness.getProductAmount())));
+        }
+        keyAndValueVos.add(new KeyAndValueVo("当前出库总金额", totalAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
+        //统计当前的入库金额和出库金额
+        BigDecimal totalPageAmount = new BigDecimal(0);
+        Paging<InventoryStockBusiness> inventoryStockBusinessPageList = getInventoryStockBusinessPageList(inventoryStockBusinessPageParam);
+        for (InventoryStockBusiness inventoryStockBusiness : inventoryStockBusinessPageList.getRecords()) {
+            totalPageAmount = totalPageAmount.add(BigDecimal.valueOf(Double.valueOf(inventoryStockBusiness.getProductAmount())));
+        }
+        keyAndValueVos.add(new KeyAndValueVo("当前页出库金额", totalPageAmount.divide(BigDecimal.valueOf(10000)).setScale(4, BigDecimal.ROUND_HALF_UP).toString() + "万元"));
+
+        return keyAndValueVos;
     }
 
 }
